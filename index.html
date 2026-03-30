@@ -157,21 +157,21 @@
         .sold-tag { position: absolute; top: 12px; left: -32px; background: #e74c3c; color: white; padding: 5px 35px; font-size: 9px; font-weight: bold; transform: rotate(-45deg); z-index: 2; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-content { width: 95%; max-width: 500px; padding:10px; background: white; border-radius: 20px; position: relative; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease-out; }
+        .modal-content { width: 100%; max-width: 500px; padding:10px; background: white; border-radius: 20px; position: relative; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .close-modal { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #333; cursor: pointer; z-index: 2010; background: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         
         /* --- Pinch to Zoom & Drag CSS --- */
-        .modal-body { padding: 10px; padding-bottom: 40px; position: relative; overflow: hidden; }
+        .modal-body { padding: 10px; padding-bottom: 10px; position: relative; overflow: hidden; }
         .img-zoom-wrapper { width: 100%; max-height: 350px; border-radius: 12px; overflow: hidden; position: relative; background-color: #fff; }
         .modal-img { width: 100%; border-radius: 12px; object-fit: cover; max-height: 350px; touch-action: none; user-select: none; -webkit-user-drag: none; transform-origin: center center; }
         
         .modal-title { font-family: 'Playfair Display', serif; color: #d4af37; font-size: 18px; margin-top: 15px; }
         .spec-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .spec-table td { padding: 10px 0; border-bottom: 1px solid #f6f6f6; font-size: 14px; }
+        .spec-table td { padding: 10px 20px; border-bottom: 1px solid #f6f6f6; font-size: 14px; }
         .spec-data { text-align: right; font-weight: 600; }
         .desc-container { margin-top: 10px; padding: 12px; background: #fdfaf0; border-left: 2px solid #d4af37; border-radius: 8px; }
-        .whatsapp-btn { background: #25d366; color: white; text-decoration: none; padding: 14px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; margin-top: 20px; }
+        .whatsapp-btn { background: #25d366; color: white; text-decoration: none; padding: 14px; border-radius: 50px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; margin-top: 20px; }
         .is-sold-out-img { filter: grayscale(1); opacity: 0.6; }
         .btn-disabled { background: #999 !important; pointer-events: none; }
 
@@ -299,11 +299,11 @@
                 </div>
                 
                 <h1 id="modalTitle" class="modal-title"></h1>
-                <strong style="color: #511377; font-size:12px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); font-family: 'Playfair Display'"> By ANAMIKA JWELLER'S</strong>
+                <strong style="color: #511377; font-size:12px; font-family: 'Playfair Display'"> By ANAMIKA JWELLER'S</strong>
                 <table class="spec-table">
-                    <tr><td>✨ Purity</td><td id="modalPurity" class="spec-data"></td></tr> 
-                    <tr><td>⚖️ Weight</td><td id="modalWeight" class="spec-data"></td></tr>
-                    <tr><td>🏷️ Code</td><td id="modalCode" class="spec-data"></td></tr>
+                    <tr><td>✨ Purity</td><td id="modalPurity" class="spec-data" style="font-weight: 600; font-size: 13px;"></td></tr> 
+                    <tr><td>⚖️ Weight</td><td id="modalWeight" class="spec-data" style="font-weight: 600; font-size: 13px;" ></td></tr>
+                    <tr><td>🏷️ Code</td><td id="modalCode" class="spec-data" style="font-weight: 600; font-size: 13px;" ></td></tr>
                 </table>
                 <div id="modalDescBox" class="desc-container">
                     <p id="modalDesc" style="font-size:10px; color:#555; line-height:1.5;"></p>
@@ -567,7 +567,7 @@
                             `,
                             showConfirmButton: true,
                             confirmButtonColor: '#d4af37',
-                            confirmButtonText: 'Theek Hai',
+                            confirmButtonText: 'Theek',
                             backdrop: `rgba(0,0,0,0.6)`
                         }).then(() => {
                             localStorage.setItem('lastSeenNoti', noti.timestamp.toString());
@@ -704,7 +704,7 @@
             document.getElementById('modalDescBox').style.display = desc.trim() !== "" ? "block" : "none";
             document.getElementById('modalDesc').innerText = desc;
             
-            const productLink = `https://9098038573.github.io/Anamika-Jwellers/product-detail.html?id=${id}`;
+            const productLink = `https://anamikajwellers-dabra.github.io/anamika/product-detail.html?id=${id}`;
             const waMsg = `Hi Anamika Jewellers, mujhe is item ki enquiry karni hai:\n\n*Item:* ${item.title || id.toUpperCase()}\n*Code:* ${id.toUpperCase()}\n*Weight:* ${item.weight || 'N/A'}\n*Link:* ${productLink}`;
             document.getElementById('modalWaBtn').href = `https://wa.me/919977441399?text=${encodeURIComponent(waMsg)}`;
             

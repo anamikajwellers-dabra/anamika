@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anamika Jeweller's</title>
+    
+    <link rel="preconnect" href="https://anamika-jwellers-default-rtdb.firebaseio.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;400;600&family=Bitter:wght@400;700&display=swap" rel="stylesheet">  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; background-color: #fcfcfb; width: 100%; }
+
+        .header {
+            position:relative;
+            text-align:center;
+            background: linear-gradient(60deg, rgba(84,58,183,1) 0%, rgba(0,172,193,1) 100%);
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            color:white;
+        }
+
+        .waves {
+            position:relative;
+            width: 100%;
+            height:15vh;
+            margin-bottom:-7px; 
+            min-height:100px;
+            max-height:150px;
+            display: block; 
+        }
+
+        .parallax > use { animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite; }
+        .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
+        .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; } 
+        .parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
+        .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
+
+        @keyframes move-forever {
+            0% { transform: translate3d(-90px,0,0); }
+            100% { transform: translate3d(85px,0,0); }
+        }
+
+        .disable-select {
+            user-select: none;
+            -webkit-user-select: none;
+            padding-top: 10px; 
+        }
+
+        .hader-01 {
+            font-family: "Times New Roman", Times, serif;
+            text-align: center;
+            color: gold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            font-size: 20px; 
+            letter-spacing: 1px;
+            display: block;
+        }
+
+        .hader-02 {
+            text-align: center;
+            color: #E5E4E2;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            font-size: 7px; 
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 768px) { .waves { height:30px; min-height:30px; } }
+        
+        .header-section { background: white; padding: 10px 0 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; width: 100%; }
+        .search-container { width: 90%; max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+        
+        /* --- SMART BOTTOM SHEET DRAWER CSS --- */
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 999998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(3px); }
+        .nav-overlay.active { opacity: 1; visibility: visible; }
+        .nav-drawer { position: fixed; bottom: -100%; left: 0; width: 100%; background: #fff; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); z-index: 999999; transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15); border-radius: 35px 35px 0 0; display: flex; flex-direction: column; padding-bottom: 20px; }
+        .nav-drawer.open { bottom: 0; }
+        .drawer-pull-line { width: 40px; height: 5px; background: #ddd; border-radius: 10px; margin: 15px auto 5px auto; }
+        .drawer-header { display: flex; justify-content: center; align-items: center; position: relative; padding: 10px 25px 20px; }
+        .drawer-header h2 { margin: 0; font-size: 24px; font-family: 'Playfair Display', serif; color: #d4af37; }
+        .close-nav-btn { position: absolute; right: 20px; top: 10px; font-size: 20px; background: #f4f4f4; border: none; cursor: pointer; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #555; transition: 0.2s; }
+        .close-nav-btn:active { transform: scale(0.9); }
+        .drawer-links { list-style: none; padding: 10px 20px; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .drawer-links li a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 15px 10px; background: #fdfaf0; color: #444; text-decoration: none; border-radius: 20px; border: 1px solid #f2e6c7; font-size: 12px; font-weight: 600; text-align: center; transition: 0.3s;}
+        .drawer-links li a i { color: #d4af37; font-size: 26px; }
+        .drawer-links li a:active { background: #d4af37; color: white; }
+        .drawer-links li a:active i { color: white; }
+
+        /* SEARCH BAR WITH MENU BUTTON AND QR */
+        .search-bar-wrapper { display: flex; align-items: center; gap: 8px; width: 100%; }
+        .search-menu-btn { background: #d4af37; color: white; border: none; width: 40px; height: 40px; min-width: 40px; border-radius: 50%; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; box-shadow: 0 3px 8px rgba(212,175,55,0.3);}
+        .search-menu-btn:active { transform: scale(0.9); }
+        .input-qr-box { position: relative; flex: 1; display: flex; align-items: center; }
+        #mainSearch { width: 100%; padding: 10px 45px 10px 15px; border-radius: 30px; border: 1.5px solid #d4af37; outline: none; font-size: 13px; background: #fffaf0; }
+        .inner-qr-btn { position: absolute; right: 12px; color: #d4af37; font-size: 18px; background: none; border: none; outline: none; cursor: pointer; transition: 0.2s; }
+        .inner-qr-btn:active { transform: scale(0.9); color: #673ab7; }
+        
+        .category-scroll-wrapper { width: 100%; overflow-x: auto; white-space: nowrap; padding: 5px 0; display: flex; gap: 2px; scrollbar-width: none; -ms-overflow-style: none; }
+        .category-scroll-wrapper::-webkit-scrollbar { display: none; }
+        .cat-card { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; min-width: 70px; }
+        .cat-thumb { width: 60px; height: 60px; border-radius: 12px; border: 2px solid #eee; background-size: cover; background-position: center; transition: 0.3s; position: relative; }
+        .active .cat-thumb { border-color: #d4af37; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3); transform: scale(1.05); }
+        .cat-name { font-size: 10px; font-weight: 800; color: #666; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+        .active .cat-name { color: #d4af37; }
+
+        .container01 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; max-width: 800px; margin: auto; }
+        
+        .gift-item { position: relative; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); text-align: center; overflow: hidden; border: 1px solid #f0f0f0; cursor: pointer; display: flex; flex-direction: column; height: 100%; }
+        
+        /* --- LIKE BUTTON CSS --- */
+        .like-btn { position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.3s; }
+        .like-btn i { color: #ccc; transition: 0.3s; font-size: 16px; }
+        .like-btn.liked i { color: #e74c3c; }
+
+        #modalLikeBtn {
+            width: 45px !important;
+            height: 45px !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        #modalLikeBtn i {
+            font-size: 22px !important; 
+        }
+
+        /* IMAGE FADE-IN CSS */
+        .gift-item img { 
+            width: 100%; 
+            height: 140px; 
+            object-fit: cover; 
+            border-radius: 8px; 
+            display: block; 
+            background-color: #f4f4f4; 
+            opacity: 0; 
+            transition: opacity 0.5s ease-in-out; 
+        }
+        
+        .item-label { font-size: 13px; font-weight: 600; margin: 8px 0 2px; display: block; color: #333; }
+        .item-weight { font-size: 11px; color: #777; margin-bottom: 5px; display: block; }
+        .buy-btn { display: block; padding: 7px; background: #d4af37; color: #000 !important; text-decoration: none; border-radius: 15px; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-top: auto; }
+        .sold-tag { position: absolute; top: 12px; left: -32px; background: #e74c3c; color: white; padding: 5px 35px; font-size: 9px; font-weight: bold; transform: rotate(-45deg); z-index: 2; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { width: 95%; max-width: 500px; padding:10px; background: white; border-radius: 20px; position: relative; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .close-modal { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #333; cursor: pointer; z-index: 2010; background: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        
+        /* --- Pinch to Zoom & Drag CSS --- */
+        .modal-body { padding: 10px; padding-bottom: 40px; position: relative; overflow: hidden; }
+        .img-zoom-wrapper { width: 100%; max-height: 350px; border-radius: 12px; overflow: hidden; position: relative; background-color: #fff; }
+        .modal-img { width: 100%; border-radius: 12px; object-fit: cover; max-height: 350px; touch-action: none; user-select: none; -webkit-user-drag: none; transform-origin: center center; }
+        
+        .modal-title { font-family: 'Playfair Display', serif; color: #d4af37; font-size: 18px; margin-top: 15px; }
+        .spec-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .spec-table td { padding: 10px 0; border-bottom: 1px solid #f6f6f6; font-size: 14px; }
+        .spec-data { text-align: right; font-weight: 600; }
+        .desc-container { margin-top: 10px; padding: 12px; background: #fdfaf0; border-left: 2px solid #d4af37; border-radius: 8px; }
+        .whatsapp-btn { background: #25d366; color: white; text-decoration: none; padding: 14px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; margin-top: 20px; }
+        .is-sold-out-img { filter: grayscale(1); opacity: 0.6; }
+        .btn-disabled { background: #999 !important; pointer-events: none; }
+
+        .search-nav { padding: 10px 20px; max-width: 800px; margin: auto; display: none; }
+        .back-link { text-decoration: none; color: #d4af37; font-weight: bold; font-size: 14px; border: 1px solid #d4af37; padding: 5px 12px; border-radius: 20px; cursor: pointer; }
+        #loader-ring { text-align: center; padding: 30px; width: 100%; }
+        .ring-anim { display: inline-block; width: 30px; height: 30px; border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #d4af37; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- LOGIN SYSTEM CSS --- */
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fdfaf0; z-index: 9999999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .login-box { background: white; padding: 30px 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 380px; text-align: center; border: 2px solid #d4af37; }
+        .login-box h2 { font-family: 'Playfair Display', serif; color: #d4af37; margin-bottom: 5px; font-size: 22px;}
+        .login-input { width: 100%; padding: 12px; margin: 10px 0; border: 1.5px solid #eee; border-radius: 10px; font-size: 16px; outline: none; text-align: center; letter-spacing: 1px; font-family: 'Poppins', sans-serif;}
+        .login-input:focus { border-color: #d4af37; background: #fffaf0; }
+        .login-btn { background: #d4af37; color: white; border: none; padding: 14px; width: 100%; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(212,175,55,0.3); transition: 0.2s;}
+        .login-btn:active { transform: scale(0.96); }
+        .login-logo { width: 80px; height: 80px; margin-bottom: 15px; border-radius: 50%; border: 2px solid #d4af37; padding: 10px; background: #fffaf0;}
+        .divider { display: flex; align-items: center; text-align: center; margin: 15px 0; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #eee; }
+        .divider span { padding: 0 10px; color: #999; font-size: 12px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    
+    <div id="loginModal" class="login-overlay" style="display: none;">
+        <div class="login-box">
+            <img src="https://i.ibb.co/zhHnrgPs/logo.jpg" class="login-logo" alt="Logo">
+            <h2 id="authTitle">Login</h2>
+            <p style="font-size: 12px; color: #666; margin-bottom: 20px;">Kripya apna mobile number darj karein.</p>
+            
+            <input type="tel" id="userPhone" class="login-input" placeholder="Mobile Number (e.g. 9876543210)">
+            <input type="password" id="userPass" class="login-input" placeholder="Password darj karein">
+            
+            <button class="login-btn" id="authBtn" onclick="handleAuth()" style="margin-top:10px;">Login</button>
+            
+            <div style="color: #d4af37; font-size: 13px; cursor: pointer; margin-top: 15px; font-weight: 600; text-decoration: underline;" id="toggleLink" onclick="toggleAuthMode()">Naya account banayein? Sign Up</div>
+
+            <p id="loginError" style="color: #e74c3c; font-size: 12px; margin-top: 15px; display: none; font-weight: 600; line-height: 1.4;"></p>
+        </div>
+        <div style="position: absolute; bottom: 20px; font-size: 11px; color: #888;">Anamika Jewellers - Since 1981</div>
+    </div>
+
+    <div class="header">
+        <div class="disable-select">
+            <div class="hader-01">ANAMIKA JEWELLER'S</div> 
+            <div class="hader-02">since 1981</div>
+        </div>
+        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+            <defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" ></path></defs>
+            <g class="parallax">
+                <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7)" ></use>
+                <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" ></use>
+                <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" ></use>
+                <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" ></use>
+            </g>
+        </svg>
+    </div>
+
+    <div id="navOverlay" class="nav-overlay"></div>
+    <div id="navDrawer" class="nav-drawer">
+        <div class="drawer-pull-line"></div>
+        <div class="drawer-header">
+            <h2>Menu</h2>
+            <button id="closeNavDrawerBtn" class="close-nav-btn">×</button>
+        </div>
+        <ul class="drawer-links">
+            <li><a href="#" onclick="closeNavMenu(); filterByCategory('all'); return false;"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="go:Live radio"><i class="fa-solid fa-radio"></i> Live radio</a></li>
+            <li><a href="#" onclick="closeNavMenu(); showFavorites(); return false;"><i class="fa-solid fa-heart" style="color: #e74c3c;"></i> My Favorites</a></li>
+            <li><a href="https://wa.me/919977441399" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></li>
+            <li><a href="#" onclick="closeNavMenu(); openQrScanner(); return false;"><i class="fa-solid fa-qrcode"></i> Smart Scan</a></li>
+            <li><a href="#" onclick="closeNavMenu(); logoutUser(); return false;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+        </ul>
+    </div>
+
+    <div class="header-section">
+        <div class="search-container">
+            <div class="category-scroll-wrapper" id="chipContainer">
+                <div class="cat-card active" onclick="filterByCategory('all', this)">
+                    <div class="cat-thumb" style="background-image: url('https://i.ibb.co/zhHnrgPs/logo.jpg'); background-size: 60px; background-repeat: no-repeat; background-color: #fffaf0;"></div>
+                    <span class="cat-name">SABHI</span>
+                </div>
+            </div>
+            
+            <div class="search-bar-wrapper">
+                <button id="openNavDrawerBtn" class="search-menu-btn"><i class="fa-solid fa-bars-staggered"></i></button>
+                <div class="input-qr-box">
+                    <input type="text" id="mainSearch" onkeypress="handleSearch(event)" placeholder="Search jewelry...">
+                    <button class="inner-qr-btn" onclick="openQrScanner()"><i class="fa-solid fa-qrcode"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-nav" id="searchNav">
+        <span onclick="window.history.back()" class="back-link">← Back</span>
+        <p id="searchStatus" style="margin-top:15px; font-size: 13px; color: #555; font-weight: 600;"></p>
+    </div>
+
+    <div id="favoritesBanner" style="display: none; padding: 10px 20px; max-width: 800px; margin: auto;">
+        <span onclick="window.history.back()" class="back-link">← Back</span>
+        <h3 style="margin-top: 15px; font-family: 'Playfair Display', serif; color: #e74c3c;"><i class="fa-solid fa-heart"></i> Meri Pasand</h3>
+    </div>
+
+    <div class="container01" id="main-product-list"></div>
+    
+    <div id="loader-ring"><div class="ring-anim"></div><p style="font-size:12px; color:#d4af37; margin-top:5px;">Loading...</p></div>
+
+    <div id="productModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closePopup()">×</span>
+            <div id="modalSoldBanner" style="background:#e74c3c; color:white; text-align:center; padding:8px; font-weight:bold; display:none; border-radius: 20px 20px 0 0;">SOLD OUT</div>
+            <div class="modal-body">
+                <div class="img-zoom-wrapper">
+                    <button id="modalLikeBtn" class="like-btn" onclick="toggleLike(this.getAttribute('data-id'), event)" style="position: absolute; bottom: 10px; left: 10px; z-index: 10;">
+                        <i class="fa-regular fa-heart"></i>
+                    </button>
+                    <img id="modalImg" src="" class="modal-img">
+                </div>
+                <div style="text-align: right; margin-top: 10px;">
+                    <a id="modalForwardBtn" target="_blank" style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px; background: #fdfaf0; border: 1px solid #d4af37; padding: 6px 12px; border-radius: 20px; color: #333; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <i class="fa-brands fa-whatsapp" style="color: #25d366; font-size: 16px;"></i> <span style="font-size: 11px; font-weight: bold;">Forward</span>
+                    </a>
+                </div>
+                
+                <h1 id="modalTitle" class="modal-title"></h1>
+                <strong style="color: #511377; font-size:12px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); font-family: 'Playfair Display'"> By ANAMIKA JWELLER'S</strong>
+                <table class="spec-table">
+                    <tr><td>✨ Purity</td><td id="modalPurity" class="spec-data"></td></tr> 
+                    <tr><td>⚖️ Weight</td><td id="modalWeight" class="spec-data"></td></tr>
+                    <tr><td>🏷️ Code</td><td id="modalCode" class="spec-data"></td></tr>
+                </table>
+                <div id="modalDescBox" class="desc-container">
+                    <p id="modalDesc" style="font-size:10px; color:#555; line-height:1.5;"></p>
+                </div>
+                <a href="#" id="modalWaBtn" class="whatsapp-btn">Inquiry on WhatsApp</a>
+
+                <footer style="text-align: center; color: #888; padding: 25px 0 10px 0; font-size: 11px; width: 100%;">
+                    Anamika Jewellers - Since 1981 <br>
+                    <strong style="color: #d4af37;">QUALITY & TRUST - 2026</strong>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <div id="qrScannerModal" class="modal-overlay" style="z-index: 999999;">
+        <div class="modal-content" style="text-align: center; padding: 20px; background: white; border-radius: 20px; position: relative; width: 95%; max-width: 400px;">
+            <span class="close-modal" onclick="closeQrScanner()" style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; background: #eee; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">×</span>
+            <h3 style="margin-bottom: 15px; font-family: 'Playfair Display', serif; color: #d4af37;">Smart Scan</h3>
+            <div id="qr-reader" style="width: 100%; border: none; border-radius: 12px; overflow: hidden; background: #f4f4f4;"></div>
+            <p style="font-size: 11px; color: #777; margin-top: 15px;">QR Code ya Barcode scan karein</p>
+        </div>
+    </div>
+
+    <div style="width: 90%; max-width: 450px; margin: 10px auto; background: white; padding: 10px; border-radius: 30px; box-shadow: 0 5px 25px rgba(0,0,0,0.05); text-align: center; box-sizing: border-box;">
+        <h2 style="font-size: 22px; color: #333; margin-bottom: 20px;">Contact US</h2>
+        <a href="https://maps.app.goo.gl/n45X4SAhX6wRAgrw5" target="_blank" style="display: flex; align-items: center; padding: 5px; background: #fdfcfb; margin-bottom: 12px; border-radius: 15px; text-decoration: none; color: #333; border: 1px solid #eee; font-size: 15px;">
+            <i class="fa-solid fa-location-dot" style="width: 40px; color: #d4af37; font-size: 18px;"></i> <span style="font-weight: 600;">View on Google Maps</span>
+        </a>
+        <a href="tel:+919977441399" style="display: flex; align-items: center; padding: 5px; background: #fdfcfb; margin-bottom: 12px; border-radius: 15px; text-decoration: none; color: #333; border: 1px solid #eee; font-size: 15px;">
+            <i class="fa-solid fa-phone" style="width: 40px; color: #2e7d32; font-size: 18px;"></i> <span style="font-weight: 600;">+91 9977441399</span>
+        </a>
+        <a href="https://wa.me/919977441399" target="_blank" style="display: flex; align-items: center; padding: 5px; background: #fdfcfb; margin-bottom: 12px; border-radius: 15px; text-decoration: none; color: #333; border: 1px solid #eee; font-size: 15px;">
+            <i class="fa-brands fa-whatsapp" style="width: 40px; color: #25d366; font-size: 22px;"></i> <span style="font-weight: 600;">WhatsApp Us</span>
+        </a>
+        <button onclick="window.open('https://search.google.com/local/writereview?placeid=ChIJRWDIGhsfdzkRefLFW7A27aA')" style="width: 100%; padding: 10px; background: #d4af37; color: white; border: none; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px;">
+            <i class="fa-solid fa-star"></i> Give Google Review
+        </button>
+    </div>
+
+    <footer style="text-align: center; color: #888; padding-bottom: 20px; font-size: 12px; width: 100%; user-select: none;">
+        Anamika Jewellers - Since 1981 <br>   
+        <strong>
+            <script type="text/javascript">
+                copyright=new Date();
+                update=copyright.getFullYear();
+                document.write("QUALITY & TRUST-"+ update + "");
+            </script>
+        </strong>
+    </footer>
+
+    <script>
+        const navOverlay = document.getElementById('navOverlay');
+        const navDrawer = document.getElementById('navDrawer');
+        
+        document.getElementById('openNavDrawerBtn').addEventListener('click', () => {
+            navDrawer.style.transition = 'bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), transform 0.3s ease';
+            navDrawer.classList.add('open');
+            navOverlay.classList.add('active');
+            document.body.style.overflow = "hidden";
+        });
+        
+        const closeNavMenu = () => {
+            navDrawer.classList.remove('open');
+            navOverlay.classList.remove('active');
+            document.body.style.overflow = "auto";
+            setTimeout(() => { navDrawer.style.transform = 'translateY(0)'; }, 400); 
+        };
+        
+        document.getElementById('closeNavDrawerBtn').addEventListener('click', closeNavMenu);
+        navOverlay.addEventListener('click', closeNavMenu);
+
+        let drawerStartY = 0;
+        let drawerCurrentY = 0;
+        let isDrawerDragging = false;
+
+        navDrawer.addEventListener('touchstart', (e) => {
+            drawerStartY = e.touches[0].clientY;
+            isDrawerDragging = true;
+            navDrawer.style.transition = 'none'; 
+        }, { passive: true });
+
+        navDrawer.addEventListener('touchmove', (e) => {
+            if (!isDrawerDragging) return;
+            drawerCurrentY = e.touches[0].clientY;
+            let deltaY = drawerCurrentY - drawerStartY;
+            
+            if (deltaY > 0) { 
+                navDrawer.style.transform = `translateY(${deltaY}px)`;
+            }
+        }, { passive: true });
+
+        navDrawer.addEventListener('touchend', () => {
+            if (!isDrawerDragging) return;
+            isDrawerDragging = false;
+            navDrawer.style.transition = 'bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), transform 0.3s ease'; 
+            
+            let deltaY = drawerCurrentY - drawerStartY;
+            if (deltaY > 80) { 
+                closeNavMenu();
+            } else { 
+                navDrawer.style.transform = 'translateY(0)';
+            }
+            drawerCurrentY = 0;
+        });
+
+        let html5QrCode = null;
+
+        function openQrScanner() {
+            document.getElementById('qrScannerModal').style.display = 'flex';
+            
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("qr-reader");
+            }
+
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText) => {
+                    closeQrScanner();
+                    if (decodedText.startsWith('http')) {
+                        window.location.href = decodedText;
+                    } else {
+                        document.getElementById('mainSearch').value = decodedText;
+                        window.location.href = window.location.pathname + "?search=" + encodeURIComponent(decodedText);
+                    }
+                },
+                (errorMessage) => {}
+            ).catch((err) => {
+                alert("Live Camera nahi khul paya. Local file ke jagah ise Netlify par chalayein.");
+                closeQrScanner();
+            });
+        }
+
+        function closeQrScanner() {
+            document.getElementById('qrScannerModal').style.display = 'none';
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                    html5QrCode = null;
+                }).catch(() => {
+                    html5QrCode.clear();
+                    html5QrCode = null;
+                });
+            }
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoY6noSIMt-YiIVOY7yNiYsKqQLgGmk_M",
+            authDomain: "anamika-jwellers.firebaseapp.com",
+            databaseURL: "https://anamika-jwellers-default-rtdb.firebaseio.com",
+            projectId: "anamika-jwellers",
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        let productData = {}; let inventoryStatus = {}; let allKeys = []; let currentIndex = 0;
+        let userLikes = {}; 
+        let showingFavoritesOnly = false; 
+        let currentState = 'home';
+        const itemsPerPage = 06; let isFetching = false; let isDataFetched = false;
+        let isProductsLoaded = false; let isInventoryLoaded = false; 
+
+        let isLoginMode = true; 
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('authTitle').innerText = isLoginMode ? "Login" : "Sign Up";
+            document.getElementById('authBtn').innerText = isLoginMode ? "Login" : "Create Account";
+            document.getElementById('toggleLink').innerText = isLoginMode ? "Naya account banayein? Sign Up" : "Pehle se account hai? Login karein";
+            document.getElementById('userPass').placeholder = isLoginMode ? "Password darj karein" : "Password banayein";
+        }
+
+        function handleAuth() {
+            let phone = document.getElementById('userPhone').value.trim();
+            let pass = document.getElementById('userPass').value.trim();
+            let errorMsg = document.getElementById('loginError');
+            errorMsg.style.display = 'none';
+
+            phone = phone.replace('+91', '').trim();
+
+            if(phone.length < 10 || pass.length < 6) {
+                errorMsg.innerText = "Sahi Mobile Number (10 digits) aur Password (kam se kam 6 akshar) dalein.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            let fakeEmail = phone + "@anamikajewellers.com";
+            document.getElementById('authBtn').innerText = "Processing...";
+
+            if(isLoginMode) {
+                auth.signInWithEmailAndPassword(fakeEmail, pass).catch(err => {
+                    errorMsg.innerText = "Login Failed: " + err.message;
+                    errorMsg.style.display = 'block';
+                    document.getElementById('authBtn').innerText = "Login";
+                });
+            } else {
+                auth.createUserWithEmailAndPassword(fakeEmail, pass).catch(err => {
+                    errorMsg.innerText = "Sign Up Failed: " + err.message;
+                    errorMsg.style.display = 'block';
+                    document.getElementById('authBtn').innerText = "Create Account";
+                });
+            }
+        }
+
+        function toggleLike(productId, event) {
+            if (event) event.stopPropagation(); 
+            
+            const user = auth.currentUser;
+            if (!user) {
+                alert("Kripya pehle login karein!");
+                return;
+            }
+
+            const likeRef = database.ref('users/' + user.uid + '/likes/' + productId);
+            
+            if (userLikes[productId]) {
+                likeRef.remove(); 
+                if(showingFavoritesOnly) {
+                   const card = document.querySelector(`.like-btn[data-id="${productId}"]`).closest('.gift-item');
+                   if(card) card.style.display = 'none';
+                }
+            } else {
+                likeRef.set(true); 
+            }
+        }
+
+        function listenToUserLikes(uid) {
+            database.ref('users/' + uid + '/likes').on('value', (snapshot) => {
+                userLikes = snapshot.val() || {};
+                
+                const allLikeBtns = document.querySelectorAll('.like-btn');
+                allLikeBtns.forEach(btn => {
+                    const id = btn.getAttribute('data-id');
+                    if (id) {
+                        if (userLikes[id]) {
+                            btn.classList.add('liked');
+                            btn.querySelector('i').className = 'fa-solid fa-heart';
+                        } else {
+                            btn.classList.remove('liked');
+                            btn.querySelector('i').className = 'fa-regular fa-heart';
+                        }
+                    }
+                });
+            });
+        }
+
+        function listenForNotifications() {
+            database.ref('global_notification').on('value', (snap) => {
+                const noti = snap.val();
+                if (noti && noti.title && noti.timestamp) {
+                    const lastSeen = localStorage.getItem('lastSeenNoti');
+                    if (!lastSeen || parseInt(lastSeen) < noti.timestamp) {
+                        Swal.fire({
+                            html: `
+                                <div style="text-align:center;">
+                                    <div style="font-size: 40px; margin-bottom: 10px;">📢</div>
+                                    <h2 style="font-family: 'Playfair Display', serif; color: #e91e63; margin-bottom: 10px; font-size: 20px;">${noti.title}</h2>
+                                    <p style="font-size: 13px; color: #555; line-height: 1.5;">${noti.body}</p>
+                                </div>
+                            `,
+                            showConfirmButton: true,
+                            confirmButtonColor: '#d4af37',
+                            confirmButtonText: 'Theek Hai',
+                            backdrop: `rgba(0,0,0,0.6)`
+                        }).then(() => {
+                            localStorage.setItem('lastSeenNoti', noti.timestamp.toString());
+                        });
+                    }
+                }
+            });
+        }
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('loginModal').style.display = 'none';
+                document.body.style.overflow = "auto";
+                
+                listenToUserLikes(user.uid); 
+                listenForNotifications(); 
+                
+                if(!isDataFetched) {
+                    database.ref('products').on('value', (snap) => {
+                        productData = snap.val() || {};
+                        isProductsLoaded = true;
+                        if (isInventoryLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); }
+                    });
+                    
+                    database.ref('inventory').on('value', (snap) => {
+                        inventoryStatus = snap.val() || {};
+                        isInventoryLoaded = true;
+                        if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); }
+                    });
+                    
+                    isDataFetched = true;
+                }
+            } else {
+                document.getElementById('loginModal').style.display = 'flex';
+                document.body.style.overflow = "hidden";
+            }
+        });
+
+        function logoutUser() {
+            auth.signOut().then(() => {
+                window.location.reload(); 
+            });
+        }
+
+        function updateDynamicThumbs() {
+            const container = document.getElementById('chipContainer');
+            const categories = {};
+            Object.keys(productData).forEach(id => {
+                const item = productData[id];
+                if (item.category && item.category.trim() !== "") {
+                    const catName = item.category.trim();
+                    if (!categories[catName]) categories[catName] = item.image;
+                }
+            });
+            container.innerHTML = `<div class="cat-card active" onclick="filterByCategory('all', this)"><div class="cat-thumb" style="background-image: url('https://i.ibb.co/zhHnrgPs/logo.jpg'); background-size: 60px; background-repeat: no-repeat; background-color: #fffaf0;"></div><span class="cat-name">SABHI</span></div>`;
+            Object.keys(categories).sort().forEach(cat => {
+                const card = document.createElement('div');
+                card.className = 'cat-card'; card.onclick = () => filterByCategory(cat, card);
+                card.innerHTML = `<div class="cat-thumb" style="background-image: url('${categories[cat]}')"></div><span class="cat-name">${cat}</span>`;
+                container.appendChild(card);
+            });
+        }
+
+        function initDisplay() {
+            showingFavoritesOnly = false;
+            document.getElementById('favoritesBanner').style.display = "none";
+            const container = document.getElementById('main-product-list'); 
+            container.innerHTML = "";
+            
+            document.getElementById('loader-ring').style.display = "block";
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const q = urlParams.get('search');
+            if (q) { showSearchPage(q); } else {
+                document.getElementById('searchNav').style.display = "none";
+                allKeys = Object.keys(productData).filter(id => !(inventoryStatus[id] && inventoryStatus[id].isSold === true));
+                allKeys.sort(() => Math.random() - 0.5); currentIndex = 0; renderNextBatch(); setupIntersectionObserver();
+            }
+        }
+
+        let scrollObserver = null; 
+        function setupIntersectionObserver() {
+            if (scrollObserver) {
+                scrollObserver.disconnect();
+            }
+            scrollObserver = new IntersectionObserver((entries) => { 
+                if (entries[0].isIntersecting && !isFetching && !new URLSearchParams(window.location.search).has('search') && !showingFavoritesOnly && currentState === 'home') {
+                    renderNextBatch(); 
+                }
+            }, { rootMargin: '300px' });
+            scrollObserver.observe(document.getElementById('loader-ring'));
+        }
+
+        function createCard(id, container) {
+            const item = productData[id]; if(!item) return;
+            const isSold = inventoryStatus[id] && inventoryStatus[id].isSold === true;
+            
+            const isLikedClass = userLikes[id] ? 'liked' : '';
+            const heartIconClass = userLikes[id] ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+
+            const itemHtml = `<div class="gift-item ${isSold ? 'is-sold' : ''}" onclick="openPopup('${id}')">
+                <button class="like-btn ${isLikedClass}" data-id="${id}" onclick="toggleLike('${id}', event)">
+                    <i class="${heartIconClass}"></i>
+                </button>
+                <div class="sold-tag" style="display: ${isSold ? 'block' : 'none'}">SOLD OUT</div>
+                <img src="${item.image}" alt="${item.title || id}" loading="lazy" onload="this.style.opacity=1">
+                <span class="item-label">${item.title || id}</span>
+                <span class="item-weight">${item.weight || "0"}gm</span>
+                <div class="buy-btn">${isSold ? 'Sold Out' : 'Explore'}</div>
+            </div>`;
+            container.insertAdjacentHTML('beforeend', itemHtml);
+        }
+
+        function openPopup(id) {
+            const item = productData[id]; const inv = inventoryStatus[id];
+            const modal = document.getElementById('productModal');
+            
+            const modalLikeBtn = document.getElementById('modalLikeBtn');
+            modalLikeBtn.setAttribute('data-id', id);
+            if (userLikes[id]) {
+                modalLikeBtn.classList.add('liked');
+                modalLikeBtn.querySelector('i').className = 'fa-solid fa-heart';
+            } else {
+                modalLikeBtn.classList.remove('liked');
+                modalLikeBtn.querySelector('i').className = 'fa-regular fa-heart';
+            }
+
+            document.getElementById('modalImg').src = item.image;
+            document.getElementById('modalTitle').innerText = item.title || "Jewellery Item";
+            document.getElementById('modalPurity').innerText = item.purity || "22K / 916";
+            document.getElementById('modalWeight').innerText = (item.weight || "0") + "gm";
+            document.getElementById('modalCode').innerText = id.toUpperCase();
+            const desc = item.description || item.desc || "";
+            document.getElementById('modalDescBox').style.display = desc.trim() !== "" ? "block" : "none";
+            document.getElementById('modalDesc').innerText = desc;
+            
+            const productLink = `https://9098038573.github.io/Anamika-Jwellers/product-detail.html?id=${id}`;
+            const waMsg = `Hi Anamika Jewellers, mujhe is item ki enquiry karni hai:\n\n*Item:* ${item.title || id.toUpperCase()}\n*Code:* ${id.toUpperCase()}\n*Weight:* ${item.weight || 'N/A'}\n*Link:* ${productLink}`;
+            document.getElementById('modalWaBtn').href = `https://wa.me/919977441399?text=${encodeURIComponent(waMsg)}`;
+            
+            let faviconLink = document.querySelector("link[rel~='icon']");
+            if (!faviconLink) {
+                faviconLink = document.createElement('link');
+                faviconLink.rel = 'icon';
+                document.head.appendChild(faviconLink);
+            }
+            faviconLink.href = item.image;
+
+            const forwardMsg = `Yeh design dekhein Anamika Jewellers se:\n\n*${item.title || id.toUpperCase()}*\nLink: ${productLink}`;
+            document.getElementById('modalForwardBtn').href = `https://wa.me/?text=${encodeURIComponent(forwardMsg)}`;
+
+            if (inv && inv.isSold === true) { 
+                document.getElementById('modalSoldBanner').style.display = 'block'; 
+                document.getElementById('modalImg').classList.add('is-sold-out-img');
+                document.getElementById('modalWaBtn').classList.add('btn-disabled');
+                document.getElementById('modalWaBtn').innerText = "SOLD OUT"; 
+            } else { 
+                document.getElementById('modalSoldBanner').style.display = 'none'; 
+                document.getElementById('modalImg').classList.remove('is-sold-out-img');
+                document.getElementById('modalWaBtn').classList.remove('btn-disabled');
+                document.getElementById('modalWaBtn').innerText = "Inquiry on WhatsApp"; 
+            }
+            modal.style.display = "flex"; document.body.style.overflow = "hidden";
+            history.pushState({ popupOpen: true }, null, window.location.href);
+        }
+
+        function renderNextBatch() {
+            if (currentIndex >= allKeys.length) { document.getElementById('loader-ring').style.display = 'none'; return; }
+            isFetching = true; const container = document.getElementById('main-product-list');
+            const nextKeys = allKeys.slice(currentIndex, currentIndex + itemsPerPage);
+            nextKeys.forEach(id => createCard(id, container)); currentIndex += itemsPerPage; isFetching = false;
+        }
+
+        function showSearchPage(query) {
+            showingFavoritesOnly = false;
+            document.getElementById('favoritesBanner').style.display = "none";
+            const container = document.getElementById('main-product-list'); 
+            const nav = document.getElementById('searchNav');
+            container.innerHTML = ""; 
+            nav.style.display = "block";
+            const lowQuery = query.toLowerCase().trim();
+            
+            let filteredKeys = Object.keys(productData).filter(id => {
+                const item = productData[id];
+                return String(id).toLowerCase().includes(lowQuery) || 
+                       (item.title && String(item.title).toLowerCase().includes(lowQuery)) || 
+                       (item.category && String(item.category).toLowerCase().includes(lowQuery));
+            });
+
+            filteredKeys.sort((a, b) => {
+                let isSoldA = (inventoryStatus[a] && inventoryStatus[a].isSold === true) ? 1 : 0;
+                let isSoldB = (inventoryStatus[b] && inventoryStatus[b].isSold === true) ? 1 : 0;
+                if (isSoldA === isSoldB) { return b.localeCompare(a); }
+                return isSoldA - isSoldB; 
+            });
+
+            filteredKeys.forEach(id => createCard(id, container));
+            document.getElementById('loader-ring').style.display = 'none';
+        }
+
+        function handleSearch(e) { if (e.key === 'Enter') { const val = document.getElementById('mainSearch').value.trim(); if (val) window.location.href = window.location.pathname + "?search=" + encodeURIComponent(val); } }
+        
+        function filterByCategory(category, el) {
+            showingFavoritesOnly = false;
+            document.getElementById('favoritesBanner').style.display = "none";
+            document.getElementById('searchNav').style.display = "none";
+            document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active')); 
+            
+            if(el) {
+                el.classList.add('active'); 
+            } else {
+                const sabhiCard = document.querySelector('.cat-card:first-child');
+                if(sabhiCard) sabhiCard.classList.add('active');
+            }
+            
+            if (category === "all") { 
+                currentState = 'home';
+                initDisplay(); 
+                return; 
+            }
+
+            if (currentState === 'home') {
+                history.pushState({ view: 'category' }, null, window.location.href);
+            } else if (currentState === 'favorites') {
+                history.replaceState({ view: 'category' }, null, window.location.href);
+            }
+            currentState = 'category';
+
+            showSearchPage(category);
+        }
+
+        function showFavorites() {
+            if (currentState === 'home') {
+                history.pushState({ view: 'favorites' }, null, window.location.href);
+            } else if (currentState === 'category') {
+                history.replaceState({ view: 'favorites' }, null, window.location.href);
+            }
+            currentState = 'favorites';
+            
+            showingFavoritesOnly = true;
+            const container = document.getElementById('main-product-list');
+            container.innerHTML = "";
+            document.getElementById('searchNav').style.display = "none";
+            document.getElementById('favoritesBanner').style.display = "block";
+            document.getElementById('loader-ring').style.display = "none";
+            
+            document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+
+            const likedKeys = Object.keys(userLikes).filter(id => userLikes[id] === true && productData[id]);
+            
+            if (likedKeys.length === 0) {
+                container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #777;">
+                    <i class="fa-solid fa-heart-crack" style="font-size: 40px; color: #ddd; margin-bottom: 10px;"></i>
+                    <p>Aapne abhi tak koi jewelry like nahi ki hai.</p>
+                </div>`;
+            } else {
+                likedKeys.forEach(id => createCard(id, container));
+            }
+        }
+
+        /* --- Advanced Pinch to Zoom & Point Double Tap Logic --- */
+        const modalImg = document.getElementById('modalImg');
+        let scale = 1;
+        let panning = false;
+        let pointX = 0, pointY = 0;
+        let startX = 0, startY = 0;
+        let startDistance = 0;
+        let initialScale = 1;
+        
+        let lastTapTime = 0; 
+
+        function resetZoom() {
+            scale = 1; pointX = 0; pointY = 0;
+            modalImg.style.transition = 'transform 0.3s ease'; 
+            modalImg.style.transform = `translate(0px, 0px) scale(1)`;
+        }
+
+        function closePopup() { 
+            const modal = document.getElementById('productModal');
+            if (modal.style.display === "none") return; 
+
+            if (history.state && history.state.popupOpen) {
+                window.history.back();
+            } else {
+                modal.style.display = "none"; 
+                document.body.style.overflow = "auto"; 
+                resetZoom(); 
+            }
+        }
+
+        window.addEventListener('popstate', function(event) {
+            const modal = document.getElementById('productModal');
+            
+            if (modal && modal.style.display === "flex") {
+                modal.style.display = "none";
+                document.body.style.overflow = "auto";
+                resetZoom();
+                return; 
+            } 
+            
+            if (currentState === 'favorites' || currentState === 'category') {
+                currentState = 'home';
+                filterByCategory('all');
+            }
+        });
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('productModal');
+            if (event.target == modal) { closePopup(); }
+        }
+
+        modalImg.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            modalImg.style.transition = 'none'; 
+            
+            if (e.touches.length === 2) {
+                startDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                initialScale = scale;
+            } else if (e.touches.length === 1 && scale > 1) {
+                panning = true;
+                startX = e.touches[0].clientX - pointX;
+                startY = e.touches[0].clientY - pointY;
+            }
+        });
+
+        modalImg.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const wrapper = modalImg.parentElement;
+            const rect = wrapper.getBoundingClientRect();
+            
+            const maxX = (rect.width * (scale - 1)) / 2;
+            const maxY = (rect.height * (scale - 1)) / 2;
+
+            if (e.touches.length === 2) {
+                const currentDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                scale = initialScale * (currentDistance / startDistance);
+                scale = Math.max(1, Math.min(scale, 5)); 
+                
+                pointX = Math.max(-maxX, Math.min(maxX, pointX));
+                pointY = Math.max(-maxY, Math.min(maxY, pointY));
+
+                if (scale === 1) { pointX = 0; pointY = 0; }
+                modalImg.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+                
+            } else if (e.touches.length === 1 && panning && scale > 1) {
+                let newPointX = e.touches[0].clientX - startX;
+                let newPointY = e.touches[0].clientY - startY;
+
+                pointX = Math.max(-maxX, Math.min(maxX, newPointX));
+                pointY = Math.max(-maxY, Math.min(maxY, newPointY));
+
+                startX = e.touches[0].clientX - pointX;
+                startY = e.touches[0].clientY - pointY;
+
+                modalImg.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+            }
+        });
+
+        modalImg.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) { initialScale = scale; }
+            if (e.touches.length === 0) { panning = false; }
+            
+            // --- Naya Point Double Tap Logic Yahan Add Kiya Hai ---
+            let currentTime = new Date().getTime();
+            let tapLength = currentTime - lastTapTime;
+            
+            if (tapLength < 300 && tapLength > 0 && e.changedTouches.length === 1) {
+                if (scale > 1) {
+                    resetZoom();
+                } else {
+                    scale = 2.5; // Zoom ka level
+                    
+                    const rect = modalImg.getBoundingClientRect();
+                    
+                    const tapX = e.changedTouches[0].clientX;
+                    const tapY = e.changedTouches[0].clientY;
+                    
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    const deltaX = tapX - centerX;
+                    const deltaY = tapY - centerY;
+                    
+                    let newPointX = -deltaX * (scale - 1);
+                    let newPointY = -deltaY * (scale - 1);
+                    
+                    const maxX = (rect.width * (scale - 1)) / 2;
+                    const maxY = (rect.height * (scale - 1)) / 2;
+                    
+                    pointX = Math.max(-maxX, Math.min(maxX, newPointX));
+                    pointY = Math.max(-maxY, Math.min(maxY, newPointY));
+
+                    modalImg.style.transition = 'transform 0.3s ease';
+                    modalImg.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+                }
+            }
+            lastTapTime = currentTime;
+            // --------------------------------------------------------
+        });
+    </script>
+</body>
+</html>

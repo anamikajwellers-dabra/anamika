@@ -183,7 +183,7 @@
 
         /* --- LOGIN SYSTEM CSS --- */
         .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fdfaf0; z-index: 9999999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .login-box { background: white; padding: 30px 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 380px; text-align: center; border: 2px solid #d4af37; }
+        .login-box { background: white; padding: 30px 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 380px; text-align: center; border: 2px solid #d4af37; transition: background-color 0.3s ease; }
         .login-box h2 { font-family: 'Playfair Display', serif; color: #d4af37; margin-bottom: 5px; font-size: 22px;}
         .login-input { width: 100%; padding: 12px; margin: 10px 0; border: 1.5px solid #eee; border-radius: 10px; font-size: 16px; outline: none; text-align: center; letter-spacing: 1px; font-family: 'Poppins', sans-serif;}
         .login-input:focus { border-color: #d4af37; background: #fffaf0; }
@@ -209,6 +209,7 @@
             <button class="login-btn" id="authBtn" onclick="handleAuth()" style="margin-top:10px;">Login</button>
             
             <div style="color: #000000; font-size: 13px; cursor: pointer; margin-top: 15px; font-weight: 600; text-decoration: underline;" id="toggleLink" onclick="toggleAuthMode()">Naya account banayein? Sign Up</div>
+            <div style="color: #e74c3c; font-size: 12px; cursor: pointer; margin-top: 12px; font-weight: 600;" onclick="forgotPassword()">🔒 Password bhool gaye?</div>
 
             <p id="loginError" style="color: #e74c3c; font-size: 12px; margin-top: 15px; display: none; font-weight: 600; line-height: 1.4;"></p>
         </div>
@@ -469,12 +470,35 @@
 
         let isLoginMode = true; 
 
+        function forgotPassword() {
+            let phone = document.getElementById('userPhone').value.trim();
+            let errorMsg = document.getElementById('loginError');
+            
+            if(!phone || phone.length < 10) {
+                errorMsg.innerText = "Kripya upar apna Mobile Number dalein aur phir 'Password bhool gaye?' par click karein.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            let waMsg = `Hi Anamika Jewellers, main apna password bhool gaya/gayi hu. Kripya mera account reset karein.\n\nMera mobile number hai: ${phone}`;
+            window.open(`https://wa.me/919977441399?text=${encodeURIComponent(waMsg)}`, '_blank');
+        }
+
         function toggleAuthMode() {
             isLoginMode = !isLoginMode;
             document.getElementById('authTitle').innerText = isLoginMode ? "Login" : "Sign Up";
             document.getElementById('authBtn').innerText = isLoginMode ? "Login" : "Create Account";
             document.getElementById('toggleLink').innerText = isLoginMode ? "Naya account banayein? Sign Up" : "Pehle se account hai? Login karein";
             document.getElementById('userPass').placeholder = isLoginMode ? "Password" : "Password banayein";
+            
+            // --- Naya logic box ka color badalne ke liye ---
+            let loginBox = document.querySelector('.login-box');
+            if(isLoginMode) {
+                loginBox.style.backgroundColor = "white"; // Login mode (Safed)
+            } else {
+                loginBox.style.backgroundColor = "#f0f8ff"; // Sign Up mode (Halka Blue)
+            }
+            // ----------------------------------------------
         }
 
         function handleAuth() {

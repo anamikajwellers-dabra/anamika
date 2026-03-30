@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anamika Admin | Sticky Controls</title>
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; background-color: #fcfcfb; overflow-x: hidden; width: 100%; }
+        #login-section { max-width: 100%; margin: 80px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        #login-section input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        #login-section button { width: 100%; padding: 12px; background: #d4af37; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .forgot-link { display: block; margin-top: 15px; font-size: 12px; color: #1976d2; text-decoration: none; cursor: pointer; }
+
+        #admin-content { display: none; }
+
+        .sticky-header { position: sticky; top: 0; background: #f4f4f4; z-index: 1000; padding-top: 5px; padding-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { color: #d4af37; text-align: center; font-size: 18px; margin: 5px 0; }
+        
+        .top-action-bar { max-width: 550px; margin: 0 auto 10px auto; display: flex; flex-wrap: wrap; gap: 5px; padding: 0 10px; }
+        .btn-action { flex: 1; min-width: 80px; padding: 8px 2px; border-radius: 6px; border: none; font-size: 9px; font-weight: 700; color: white; cursor: pointer; text-align: center; text-transform: uppercase; }
+        .bg-gold { background: #d4af37; } .bg-blue { background: #1976d2; } .bg-green { background: #2e7d32; } .bg-red { background: #c62828; } .bg-purple { background: #673ab7; } .bg-orange { background: #ff9800; } .bg-pink { background: #e91e63; }
+
+        .tabs-container { display: flex; max-width: 550px; margin: 0 auto 10px auto; padding: 0 10px; gap: 10px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 13px; background: #e0e0e0; color: #666; }
+        .tab-btn.active-tab { background: #d4af37; color: white; }
+
+        #weight-box { max-width: 530px; margin: 0 auto 10px auto; background: #fff; border: 1.5px solid #d4af37; padding: 10px; border-radius: 12px; display: none; text-align: center; }
+        .search-container { max-width: 550px; margin: 0 auto 5px auto; padding: 0 10px; }
+        #smartSearch { width: 100%; height: 30px; padding: 12px 15px; border-radius: 25px; border: 1.5px solid #d4af37; outline: none; box-sizing: border-box; background: white; }
+
+        .product-card { background: white; display: flex; align-items: center; padding: 10px; margin: 8px auto; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); max-width: 550px; gap: 12px; border: 1px solid #eee; }
+        .prod-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; }
+        .info { flex-grow: 1; } .info strong { display: block; font-size: 11px; }
+        
+        .action-area { display: flex; align-items: center; gap: 5px; } 
+        .btn-status { padding: 8px 10px; border-radius: 6px; border: none; font-size: 10px; min-width: 75px; font-weight: 800; cursor: pointer; }
+        .btn-delete { background: none; border: none; color: #ff5252; cursor: pointer; font-size: 18px; padding: 5px; border-radius: 5px; }
+        .btn-info { background: none; border: none; cursor: pointer; font-size: 18px; padding: 5px; border-radius: 5px; }
+        #excelFile { display: none; }
+        
+        .swal-custom-input { width: 90%; margin: 8px auto; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; display: block;}
+    </style>
+</head>
+<body>
+
+    <div id="login-section">
+        <h2 style="color:#d4af37;">Anamika Admin</h2>
+        <input type="email" id="email" placeholder="Admin Email">
+        <input type="password" id="pass" placeholder="Password">
+        <button onclick="login()">LOGIN</button>
+        <span class="forgot-link" onclick="resetPassword()">Forgot Password?</span>
+    </div>
+
+    <div id="admin-content">
+        <div class="sticky-header">
+            <div class="top-action-bar">
+                <button onclick="addNewProduct()" class="btn-action bg-gold">➕ Add Item</button>
+                <button onclick="toggleWeightCalc()" class="btn-action bg-purple">⚖️ Weight</button>
+                <button onclick="downloadBackup()" class="btn-action bg-blue">📥 Backup</button>
+                <label for="excelFile" class="btn-action bg-green">📤 Upload</label>
+                <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" onchange="importAndSync()">
+                <button onclick="showUsersList()" class="btn-action bg-orange">👥 Users</button>
+                
+                <button onclick="sendNotification()" class="btn-action bg-pink">📢 Notify</button>
+                
+                <button onclick="logout()" class="btn-action bg-red">Logout</button>
+            </div>
+            <div id="weight-box">
+                <div style="display:flex; justify-content:space-around;">
+                    <div><small>LIVE</small><div id="live-weight-display" style="font-weight:bold; color:#2e7d32;">0g</div></div>
+                    <div style="width:1px; background:#ddd;"></div>
+                    <div><small>SOLD</small><div id="sold-weight-display" style="font-weight:bold; color:#c62828;">0g</div></div>
+                </div>
+            </div>
+            <div class="search-container">
+                <input type="text" id="smartSearch" onkeyup="smartFilter()" placeholder="Search Name/ID/Category...">
+            </div>
+            <div class="tabs-container">
+                <button id="btn-live" class="tab-btn active-tab" onclick="switchTab('live')">📦 ACTIVE (<span id="live-count">0</span>)</button>
+                <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">📁 ARCHIVE (<span id="sold-count">0</span>)</button>
+            </div>
+        </div>
+        <div id="list-container" style="padding: 0 10px; margin-top: 10px;"></div>
+    </div>
+
+    <script>
+        // === YAHAN APNI IMGBB API KEY PASTE KAREIN ===
+        const IMGBB_API_KEY = "92c27dba00b654deddf7dadcbe8aa9a6"; 
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoY6noSIMt-YiIVOY7yNiYsKqQLgGmk_M",
+            authDomain: "anamika-jwellers.firebaseapp.com",
+            databaseURL: "https://anamika-jwellers-default-rtdb.firebaseio.com",
+            projectId: "anamika-jwellers"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        let allProducts = {}; let inventoryStatus = {}; let currentTab = 'live';
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+                loadData();
+            } else {
+                document.getElementById('login-section').style.display = 'block';
+                document.getElementById('admin-content').style.display = 'none';
+            }
+        });
+
+        function login() {
+            const e = document.getElementById('email').value.trim();
+            const p = document.getElementById('pass').value;
+            if(!e || !p) return Swal.fire('Error', 'Please enter Email & Password', 'error');
+            auth.signInWithEmailAndPassword(e, p).catch(err => Swal.fire('Login Error', err.message, 'error'));
+        }
+
+        function resetPassword() {
+            const email = document.getElementById('email').value.trim();
+            if (!email) return Swal.fire('Email?', 'Please enter email first', 'info');
+            auth.sendPasswordResetEmail(email).then(() => Swal.fire('Sent', 'Reset link sent to email', 'success'));
+        }
+
+        function logout() {
+            Swal.fire({
+                title: 'Logout?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d4af37',
+                confirmButtonText: 'Yes'
+            }).then((res) => { if(res.isConfirmed) auth.signOut(); });
+        }
+
+        function loadData() {
+            database.ref('products').on('value', snap => { allProducts = snap.val() || {}; renderList(); calculateWeights(); });
+            database.ref('inventory').on('value', snap => { inventoryStatus = snap.val() || {}; renderList(); calculateWeights(); });
+        }
+
+        // --- NAYA FUNCTION: NOTIFICATION BHEJNE KE LIYE ---
+        function sendNotification() {
+            Swal.fire({
+                title: '📢 Sabhi ko Message bhejein',
+                html: `
+                    <input id="notiTitle" class="swal-custom-input" placeholder="Title (Jaise: Diwali Dhamaka!)" style="font-weight:bold;">
+                    <textarea id="notiBody" class="swal-custom-input" placeholder="Yahan apna lamba message likhein..." rows="3"></textarea>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Send Notification',
+                confirmButtonColor: '#e91e63',
+                preConfirm: () => {
+                    const title = document.getElementById('notiTitle').value.trim();
+                    const body = document.getElementById('notiBody').value.trim();
+                    if (!title || !body) {
+                        Swal.showValidationMessage('Title aur Message dono likhna zaroori hai!');
+                        return false;
+                    }
+                    return {
+                        title: title,
+                        body: body,
+                        timestamp: new Date().getTime(), // Current time bhej rahe hain
+                        readBy: {} // Ye list banegi baad mein padhne walo ki
+                    };
+                }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    // Firebase mein message save karein
+                    database.ref('global_notification').set(res.value)
+                    .then(() => {
+                        Swal.fire('Sent!', 'Message safaltapoorvak sabhi users ke database mein update kar diya gaya hai.', 'success');
+                    })
+                    .catch(err => {
+                        Swal.fire('Error', err.message, 'error');
+                    });
+                }
+            });
+        }
+        // --------------------------------------------------
+
+        function setUserName(uid, currentName, event) {
+            event.preventDefault(); 
+            event.stopPropagation();
+            
+            Swal.fire({
+                title: 'User ka naam likhein',
+                input: 'text',
+                inputValue: currentName,
+                inputPlaceholder: 'Jaise: Rahul Sharma',
+                showCancelButton: true,
+                confirmButtonText: 'Save',
+                confirmButtonColor: '#d4af37'
+            }).then(res => {
+                if (res.isConfirmed) {
+                    database.ref('user_names/' + uid).set(res.value).then(() => {
+                        showUsersList(uid); 
+                    }).catch(err => {
+                        Swal.fire('Permission Denied', 'Kripya pehle Firebase Rules update karein.', 'error');
+                    });
+                }
+            });
+        }
+
+        function deleteUserRecord(uid, name, event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            Swal.fire({
+                title: 'Delete User Data?',
+                text: `Kya aap sach mein ${name} ka sara Likes data hamesha ke liye delete karna chahte hain?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#c62828',
+                confirmButtonText: 'Haan, Delete karein'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Promise.all([
+                        database.ref('users/' + uid).remove(),
+                        database.ref('user_names/' + uid).remove()
+                    ]).then(() => {
+                        Swal.fire('Deleted!', 'User ka data hat gaya hai.', 'success').then(() => {
+                            showUsersList();
+                        });
+                    }).catch(err => {
+                        Swal.fire('Error', err.message, 'error');
+                    });
+                }
+            });
+        }
+
+        function showUsersList(openUid = null) {
+            Swal.fire({
+                title: 'Fetching Data...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            Promise.all([
+                database.ref('users').once('value'),
+                database.ref('user_names').once('value')
+            ]).then(([usersSnap, namesSnap]) => {
+                const usersData = usersSnap.val() || {};
+                const namesData = namesSnap.val() || {};
+                const userIds = Object.keys(usersData);
+                
+                if (userIds.length === 0) {
+                    Swal.fire('No Users', 'Abhi tak kisi user ne app mein kuch Like (Favorite) nahi kiya hai.', 'info');
+                    return;
+                }
+
+                let htmlContent = `<div style="text-align:left; max-height:350px; overflow-y:auto; background:#fff; padding:0; border-radius:8px;">`;
+                htmlContent += `<p style="color:#d4af37; font-size:16px; margin:10px 5px;"><strong>Total Active Users: ${userIds.length}</strong></p><ul style="padding:0; list-style:none; margin:0;">`;
+                
+                userIds.forEach((uid, index) => {
+                    let likesObj = usersData[uid].likes || {};
+                    let likedIds = Object.keys(likesObj).filter(id => likesObj[id] === true);
+                    let likesCount = likedIds.length;
+                    
+                    let productListItems = '';
+                    if (likesCount > 0) {
+                        productListItems = likedIds.map(id => {
+                            let prodName = allProducts[id] ? allProducts[id].title : "Item";
+                            return `
+                                <div onclick="viewLikedProduct('${id}', '${uid}')" style="background:#e8f5e9; color:#2e7d32; padding:8px 10px; border-radius:6px; margin:4px 0; font-size:12px; border: 1px solid #c8e6c9; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+                                    <span>${prodName} <b>(${id.toUpperCase()})</b></span>
+                                    <i class="fa-solid fa-eye"></i>
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        productListItems = `<div style="color:#888; font-style:italic; padding:5px 0; font-size:12px;">Koi item pasand nahi kiya.</div>`;
+                    }
+
+                    let isOpen = (openUid === uid) ? 'open' : '';
+                    let customName = namesData[uid] || '';
+                    let displayName = customName ? customName : `User ${index + 1}`;
+                    let safeName = customName.replace(/'/g, "\\'"); 
+                    
+                    htmlContent += `
+                    <li style="border-bottom:1px solid #eee;">
+                        <details ${isOpen}>
+                            <summary style="cursor:pointer; outline:none; padding:12px 2px; display:flex; justify-content:space-between; align-items:center; list-style:none;">
+                                <div style="display:flex; align-items:center; gap:6px; font-size:11px; color:#777; flex-wrap:wrap; width: 75%;">
+                                    <span style="font-weight:bold; font-size:13px; color:#333;">${displayName}</span>
+                                    <span onclick="setUserName('${uid}', '${safeName}', event)" style="color:#1976d2; padding:2px 6px; border-radius:4px; background:#e3f2fd; font-weight:bold; cursor:pointer;"><i class="fa-solid fa-pen-to-square"></i></span>
+                                    <span onclick="deleteUserRecord('${uid}', '${safeName}', event)" style="color:#c62828; padding:2px 6px; border-radius:4px; background:#ffebee; font-weight:bold; cursor:pointer;"><i class="fa-solid fa-trash"></i></span>
+                                    <div style="width:100%; word-break:break-all; margin-top:2px;">${uid}</div>
+                                </div>
+                                <div style="color:#e74c3c; font-weight:bold; font-size:12px; background:#ffebee; padding:4px 8px; border-radius:15px; white-space:nowrap; margin-left:5px; flex-shrink:0;">
+                                    ❤️ ${likesCount} ▾
+                                </div>
+                            </summary>
+                            <div style="padding:0 2px 10px 2px;">
+                                ${productListItems}
+                            </div>
+                        </details>
+                    </li>`;
+                });
+                htmlContent += `</ul></div>`;
+                
+                htmlContent += `<p style="font-size:10px; color:#888; margin-top:12px; line-height:1.4;">Note: Users ke Asli Mobile Numbers dekhne ke liye apne Firebase Console mein <b>'Authentication'</b> tab par jayen aur is ID se match karein.</p>`;
+
+                Swal.fire({
+                    title: '👥 Users & Likes',
+                    html: htmlContent,
+                    confirmButtonColor: '#d4af37',
+                    confirmButtonText: 'Close',
+                    width: '450px' 
+                });
+
+            }).catch(err => {
+                Swal.fire('Permission Denied!', 'Aapko Users ka data padhne ki permission nahi hai. Kripya pehle Firebase Rules update karein.<br><br>Error: ' + err.message, 'error');
+            });
+        }
+
+        function viewLikedProduct(id, uid) {
+            const item = allProducts[id];
+            if(!item) {
+                Swal.fire('Not Found', 'Yeh item ab database mein nahi hai ya delete ho chuka hai.', 'error')
+                .then(() => { showUsersList(uid); }); 
+                return;
+            }
+
+            Swal.fire({
+                title: item.title || 'Jewelry Item',
+                html: `
+                    <div style="text-align:center;">
+                        <img src="${item.image}" style="max-width:100%; height:200px; object-fit:cover; border-radius:10px; margin-bottom:15px; border:1px solid #eee;" onerror="this.src='https://via.placeholder.com/200'">
+                        <p style="margin:5px 0;"><strong>ID:</strong> ${id.toUpperCase()}</p>
+                        <p style="margin:5px 0;"><strong>Weight:</strong> ${item.weight || 'N/A'} gm</p>
+                        <p style="margin:5px 0;"><strong>Purity:</strong> ${item.purity || 'N/A'}</p>
+                        <p style="margin:5px 0;"><strong>Category:</strong> ${item.category || 'N/A'}</p>
+                        ${item.desc ? `<p style="margin:10px 0; font-size:12px; color:#555; background:#f4f4f4; padding:8px; border-radius:5px;">${item.desc}</p>` : ''}
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonColor: '#d4af37',
+                cancelButtonColor: '#666',
+                confirmButtonText: 'Close',
+                cancelButtonText: '⬅ Back to Users'
+            }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.cancel) {
+                    showUsersList(uid);
+                }
+            });
+        }
+
+        function editProduct(id) {
+            const item = allProducts[id];
+            if(!item) return;
+
+            let uniqueCategories = [...new Set(Object.values(allProducts).map(p => p.category).filter(Boolean))];
+            let uniquePurities = [...new Set(Object.values(allProducts).map(p => p.purity).filter(Boolean))];
+            let uniqueTitles = [...new Set(Object.values(allProducts).map(p => p.title).filter(Boolean))];
+
+            let categoryOptions = uniqueCategories.map(c => `<option value="${c}">`).join('');
+            let purityOptions = uniquePurities.map(p => `<option value="${p}">`).join('');
+            let titleOptions = uniqueTitles.map(t => `<option value="${t}">`).join('');
+
+            Swal.fire({
+                title: 'Edit Product',
+                html: `
+                    <datalist id="cat-list">${categoryOptions}</datalist>
+                    <datalist id="pur-list">${purityOptions}</datalist>
+                    <datalist id="tit-list">${titleOptions}</datalist>
+
+                    <div style="text-align:left; font-size:12px; color:#888; margin-left:5%;">Product ID: ${id.toUpperCase()} (Cannot be changed)</div>
+                    <input id="editTitle" class="swal-custom-input" placeholder="Product Name/Title" list="tit-list" value="${item.title || ''}">
+                    <input id="editWeight" class="swal-custom-input" placeholder="Weight (in gm)" type="number" step="0.01" value="${item.weight || ''}">
+                    <input id="editPurity" class="swal-custom-input" placeholder="Purity (e.g., 22K)" list="pur-list" value="${item.purity || ''}">
+                    <input id="editCategory" class="swal-custom-input" placeholder="Category" list="cat-list" value="${item.category || ''}">
+                    <textarea id="editDesc" class="swal-custom-input" placeholder="Description" rows="2">${item.desc || ''}</textarea>
+                    
+                    <div style="text-align:left; width:90%; margin:15px auto 5px auto; font-size:12px; font-weight:bold; color:#666;">📸 Change Image (Optional):</div>
+                    <input id="editImageFile" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">
+                    <div style="font-size:12px; font-weight:bold; margin:5px 0;">-- OR --</div>
+                    <input id="editImageUrl" class="swal-custom-input" placeholder="Paste Image Link (URL)" value="${item.image || ''}">
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Update Details',
+                confirmButtonColor: '#1976d2',
+                showLoaderOnConfirm: true,
+                preConfirm: async () => {
+                    let finalImageUrl = document.getElementById('editImageUrl').value;
+                    const imageFile = document.getElementById('editImageFile').files[0];
+
+                    if (imageFile) {
+                        const formData = new FormData();
+                        formData.append('image', imageFile);
+                        try {
+                            const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+                            const result = await response.json();
+                            if(result.success) { finalImageUrl = result.data.url; } 
+                            else { Swal.showValidationMessage('Image upload fail: ' + result.error.message); return false; }
+                        } catch (error) {
+                            Swal.showValidationMessage('Image upload mein dikkat aayi.'); return false;
+                        }
+                    }
+                    return {
+                        title: document.getElementById('editTitle').value,
+                        weight: document.getElementById('editWeight').value,
+                        purity: document.getElementById('editPurity').value,
+                        category: document.getElementById('editCategory').value,
+                        desc: document.getElementById('editDesc').value,
+                        image: finalImageUrl 
+                    };
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((res) => {
+                if(res.isConfirmed) {
+                    database.ref('products/' + id).update(res.value)
+                    .then(() => { Swal.fire('Updated!', 'Product successfully update ho gaya hai.', 'success'); })
+                    .catch(err => { Swal.fire('Permission Denied!', 'Firebase Error: Aapko rules dwara roka gaya hai.<br><br>' + err.message, 'error'); });
+                }
+            });
+        }
+
+        function addNewProduct() {
+            let uniqueCategories = [...new Set(Object.values(allProducts).map(p => p.category).filter(Boolean))];
+            let uniquePurities = [...new Set(Object.values(allProducts).map(p => p.purity).filter(Boolean))];
+            let uniqueTitles = [...new Set(Object.values(allProducts).map(p => p.title).filter(Boolean))];
+
+            let categoryOptions = uniqueCategories.map(c => `<option value="${c}">`).join('');
+            let purityOptions = uniquePurities.map(p => `<option value="${p}">`).join('');
+            let titleOptions = uniqueTitles.map(t => `<option value="${t}">`).join('');
+
+            Swal.fire({
+                title: 'Add New Product',
+                html: `
+                    <datalist id="cat-list">${categoryOptions}</datalist>
+                    <datalist id="pur-list">${purityOptions}</datalist>
+                    <datalist id="tit-list">${titleOptions}</datalist>
+
+                    <input id="addId" class="swal-custom-input" placeholder="Product ID (e.g., RNG001)">
+                    <input id="addTitle" class="swal-custom-input" placeholder="Product Name/Title" list="tit-list">
+                    <input id="addWeight" class="swal-custom-input" placeholder="Weight (in gm)" type="number" step="0.01">
+                    <input id="addPurity" class="swal-custom-input" placeholder="Purity (e.g., 22K)" list="pur-list">
+                    <input id="addCategory" class="swal-custom-input" placeholder="Category (e.g., Ring, Chain)" list="cat-list">
+                    <textarea id="addDesc" class="swal-custom-input" placeholder="Description" rows="2"></textarea>
+                    
+                    <div style="text-align:left; width:90%; margin:15px auto 5px auto; font-size:12px; font-weight:bold; color:#666;">📸 Upload Image:</div>
+                    <input id="addImageFile" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">
+                    <div style="font-size:12px; font-weight:bold; margin:5px 0;">-- OR --</div>
+                    <input id="addImageUrl" class="swal-custom-input" placeholder="Paste Image Link (URL)">
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Save Product',
+                confirmButtonColor: '#d4af37',
+                showLoaderOnConfirm: true,
+                preConfirm: async () => {
+                    const id = document.getElementById('addId').value.trim().toLowerCase();
+                    if (!id) { Swal.showValidationMessage('Product ID dalna zaroori hai!'); return false; }
+                    if (allProducts[id]) { Swal.showValidationMessage('Ye ID pehle se maujood hai!'); return false; }
+
+                    let finalImageUrl = document.getElementById('addImageUrl').value;
+                    const imageFile = document.getElementById('addImageFile').files[0];
+
+                    if (imageFile) {
+                        const formData = new FormData();
+                        formData.append('image', imageFile);
+                        try {
+                            const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+                            const result = await response.json();
+                            if(result.success) { finalImageUrl = result.data.url; } 
+                            else { Swal.showValidationMessage('Image upload fail: ' + result.error.message); return false; }
+                        } catch (error) {
+                            Swal.showValidationMessage('Image upload mein dikkat aayi.'); return false;
+                        }
+                    }
+
+                    return {
+                        id: id,
+                        title: document.getElementById('addTitle').value,
+                        weight: document.getElementById('addWeight').value,
+                        purity: document.getElementById('addPurity').value,
+                        category: document.getElementById('addCategory').value,
+                        desc: document.getElementById('addDesc').value,
+                        image: finalImageUrl 
+                    };
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((res) => {
+                if(res.isConfirmed) {
+                    const data = res.value;
+                    const pId = data.id;
+
+                    Promise.all([
+                        database.ref('products/' + pId).set({
+                            title: data.title,
+                            weight: data.weight,
+                            purity: data.purity,
+                            category: data.category,
+                            image: data.image,
+                            desc: data.desc
+                        }),
+                        database.ref('inventory/' + pId).set({ isSold: false })
+                    ])
+                    .then(() => {
+                        Swal.fire('Added!', 'Naya product safaltapoorvak add ho gaya hai.', 'success');
+                    })
+                    .catch(err => {
+                        Swal.fire('Permission Denied!', 'Firebase ne block kar diya hai. Kripya Database Rules aur apni login Email match karein.<br><br>Error: ' + err.message, 'error');
+                    });
+                }
+            });
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('btn-live').classList.toggle('active-tab', tab === 'live');
+            document.getElementById('btn-archive').classList.toggle('active-tab', tab === 'archive');
+            renderList();
+        }
+
+        function renderList() {
+            const list = document.getElementById('list-container');
+            list.innerHTML = '';
+            let lCount = 0; let sCount = 0;
+            
+            const keys = Object.keys(allProducts).reverse();
+
+            keys.forEach(id => {
+                const isSold = inventoryStatus[id] ? inventoryStatus[id].isSold : false;
+                if(isSold) sCount++; else lCount++;
+                if ((currentTab === 'live' && !isSold) || (currentTab === 'archive' && isSold)) {
+                    const item = allProducts[id];
+                    
+                    let infoBtn = isSold ? `<button class="btn-info" onclick="viewSaleDetails('${id}')" title="Customer Details">👁️</button>` : '';
+                    let editBtn = `<button class="btn-info" onclick="editProduct('${id}')" title="Edit Item">✏️</button>`;
+
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <img src="${item.image}" class="prod-img" onerror="this.src='https://via.placeholder.com/50'">
+                        <div class="info">
+                            <strong>${item.title}</strong>
+                            <span style="font-size:11px; color:#888;">ID: ${id.toUpperCase()} </span>
+                            <span style="font-size:10px; color:#000000;"> Wt: ${item.weight}gm </span>
+                        </div>
+                        <div class="action-area">
+                            ${infoBtn}
+                            ${editBtn}
+                            <button class="btn-status" 
+                                style="background:${isSold ? '#ffebee' : '#e8f5e9'}; color:${isSold ? '#c62828' : '#2e7d32'}"
+                                onclick="toggleStatus('${id}', ${isSold}, '${item.title}')">
+                                ${isSold ? 'RESTORE' : '[SOLD]'}
+                            </button>
+                            <button class="btn-delete" onclick="deleteItem('${id}', '${item.title}')" title="Delete Item">🗑️</button>
+                        </div>`;
+                    list.appendChild(card);
+                }
+            });
+            document.getElementById('live-count').innerText = lCount;
+            document.getElementById('sold-count').innerText = sCount;
+        }
+
+        function toggleStatus(id, currentSold, title) {
+            if (!currentSold) {
+                let d = new Date(); let dd = String(d.getDate()).padStart(2, '0'); let mm = String(d.getMonth() + 1).padStart(2, '0'); let yyyy = d.getFullYear();
+                let todayFormatted = dd + '/' + mm + '/' + yyyy;
+
+                Swal.fire({
+                    title: 'Sell Details',
+                    html: `
+                        <input id="saleName" class="swal-custom-input" placeholder="Customer Name">
+                        <input id="salePhone" class="swal-custom-input" placeholder="Phone Number" type="tel">
+                        <input id="salePrice" class="swal-custom-input" placeholder="Selling Price (₹)" type="number">
+                        <input id="saleDate" class="swal-custom-input" type="text" placeholder="DD/MM/YYYY" value="${todayFormatted}">
+                    `,
+                    showCancelButton: true, confirmButtonText: 'Save & Mark Sold', confirmButtonColor: '#2e7d32',
+                    preConfirm: () => {
+                        return { name: document.getElementById('saleName').value, phone: document.getElementById('salePhone').value, price: document.getElementById('salePrice').value, date: document.getElementById('saleDate').value }
+                    }
+                }).then((res) => {
+                    if(res.isConfirmed) {
+                        Promise.all([
+                            database.ref('sales_details/' + id).set(res.value),
+                            database.ref('inventory/' + id).update({ isSold: true })
+                        ]).then(() => Swal.fire('Sold!', 'Product sold mark ho gaya.', 'success'))
+                          .catch(err => Swal.fire('Error', err.message, 'error'));
+                    }
+                });
+            } else {
+                Swal.fire({ title: 'Status?', text: `Restore "${title}" to Live Inventory?`, icon: 'question', showCancelButton: true, confirmButtonColor: '#d4af37' })
+                .then((res) => {
+                    if(res.isConfirmed) {
+                        database.ref('inventory/' + id).update({ isSold: false }).catch(err => Swal.fire('Error', err.message, 'error'));
+                    }
+                });
+            }
+        }
+
+        function viewSaleDetails(id) {
+            database.ref('sales_details/' + id).once('value').then(snap => {
+                const data = snap.val();
+                if (data) {
+                    let formattedDate = data.date || 'N/A';
+                    if (data.date && data.date.includes('-')) {
+                        let parts = data.date.split('-');
+                        if(parts.length === 3 && parts[0].length === 4) formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    }
+                    Swal.fire({
+                        title: 'Customer Details',
+                        html: `<div style="text-align:left; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;"><p style="margin:5px 0;"><strong>Name:</strong> ${data.name || 'N/A'}</p><p style="margin:5px 0;"><strong>Phone:</strong> ${data.phone || 'N/A'}</p><p style="margin:5px 0;"><strong>Price:</strong> ${data.price || '0'} ₹ </p><p style="margin:5px 0;"><strong>Date:</strong> ${formattedDate}</p></div>`,
+                        showCancelButton: true, cancelButtonText: 'Close', confirmButtonText: 'Delete Details', confirmButtonColor: '#c62828'
+                    }).then((res) => {
+                        if(res.isConfirmed) {
+                            database.ref('sales_details/' + id).remove().then(() => Swal.fire('Deleted', 'Sale details delete ho gayi hain.', 'success')).catch(err => Swal.fire('Error', err.message, 'error'));
+                        }
+                    });
+                } else { Swal.fire('No Data', 'Is product ki koi sale detail save nahi hai.', 'info'); }
+            });
+        }
+
+        function deleteItem(id, title) {
+            Swal.fire({ title: 'Delete?', text: `Remove "${title}" permanently?`, icon: 'error', showCancelButton: true, confirmButtonColor: '#c62828' })
+            .then((res) => {
+                if(res.isConfirmed) {
+                    Promise.all([
+                        database.ref('products/' + id).remove(),
+                        database.ref('inventory/' + id).remove(),
+                        database.ref('sales_details/' + id).remove()
+                    ]).then(() => Swal.fire('Deleted!', 'Product delete ho gaya.', 'success'))
+                      .catch(err => Swal.fire('Error', err.message, 'error'));
+                }
+            });
+        }
+
+        function calculateWeights() {
+            let lw = 0; let sw = 0;
+            Object.keys(allProducts).forEach(id => {
+                let w = parseFloat(allProducts[id].weight) || 0;
+                if(inventoryStatus[id]?.isSold) sw += w; else lw += w;
+            });
+            document.getElementById('live-weight-display').innerText = lw.toFixed(3) + " g";
+            document.getElementById('sold-weight-display').innerText = sw.toFixed(3) + " g";
+        }
+
+        function toggleWeightCalc() {
+            const box = document.getElementById('weight-box');
+            box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+        }
+
+        function importAndSync() {
+            const file = document.getElementById('excelFile').files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                let updates = {};
+                json.forEach(row => {
+                    if(row.ID) {
+                        const pId = row.ID.toString().toLowerCase();
+                        updates['products/' + pId] = { title: row.Title || "", weight: row.Weight || "", purity: row.Purity || "", category: row.Category || "", image: row["Image URL"] || "", desc: row.Description || "" };
+                    }
+                });
+                database.ref().update(updates)
+                .then(() => { Swal.fire('Updated', 'Syncing data.js...', 'success'); downloadDataJS(); })
+                .catch(err => Swal.fire('Error', 'Bulk update failed: ' + err.message, 'error'));
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function downloadDataJS() {
+            database.ref('products').once('value', (snap) => {
+                const content = "const productData = " + JSON.stringify(snap.val() || {}, null, 2) + ";";
+                const blob = new Blob([content], {type: "text/javascript"});
+                const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "data.js"; a.click();
+            });
+        }
+
+        function downloadBackup() {
+            const rows = Object.keys(allProducts).map(id => {
+                const item = allProducts[id];
+                const isSold = inventoryStatus[id] ? inventoryStatus[id].isSold : false;
+                return { "ID": id.toUpperCase(), "Title": item.title || "", "Weight": item.weight || "", "Purity": item.purity || "", "Category": item.category || "", "Status": isSold ? "SOLD" : "LIVE", "Image URL": item.image || "", "Description": item.desc || "" };
+            });
+            const ws = XLSX.utils.json_to_sheet(rows); 
+            const wb = XLSX.utils.book_new(); 
+            XLSX.utils.book_append_sheet(wb, ws, "Stock"); 
+            XLSX.writeFile(wb, "Anamika_Full_Backup.xlsx");
+        }
+
+        function smartFilter() {
+            let input = document.getElementById('smartSearch').value.toUpperCase();
+            let cards = document.getElementsByClassName('product-card');
+            for (let card of cards) { card.style.display = card.innerText.toUpperCase().includes(input) ? "" : "none"; }
+        }
+    </script>
+</body>
+</html>

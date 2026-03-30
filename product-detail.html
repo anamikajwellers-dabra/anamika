@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Product Details | Anamika Jewellers</title>
+
+    <meta name="title" content="Anamika Jeweller's - Premium Collection">
+    <meta name="description" content="Click the link to view this beautiful jewellery item details. Quality & Trust since 1981.">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Anamika Jeweller's - Premium Collection">
+    <meta property="og:description" content="Click the link to view this beautiful jewellery item details. Quality & Trust since 1981.">
+    <meta property="og:image" content="https://i.ibb.co/RT7prNrC/Format-Convert-20260324-170933-3110.png?text=Anamika+Jewellers">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background: #fff; }
+        
+        .sold-banner { 
+            display: none; 
+            background: #e74c3c; 
+            color: white; 
+            text-align: center; 
+            padding: 12px; 
+            font-weight: 700; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            text-transform: uppercase; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .product-page-wrapper { max-width: 600px; margin: auto; padding: 15px; position: relative; }
+        
+        .image-container { position: relative; width: 100%; overflow: hidden; border-radius: 12px; }
+        .main-img { width: 100%; transition: 0.4s; min-height: 300px; background: #f9f9f9; object-fit: cover; display: block; }
+        
+        .product-main-title { font-family: 'Playfair Display', serif; color: #d4af37; font-size: 26px; margin-top: 15px; }
+        
+        .spec-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .spec-table td { padding: 12px 0; border-bottom: 1px solid #f6f6f6; font-size: 14px; }
+        .spec-data { text-align: right; font-weight: 600; }
+
+        .desc-container { margin-top: 25px; padding: 15px; background: #fdfaf0; border-left: 4px solid #d4af37; border-radius: 8px; }
+        .desc-label { font-weight: 600; color: #d4af37; font-size: 15px; margin-bottom: 5px; display: block; }
+        .desc-text { color: #555; font-size: 14px; line-height: 1.6; white-space: pre-wrap; margin: 0; }
+
+        .whatsapp-btn { background: #25d366; color: white; text-decoration: none; padding: 16px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: 600; margin-top: 30px; }
+        
+        .is-sold-out-img { filter: grayscale(1); opacity: 0.6; }
+        .btn-disabled { background: #999 !important; pointer-events: none; }
+        #loading-msg { text-align: center; margin-top: 100px; color: #d4af37; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div id="soldBanner" class="sold-banner">⚠️ यह आइटम बिक चुका है / Sold Out</div>
+    <div id="loading-msg">डेटा लोड हो रहा है...</div>
+
+    <div class="product-page-wrapper" id="main-content" style="display:none;">
+        <div class="image-container">
+            <img id="main-product-img" src="" class="main-img" onerror="this.src='https://via.placeholder.com/400'">
+        </div>
+
+        <h1 id="product-title" class="product-main-title">Loading...</h1>
+        
+        <table class="spec-table">
+            <tr><td>✨ Purity</td><td id="spec-purity" class="spec-data">---</td></tr> 
+            <tr><td>⚖️ Weight</td><td id="spec-weight" class="spec-data">grams</td></tr>
+            <tr><td>🏷️ Code</td><td id="spec-code" class="spec-data">---</td></tr>
+        </table>
+
+        <div id="desc-box" class="desc-container" style="display:none;">
+            <span class="desc-label">Product Description:</span>
+            <p id="product-desc" class="desc-text"></p>
+        </div>
+
+        <a href="#" id="whatsapp-btn" class="whatsapp-btn">Inquiry on WhatsApp</a>
+        <center><a href="index.html" style="display:block; margin-top:20px; color:#d4af37; text-decoration:none; font-size:14px;">← Back to Collection</a></center>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoY6noSIMt-YiIVOY7yNiYsKqQLgGmk_M",
+            databaseURL: "https://anamika-jwellers-default-rtdb.firebaseio.com",
+            projectId: "anamika-jwellers",
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // URL से ID निकाल रहे हैं और उसे हमेशा छोटे अक्षरों (lowercase) में बदल रहे हैं
+        let productId = urlParams.get('id') ? urlParams.get('id').toLowerCase() : null; 
+
+        if (productId) {
+            // पूरे डेटाबेस की जगह सिर्फ उस खास प्रोडक्ट को ढूंढ रहे हैं
+            database.ref('products/' + productId).on('value', (snapshot) => {
+                const item = snapshot.val();
+                
+                if (item) {
+                    // अगर प्रोडक्ट मिल गया, तो उसका inventory स्टेटस चेक करें
+                    database.ref('inventory/' + productId).once('value').then((invSnapshot) => {
+                        const inv = invSnapshot.val();
+
+                        document.getElementById('loading-msg').style.display = 'none';
+                        document.getElementById('main-content').style.display = 'block';
+
+                        document.getElementById('product-title').innerText = item.title || "Jewellery Item";
+                        document.getElementById('spec-purity').innerText = item.purity || "22K / 916"; 
+                        document.getElementById('spec-code').innerText = productId.toUpperCase();
+                        document.getElementById('spec-weight').innerText = item.weight || "N/A";
+                        document.getElementById('main-product-img').src = item.image || "https://via.placeholder.com/400";
+                        
+                        const description = item.description || item.desc || "";
+                        if (description.trim() !== "") {
+                            document.getElementById('product-desc').innerText = description;
+                            document.getElementById('desc-box').style.display = 'block';
+                        } else {
+                            document.getElementById('desc-box').style.display = 'none';
+                        }
+
+                        const currentUrl = window.location.href;
+                        const waMsg = `Hi Anamika Jewellers, mujhe is item ki enquiry karni hai:\n*Item:* ${item.title || productId.toUpperCase()}\n*Code:* ${productId.toUpperCase()}\n*Weight:* ${item.weight || 'N/A'}\n*Link:* ${currentUrl}`;
+                        document.getElementById('whatsapp-btn').href = `https://wa.me/919977441399?text=${encodeURIComponent(waMsg)}`;
+
+                        const isSold = inv && inv.isSold === true;
+                        if (isSold) {
+                            document.getElementById('soldBanner').style.display = 'block';
+                            document.getElementById('main-product-img').classList.add('is-sold-out-img');
+                            document.getElementById('whatsapp-btn').classList.add('btn-disabled');
+                            document.getElementById('whatsapp-btn').innerText = "SOLD OUT";
+                        } else {
+                            document.getElementById('soldBanner').style.display = 'none';
+                            document.getElementById('main-product-img').classList.remove('is-sold-out-img');
+                            document.getElementById('whatsapp-btn').classList.remove('btn-disabled');
+                            document.getElementById('whatsapp-btn').innerText = "Inquiry on WhatsApp";
+                        }
+                    });
+
+                } else {
+                    // अगर प्रोडक्ट नहीं मिला
+                    document.getElementById('loading-msg').innerHTML = "<h3 style='color:red;'>Product Not Found</h3><p>यह प्रोडक्ट डेटाबेस में नहीं मिला। कृपया ID चेक करें।</p><a href='index.html' style='color:#d4af37; text-decoration:underline;'>Back to Home</a>";
+                }
+            }, (error) => {
+                // अगर Firebase से कोई परमिशन एरर आती है, तो वह स्क्रीन पर दिखेगी
+                console.error("Firebase Error:", error);
+                document.getElementById('loading-msg').innerHTML = `<h3 style='color:red;'>Database Error: ${error.message}</h3>`;
+            });
+        } else {
+            document.getElementById('loading-msg').innerHTML = "<h1>No Product Selected</h1><a href='index.html' style='color:#d4af37; text-decoration:underline;'>Go to Collection</a>";
+        }
+    </script>
+</body>
+</html>

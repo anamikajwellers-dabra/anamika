@@ -203,12 +203,12 @@
             <h2 id="authTitle">Login</h2>
             <p style="font-size: 12px; color: #666; margin-bottom: 20px;">Kripya apna mobile number darj karein.</p>
             
-            <input type="tel" id="userPhone" class="login-input" placeholder="Mobile Number (e.g. 9876543210)">
-            <input type="password" id="userPass" class="login-input" placeholder="Password darj karein">
+            <input type="tel" id="userPhone" class="login-input" placeholder="Mobile Number">
+            <input type="password" id="userPass" class="login-input" placeholder="Password">
             
             <button class="login-btn" id="authBtn" onclick="handleAuth()" style="margin-top:10px;">Login</button>
             
-            <div style="color: #d4af37; font-size: 13px; cursor: pointer; margin-top: 15px; font-weight: 600; text-decoration: underline;" id="toggleLink" onclick="toggleAuthMode()">Naya account banayein? Sign Up</div>
+            <div style="color: #000000; font-size: 13px; cursor: pointer; margin-top: 15px; font-weight: 600; text-decoration: underline;" id="toggleLink" onclick="toggleAuthMode()">Naya account banayein? Sign Up</div>
 
             <p id="loginError" style="color: #e74c3c; font-size: 12px; margin-top: 15px; display: none; font-weight: 600; line-height: 1.4;"></p>
         </div>
@@ -474,7 +474,7 @@
             document.getElementById('authTitle').innerText = isLoginMode ? "Login" : "Sign Up";
             document.getElementById('authBtn').innerText = isLoginMode ? "Login" : "Create Account";
             document.getElementById('toggleLink').innerText = isLoginMode ? "Naya account banayein? Sign Up" : "Pehle se account hai? Login karein";
-            document.getElementById('userPass').placeholder = isLoginMode ? "Password darj karein" : "Password banayein";
+            document.getElementById('userPass').placeholder = isLoginMode ? "Password" : "Password banayein";
         }
 
         function handleAuth() {

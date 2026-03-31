@@ -249,8 +249,12 @@
         </ul>
     </div>
 
-    <div class="header-section">
+        <div class="header-section">
+        <div id="userGreeting" style="text-align: center; font-size: 13px; color: #d4af37; font-family: 'Playfair Display', serif; font-weight: bold; padding-bottom: 8px; display: none;">
+            Namaste, <span id="userNameDisplay"></span> <i class="fa-solid fa-hands-praying" style="font-size: 12px;"></i>
+        </div>
         <div class="search-container">
+
             <div class="category-scroll-wrapper" id="chipContainer">
                 <div class="cat-card active" onclick="filterByCategory('all', this)">
                     <div class="cat-thumb" style="background-image: url('https://i.ibb.co/zhHnrgPs/logo.jpg'); background-size: 60px; background-repeat: no-repeat; background-color: #fffaf0;"></div>
@@ -300,7 +304,7 @@
                 </div>
                 
                 <h1 id="modalTitle" class="modal-title"></h1>
-                <strong style="color: #000000; font-size:12px; font-family: 'Playfair Display'"> By ANAMIKA JWELLER'S</strong>
+                <strong style="color: #511377; font-size:12px; font-family: 'Playfair Display'"> By ANAMIKA JWELLER'S</strong>
                 <table class="spec-table">
                     <tr><td>✨ Purity</td><td id="modalPurity" class="spec-data" style="font-weight: 600; font-size: 13px;"></td></tr> 
                     <tr><td>⚖️ Weight</td><td id="modalWeight" class="spec-data" style="font-weight: 600; font-size: 13px;" ></td></tr>
@@ -601,13 +605,32 @@
             });
         }
 
-        auth.onAuthStateChanged((user) => {
+                auth.onAuthStateChanged((user) => {
             if (user) {
                 document.getElementById('loginModal').style.display = 'none';
                 document.body.style.overflow = "auto";
                 
+                // --- NAYA CODE: Admin Panel se Naam uthane ke liye ---
+                document.getElementById('userGreeting').style.display = 'block';
+                let phoneStr = user.email.replace('@anamikajewellers.com', '');
+                
+                // Yahan humne path 'user_names/' kar diya hai, jo aapke Admin panel se match karta hai
+                database.ref('user_names/' + user.uid).on('value', (snapshot) => {
+                    let customerName = snapshot.val();
+                    if (customerName) {
+                        document.getElementById('userNameDisplay').innerText = customerName;
+                    } else {
+                        // Agar admin ne naam set nahi kiya hai toh number dikhega
+                        document.getElementById('userNameDisplay').innerText = phoneStr;
+                    }
+                });
+                // --- NAYA CODE END ---
+
                 listenToUserLikes(user.uid); 
                 listenForNotifications(); 
+                
+                // ... (baki ka code waisa hi rahega)
+
                 
                 if(!isDataFetched) {
                     database.ref('products').on('value', (snap) => {

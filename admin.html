@@ -262,12 +262,19 @@
                 let htmlContent = `<div style="text-align:left; max-height:350px; overflow-y:auto; background:#fff; padding:0; border-radius:8px;">`;
                 htmlContent += `<p style="color:#d4af37; font-size:16px; margin:10px 5px;"><strong>Total Active Users: ${userIds.length}</strong></p><ul style="padding:0; list-style:none; margin:0;">`;
                 
-                userIds.forEach((uid, index) => {
-                    let likesObj = usersData[uid].likes || {};
+                                userIds.forEach((uid, index) => {
+                    let userData = usersData[uid] || {}; // Pura user data nikala
+                    let likesObj = userData.likes || {};
                     let likedIds = Object.keys(likesObj).filter(id => likesObj[id] === true);
                     let likesCount = likedIds.length;
                     
+                    // --- NAYA: Phone number nikalne ke liye ---
+                    let userPhone = userData.phone ? userData.phone : '';
+                    let contactHtml = userPhone ? `<br><span style="font-size:11px; color:#1976d2; font-weight:normal;">📞 ${userPhone}</span>` : '';
+                    // ------------------------------------------
+
                     let productListItems = '';
+
                     if (likesCount > 0) {
                         productListItems = likedIds.map(id => {
                             let prodName = allProducts[id] ? allProducts[id].title : "Item";
@@ -292,7 +299,8 @@
                         <details ${isOpen}>
                             <summary style="cursor:pointer; outline:none; padding:12px 2px; display:flex; justify-content:space-between; align-items:center; list-style:none;">
                                 <div style="display:flex; align-items:center; gap:6px; font-size:11px; color:#777; flex-wrap:wrap; width: 75%;">
-                                    <span style="font-weight:bold; font-size:13px; color:#333;">${displayName}</span>
+                                    <span style="font-weight:bold; font-size:13px; color:#333;">${displayName} ${contactHtml}</span>
+
                                     <span onclick="setUserName('${uid}', '${safeName}', event)" style="color:#1976d2; padding:2px 6px; border-radius:4px; background:#e3f2fd; font-weight:bold; cursor:pointer;"><i class="fa-solid fa-pen-to-square"></i></span>
                                     <span onclick="deleteUserRecord('${uid}', '${safeName}', event)" style="color:#c62828; padding:2px 6px; border-radius:4px; background:#ffebee; font-weight:bold; cursor:pointer;"><i class="fa-solid fa-trash"></i></span>
                                     <div style="width:100%; word-break:break-all; margin-top:2px;">${uid}</div>

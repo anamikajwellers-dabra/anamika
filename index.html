@@ -203,6 +203,7 @@
             <h2 id="authTitle">Login</h2>
             <p style="font-size: 12px; color: #666; margin-bottom: 20px;">Kripya apna mobile number darj karein.</p>
             
+            <input type="text" id="userNameInput" class="login-input" placeholder="Aapka Naam" style="display: none;">
             <input type="tel" id="userPhone" class="login-input" placeholder="Mobile Number">
             <input type="password" id="userPass" class="login-input" placeholder="Password">
             
@@ -494,6 +495,7 @@
             document.getElementById('authBtn').innerText = isLoginMode ? "Login" : "Create Account";
             document.getElementById('toggleLink').innerText = isLoginMode ? "Naya account banayein? Sign Up" : "Pehle se account hai? Login karein";
             document.getElementById('userPass').placeholder = isLoginMode ? "Password" : "Password banayein";
+            document.getElementById('userNameInput').style.display = isLoginMode ? "none" : "block";
             
             // --- Naya logic box ka color badalne ke liye ---
             let loginBox = document.querySelector('.login-box');
@@ -508,10 +510,17 @@
         function handleAuth() {
             let phone = document.getElementById('userPhone').value.trim();
             let pass = document.getElementById('userPass').value.trim();
+            let nameInput = document.getElementById('userNameInput').value.trim();
             let errorMsg = document.getElementById('loginError');
             errorMsg.style.display = 'none';
 
             phone = phone.replace('+91', '').trim();
+
+            if (!isLoginMode && nameInput === "") {
+                errorMsg.innerText = "Kripya apna naam dalein.";
+                errorMsg.style.display = 'block';
+                return;
+            }
 
             if(phone.length < 10 || pass.length < 6) {
                 errorMsg.innerText = "Sahi Mobile Number (10 digits) aur Password (kam se kam 6 akshar) dalein.";
@@ -529,7 +538,9 @@
                     document.getElementById('authBtn').innerText = "Login";
                 });
             } else {
-                auth.createUserWithEmailAndPassword(fakeEmail, pass).catch(err => {
+                auth.createUserWithEmailAndPassword(fakeEmail, pass).then((userCredential) => {
+                    database.ref('user_names/' + userCredential.user.uid).set(nameInput);
+                }).catch(err => {
                     errorMsg.innerText = "Sign Up Failed: " + err.message;
                     errorMsg.style.display = 'block';
                     document.getElementById('authBtn').innerText = "Create Account";
@@ -660,6 +671,9 @@
             } else {
                 document.getElementById('loginModal').style.display = 'flex';
                 document.body.style.overflow = "hidden";
+                if (isLoginMode === true) {
+                    toggleAuthMode();
+                }
             }
         });
 

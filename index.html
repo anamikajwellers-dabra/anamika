@@ -22,7 +22,7 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
 
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent;  }
         body { font-family: 'Poppins', sans-serif; background-color: #fcfcfb; width: 100%; }
 
         .header {
@@ -38,10 +38,10 @@
         .waves {
             position:relative;
             width: 100%;
-            height:15vh;
+            height:8vh;
             margin-bottom:-7px; 
-            min-height:100px;
-            max-height:150px;
+            min-height:50px;
+            max-height:80px;
             display: block; 
         }
 
@@ -59,7 +59,7 @@
         .disable-select {
             user-select: none;
             -webkit-user-select: none;
-            padding-top: 10px; 
+            padding-top: 5px; 
         }
 
         .hader-01 {
@@ -82,10 +82,10 @@
             text-transform: uppercase;
         }
 
-        @media (max-width: 768px) { .waves { height:30px; min-height:30px; } }
+        @media (max-width: 768px) { .waves { height:20px; min-height:20px; } }
         
-        .header-section { background: white; padding: 10px 0 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; width: 100%; }
-        .search-container { width: 90%; max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+        .header-section { background: white; padding: 10px 0px 5px 0px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; width: 100%; }
+        .search-container { width: 90%; max-width: 500px; margin: 10px; display: flex; flex-direction: column; gap: 8px; }
         
         /* --- SMART BOTTOM SHEET DRAWER CSS --- */
         .nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 999998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(3px); }
@@ -93,7 +93,7 @@
         .nav-drawer { position: fixed; bottom: -100%; left: 0; width: 100%; background: #fff; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); z-index: 999999; transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15); border-radius: 35px 35px 0 0; display: flex; flex-direction: column; padding-bottom: 20px; }
         .nav-drawer.open { bottom: 0; }
         .drawer-pull-line { width: 40px; height: 5px; background: #ddd; border-radius: 10px; margin: 15px auto 5px auto; }
-        .drawer-header { display: flex; justify-content: center; align-items: center; position: relative; padding: 10px 25px 20px; }
+        .drawer-header { display: flex; justify-content: center; align-items: center; position: relative; padding: 5px 25px 10px ; }
         .drawer-header h2 { margin: 0; font-size: 24px; font-family: 'Playfair Display', serif; color: #d4af37; }
         .close-nav-btn { position: absolute; right: 20px; top: 10px; font-size: 20px; background: #f4f4f4; border: none; cursor: pointer; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #555; transition: 0.2s; }
         .close-nav-btn:active { transform: scale(0.9); }
@@ -112,13 +112,14 @@
         .inner-qr-btn { position: absolute; right: 12px; color: #d4af37; font-size: 18px; background: none; border: none; outline: none; cursor: pointer; transition: 0.2s; }
         .inner-qr-btn:active { transform: scale(0.9); color: #673ab7; }
         
-        .category-scroll-wrapper { width: 100%; overflow-x: auto; white-space: nowrap; padding: 5px 0; display: flex; gap: 2px; scrollbar-width: none; -ms-overflow-style: none; }
+        .category-scroll-wrapper { width: 100%; overflow-x: auto; white-space: nowrap; padding-bottom: 15px; display: flex; gap: 2px; scrollbar-width: none; -ms-overflow-style: none; }
         .category-scroll-wrapper::-webkit-scrollbar { display: none; }
-        .cat-card { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; min-width: 70px; }
-        .cat-thumb { width: 60px; height: 60px; border-radius: 12px; border: 2px solid #eee; background-size: cover; background-position: center; transition: 0.3s; position: relative; }
-        .active .cat-thumb { border-color: #d4af37; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3); transform: scale(1.05); }
-        .cat-name { font-size: 10px; font-weight: 800; color: #666; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
-        .active .cat-name { color: #d4af37; }
+        .cat-card { display: flex; flex-direction: column; align-items: center; gap: 0px; cursor: pointer; min-width: 90px; }
+        .cat-thumb { width: 80px; height: 80px; border-radius: 5px 5px 0px 0px; position: relative; overflow: hidden; background-color: #fffaf0; transition: 0.3s; }
+        .cat-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.5s ease-in-out; }
+        .active .cat-thumb { box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3); transform: scale(1.05); }
+        .cat-name { width: 80px; font-size: 10px; padding:5px 0px 5px 0px; font-weight: 800; color: maroon; border-radius: 0px 0px 5px 5px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #ffffff; box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; }
+        .active .cat-name { color: #d4af37; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3); transform: scale(1.05);  }
 
         .container01 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; max-width: 800px; margin: auto; }
         
@@ -129,28 +130,11 @@
         .like-btn i { color: #ccc; transition: 0.3s; font-size: 16px; }
         .like-btn.liked i { color: #e74c3c; }
 
-        #modalLikeBtn {
-            width: 45px !important;
-            height: 45px !important;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-
-        #modalLikeBtn i {
-            font-size: 22px !important; 
-        }
+        #modalLikeBtn { width: 45px !important; height: 45px !important; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        #modalLikeBtn i { font-size: 22px !important; }
 
         /* IMAGE FADE-IN CSS */
-        .gift-item img { 
-            width: 100%; 
-            height: 140px; 
-            object-fit: cover; 
-            border-radius: 8px; 
-            display: block; 
-            background-color: #f4f4f4; 
-            opacity: 0; 
-            transition: opacity 0.5s ease-in-out; 
-        }
-        
+        .gift-item img { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; display: block; background-color: #f4f4f4; opacity: 0; transition: opacity 0.5s ease-in-out; }
         .item-label { font-size: 13px; font-weight: 600; margin: 8px 0 2px; display: block; color: #333; }
         .item-weight { font-size: 11px; color: #777; margin-bottom: 5px; display: block; }
         .buy-btn { display: block; padding: 7px; background: #d4af37; color: #000 !important; text-decoration: none; border-radius: 15px; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-top: auto; }
@@ -175,48 +159,51 @@
         .is-sold-out-img { filter: grayscale(1); opacity: 0.6; }
         .btn-disabled { background: #999 !important; pointer-events: none; }
 
-        .search-nav { padding: 10px 20px; max-width: 800px; margin: auto; display: none; }
+        .search-nav { padding: 11px 20px; max-width: 800px; margin: auto; display: none; }
         .back-link { text-decoration: none; color: #d4af37; font-weight: bold; font-size: 14px; border: 1px solid #d4af37; padding: 5px 12px; border-radius: 20px; cursor: pointer; }
         #loader-ring { text-align: center; padding: 30px; width: 100%; }
         .ring-anim { display: inline-block; width: 30px; height: 30px; border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #d4af37; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- LOGIN SYSTEM CSS --- */
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fdfaf0; z-index: 9999999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .login-box { background: white; padding: 30px 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 380px; text-align: center; border: 2px solid #d4af37; transition: background-color 0.3s ease; }
-        .login-box h2 { font-family: 'Playfair Display', serif; color: #d4af37; margin-bottom: 5px; font-size: 22px;}
-        .login-input { width: 100%; padding: 12px; margin: 10px 0; border: 1.5px solid #eee; border-radius: 10px; font-size: 16px; outline: none; text-align: center; letter-spacing: 1px; font-family: 'Poppins', sans-serif;}
-        .login-input:focus { border-color: #d4af37; background: #fffaf0; }
-        .login-btn { background: #d4af37; color: white; border: none; padding: 14px; width: 100%; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(212,175,55,0.3); transition: 0.2s;}
-        .login-btn:active { transform: scale(0.96); }
-        .login-logo { width: 80px; height: 80px; margin-bottom: 15px; border-radius: 50%; border: 2px solid #d4af37; padding: 10px; background: #fffaf0;}
-        .divider { display: flex; align-items: center; text-align: center; margin: 15px 0; }
-        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #eee; }
-        .divider span { padding: 0 10px; color: #999; font-size: 12px; font-weight: 600; }
+        /* --- PREMIUM SLIDER CSS --- */
+        .slider-container { width: 100%; max-width: 800px; margin: 10px auto; position: relative; overflow: hidden; border-radius: 0px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .slides-wrapper { display: flex; width: 100%; transition: transform 0.5s ease-in-out; }
+        .slide { position: relative; min-width: 100%; box-sizing: border-box; display: block; text-decoration: none; }
+        .slide img { width: 100%; height: auto; display: block; aspect-ratio: 4 / 3; object-fit: cover; }
+        .slider-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; background: rgba(255, 255, 255, 0.6); padding: 5px 10px; border-radius: 20px; backdrop-filter: blur(4px); }
+        .dot { width: 8px; height: 8px; background-color: #999; border-radius: 50%; cursor: pointer; transition: 0.3s all ease; }
+        .dot.active { background-color: maroon; width: 20px; border-radius: 5px; }
+
+        .discount-badge { position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; padding: 5px 10px; border-radius: 10px; font-size: 12px; text-align:center; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10; }
+
+        /* --- PREMIUM HEADING & FANCY DIVIDER CSS --- */
+        .special-heading { text-align: center; margin: 20px 15px 20px 15px; }
+        .special-heading h2 { color: #7d1c1c; font-family: 'Playfair Display', serif; font-size: 26px; margin-bottom: 5px; }
+        .special-heading p { color: #555; font-size: 13px; margin-bottom: 15px; }
+        .fancy-divider { display: flex; align-items: center; justify-content: center; width: 90%; max-width: 350px; margin: 0 auto; }
+        .fancy-divider::before, .fancy-divider::after { content: ''; flex: 1; border-bottom: 1.5px solid #7d1c1c; }
+        .fancy-divider span { padding: 0 5px; color: #7d1c1c; font-size: 22px; line-height: 1; }
+
+        /* --- MULTI-ITEM PRODUCT SLIDER CSS --- */
+        .multi-slider-container { width: 95%; max-width: 800px; margin: 5px auto 25px; position: relative; -webkit-tap-highlight-color: transparent;}
+        .multi-slides-wrapper { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth;}
+        .multi-slides-wrapper::-webkit-scrollbar { display: none; }
+        .multi-slide-page { min-width: 100%; display: flex; gap: 12px; padding: 5px; scroll-snap-align: center; box-sizing: border-box; }
+        
+        .multi-card { flex: 1; background: white; border-radius: 8px; box-shadow: 0 3px 8px rgba(0,0,0,0.08); overflow: hidden; cursor: pointer; border: 1px solid #eee; display: flex; flex-direction: column; }
+        .multi-card-img-wrap { position: relative; width: 100%; }
+        .multi-card-img-wrap img { width: 100%; height: 160px; object-fit: cover; display: block; }
+        .multi-card-title { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white; font-family: 'Playfair Display', serif; font-size: 13px; text-align: center; padding: 25px 5px 8px 5px; letter-spacing: 0.5px; }
+        .multi-card-img-wrap::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid rgba(255,255,255,0.4); pointer-events: none; z-index: 2; border-radius: 4px;}
+        .multi-card-btn { color: #7d1c1c; text-align: center; padding: 12px 5px; font-weight: 600; font-size: 14px; background: white; font-family: 'Poppins', sans-serif;}
+        
+        .multi-slider-dots { display: flex; justify-content: center; gap: 8px; margin-top: 5px; }
+        .multi-dot { width: 8px; height: 8px; background-color: #ddd; border-radius: 50%; cursor: pointer; transition: 0.3s; }
+        .multi-dot.active { background-color: #7d1c1c; }
     </style>
 </head>
 <body>
     
-    <div id="loginModal" class="login-overlay" style="display: none;">
-        <div class="login-box">
-            <img src="https://i.ibb.co/zhHnrgPs/logo.jpg" class="login-logo" alt="Logo">
-            <h2 id="authTitle">Login</h2>
-            <p style="font-size: 12px; color: #666; margin-bottom: 20px;">Kripya apna mobile number darj karein.</p>
-            
-            <input type="text" id="userNameInput" class="login-input" placeholder="Aapka Naam" style="display: none;">
-            <input type="tel" id="userPhone" class="login-input" placeholder="Mobile Number">
-            <input type="password" id="userPass" class="login-input" placeholder="Password">
-            
-            <button class="login-btn" id="authBtn" onclick="handleAuth()" style="margin-top:10px;">Login</button>
-            
-            <div style="color: #000000; font-size: 13px; cursor: pointer; margin-top: 15px; font-weight: 600; text-decoration: underline;" id="toggleLink" onclick="toggleAuthMode()">Naya account banayein? Sign Up</div>
-            <div style="color: #e74c3c; font-size: 12px; cursor: pointer; margin-top: 12px; font-weight: 600;" onclick="forgotPassword()">🔒 Password bhool gaye?</div>
-
-            <p id="loginError" style="color: #e74c3c; font-size: 12px; margin-top: 15px; display: none; font-weight: 600; line-height: 1.4;"></p>
-        </div>
-        <div style="position: absolute; bottom: 20px; font-size: 11px; color: #888;">Anamika Jewellers - Since 1981</div>
-    </div>
-
     <div class="header">
         <div class="disable-select">
             <div class="hader-01">ANAMIKA JEWELLER'S</div> 
@@ -232,10 +219,16 @@
             </g>
         </svg>
     </div>
-
+    
+    <div class="header-section">
     <div id="navOverlay" class="nav-overlay"></div>
     <div id="navDrawer" class="nav-drawer">
         <div class="drawer-pull-line"></div>
+        
+        <div id="userGreeting" style="text-align: center; padding: 0px; font-size: 13px; color: maroon; font-family: 'PLAYFAIR DISPLAY', serif; font-weight: bold; padding-bottom: 8px; display: none;">
+            Welcome <i class="fa-solid fa-gem"></i>
+        </div>
+       
         <div class="drawer-header">
             <h2>Menu</h2>
             <button id="closeNavDrawerBtn" class="close-nav-btn">×</button>
@@ -246,23 +239,10 @@
             <li><a href="#" onclick="closeNavMenu(); showFavorites(); return false;"><i class="fa-solid fa-heart" style="color: #e74c3c;"></i> My Favorites</a></li>
             <li><a href="https://wa.me/919977441399" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></li>
             <li><a href="#" onclick="closeNavMenu(); openQrScanner(); return false;"><i class="fa-solid fa-qrcode"></i> Smart Scan</a></li>
-            <li><a href="#" onclick="closeNavMenu(); logoutUser(); return false;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
         </ul>
     </div>
 
-        <div class="header-section">
-        <div id="userGreeting" style="text-align: left; padding:20px; font-size: 13px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); color: maroon; font-family: 'PLAYFAIR DISPLAY', serif; font-weight: bold; padding-bottom: 8px; display: none;">
-            Welcome, <span id="userNameDisplay"></span> 🙏 <i class="fa-solid fa-wellcome" style="font-size: 12px;"></i>
-        </div>
         <div class="search-container">
-
-            <div class="category-scroll-wrapper" id="chipContainer">
-                <div class="cat-card active" onclick="filterByCategory('all', this)">
-                    <div class="cat-thumb" style="background-image: url('https://i.ibb.co/zhHnrgPs/logo.jpg'); background-size: 60px; background-repeat: no-repeat; background-color: #fffaf0;"></div>
-                    <span class="cat-name">SABHI</span>
-                </div>
-            </div>
-            
             <div class="search-bar-wrapper">
                 <button id="openNavDrawerBtn" class="search-menu-btn"><i class="fa-solid fa-bars-staggered"></i></button>
                 <div class="input-qr-box">
@@ -272,6 +252,43 @@
             </div>
         </div>
     </div>
+        
+    <div class="search-container" style="margin-top: 10px; margin-bottom: 5px;">
+        <div class="category-scroll-wrapper" id="chipContainer">
+            <div class="cat-card active" onclick="window.open(window.location.pathname, '_blank')">
+                <div class="cat-thumb">
+                    <img src="https://i.ibb.co/tPQQjFHZ/1775412992676-1.jpg" onload="this.style.opacity=1" alt="Sabhi">
+                </div>
+                <span class="cat-name">SABHI</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="slider-container" id="homeSlider" style="display:none;"> 
+        <div class="slides-wrapper" id="slidesWrapper"></div>
+        <div class="slider-dots" id="sliderDots"></div>
+    </div>
+    
+    <div class="special-heading" id="specialHeading" style="display:none;">
+        <h2>Anamika Special</h2>
+        <p>Our top picks, just for you !</p>
+        <div class="fancy-divider"><span> 💍 </span></div>
+    </div>
+    
+    <div class="multi-slider-container" id="specialSlider" style="display:none;">
+        <div class="multi-slides-wrapper" id="multiSlidesWrapper"></div>
+        <div class="multi-slider-dots" id="multiSliderDots"></div>
+        <div class="fancy-divider"><span style="padding:10px 0px;"></span></div>            
+    </div>
+
+    <script>
+        if (new URLSearchParams(window.location.search).has('offer') || new URLSearchParams(window.location.search).has('search')) {
+            document.getElementById('chipContainer').parentNode.style.display = 'none';
+            if(document.getElementById('homeSlider')) document.getElementById('homeSlider').style.display = 'none';
+            if(document.getElementById('specialSlider')) document.getElementById('specialSlider').style.display = 'none';
+            if(document.getElementById('specialHeading')) document.getElementById('specialHeading').style.display = 'none';
+        }
+    </script>
 
     <div class="search-nav" id="searchNav">
         <span onclick="window.history.back()" class="back-link">← Back</span>
@@ -473,87 +490,64 @@
         const itemsPerPage = 06; let isFetching = false; let isDataFetched = false;
         let isProductsLoaded = false; let isInventoryLoaded = false; 
 
-        let isLoginMode = true; 
-
-        function forgotPassword() {
-            let phone = document.getElementById('userPhone').value.trim();
-            let errorMsg = document.getElementById('loginError');
+        // ============== MAIN DATA FETCH (OUTSIDE AUTH) ============== //
+        // Isse data hamesha load hoga, chahe login fail ho ya pass
+        if(!isDataFetched) {
+            database.ref('products').on('value', (snap) => {
+                productData = snap.val() || {};
+                isProductsLoaded = true;
+                if (isInventoryLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); }
+            });
             
-            if(!phone || phone.length < 10) {
-                errorMsg.innerText = "Kripya upar apna Mobile Number dalein aur phir 'Password bhool gaye?' par click karein.";
-                errorMsg.style.display = 'block';
-                return;
-            }
+            database.ref('inventory').on('value', (snap) => {
+                inventoryStatus = snap.val() || {};
+                isInventoryLoaded = true;
+                if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); }
+            });
 
-            let waMsg = `Hi Anamika Jewellers, main apna password bhool gaya/gayi hu. Kripya mera account reset karein.\n\nMera mobile number hai: ${phone}`;
-            window.open(`https://wa.me/919977441399?text=${encodeURIComponent(waMsg)}`, '_blank');
-        }
+            database.ref('offers_banners').on('value', (snap) => {
+                let offers = snap.val();
+                if(offers && !new URLSearchParams(window.location.search).has('offer') && !new URLSearchParams(window.location.search).has('search')) {
+                    let slidesHtml = '';
+                    let dotsHtml = '';
+                    let slideCount = 0;
+                    
+                    ['slide1', 'slide2', 'slide3', 'slide4', 'slide5'].forEach((key, index) => {
+                        if(offers[key] && offers[key].image) {
+                            let badgeHtml = offers[key].discount ? `<div class="discount-badge">${offers[key].discount}% OFF <br><div style="font-size: 1px; opacity: 0.8; font-weight: normal; ">on making charge.</div></div>` : '';
+                            slidesHtml += `
+                            <a href="${offers[key].link}" target="_blank" class="slide">
+                                ${badgeHtml}
+                                <img src="${offers[key].image}" alt="Offer ${index+1}">
+                            </a>`;
+                            dotsHtml += `<span class="dot ${slideCount === 0 ? 'active' : ''}" onclick="goToSlide(${slideCount})"></span>`;
+                            slideCount++;
+                        }
+                    });
 
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('authTitle').innerText = isLoginMode ? "Login" : "Sign Up";
-            document.getElementById('authBtn').innerText = isLoginMode ? "Login" : "Create Account";
-            document.getElementById('toggleLink').innerText = isLoginMode ? "Naya account banayein? Sign Up" : "Pehle se account hai? Login karein";
-            document.getElementById('userPass').placeholder = isLoginMode ? "Password" : "Password banayein";
-            document.getElementById('userNameInput').style.display = isLoginMode ? "none" : "block";
+                    if(slideCount > 0) {
+                        document.getElementById('slidesWrapper').innerHTML = slidesHtml;
+                        document.getElementById('sliderDots').innerHTML = dotsHtml;
+                        document.getElementById('homeSlider').style.display = 'block';
+                        totalSlides = slideCount; 
+                        resetInterval();
+                    } else {
+                        document.getElementById('homeSlider').style.display = 'none';
+                    }
+                }
+            });
             
-            // --- Naya logic box ka color badalne ke liye ---
-            let loginBox = document.querySelector('.login-box');
-            if(isLoginMode) {
-                loginBox.style.backgroundColor = "white"; // Login mode (Safed)
-            } else {
-                loginBox.style.backgroundColor = "#f0f8ff"; // Sign Up mode (Halka Blue)
-            }
-            // ----------------------------------------------
+            isDataFetched = true;
         }
+        // ======================================================= //
 
-        function handleAuth() {
-            let phone = document.getElementById('userPhone').value.trim();
-            let pass = document.getElementById('userPass').value.trim();
-            let nameInput = document.getElementById('userNameInput').value.trim();
-            let errorMsg = document.getElementById('loginError');
-            errorMsg.style.display = 'none';
-
-            phone = phone.replace('+91', '').trim();
-
-            if (!isLoginMode && nameInput === "") {
-                errorMsg.innerText = "Kripya apna naam dalein.";
-                errorMsg.style.display = 'block';
-                return;
-            }
-
-            if(phone.length < 10 || pass.length < 6) {
-                errorMsg.innerText = "Sahi Mobile Number (10 digits) aur Password (kam se kam 6 akshar) dalein.";
-                errorMsg.style.display = 'block';
-                return;
-            }
-
-            let fakeEmail = phone + "@anamikajewellers.com";
-            document.getElementById('authBtn').innerText = "Processing...";
-
-            if(isLoginMode) {
-                auth.signInWithEmailAndPassword(fakeEmail, pass).catch(err => {
-                    errorMsg.innerText = "Login Failed: " + err.message;
-                    errorMsg.style.display = 'block';
-                    document.getElementById('authBtn').innerText = "Login";
-                });
-            } else {
-                auth.createUserWithEmailAndPassword(fakeEmail, pass).then((userCredential) => {
-                    database.ref('user_names/' + userCredential.user.uid).set(nameInput);
-                }).catch(err => {
-                    errorMsg.innerText = "Sign Up Failed: " + err.message;
-                    errorMsg.style.display = 'block';
-                    document.getElementById('authBtn').innerText = "Create Account";
-                });
-            }
-        }
 
         function toggleLike(productId, event) {
             if (event) event.stopPropagation(); 
             
             const user = auth.currentUser;
             if (!user) {
-                alert("Kripya pehle login karein!");
+                alert("Bina login ke abhi Like option chal nahi payega. Humne background mein try kiya, thodi der baad koshish karein.");
                 return;
             }
 
@@ -616,72 +610,24 @@
             });
         }
 
-                        auth.onAuthStateChanged((user) => {
+        // SILENT ANONYMOUS AUTH (Sirf Likes ke liye)
+        auth.onAuthStateChanged((user) => {
             if (user) {
-                // --- YAHAN SE NAYA CODE SHURU: Login hote hi database me entry banayein ---
-                let phoneStr = user.email.replace('@anamikajewellers.com', '');
                 database.ref('users/' + user.uid).update({
-                    phone: phoneStr,
-                    email: user.email,
                     lastLogin: new Date().toLocaleString()
                 }).catch(err => console.log("User entry error:", err));
-                // --- NAYA CODE KHATAM ---
 
-                document.getElementById('loginModal').style.display = 'none';
-                document.body.style.overflow = "auto";
-                
-                // --- NAYA CODE: Admin Panel se Naam uthane ke liye ---
                 document.getElementById('userGreeting').style.display = 'block';
-                // phoneStr already upar define kar diya hai isliye yahan se hata sakte hain
-
-                
-                // Yahan humne path 'user_names/' kar diya hai, jo aapke Admin panel se match karta hai
-                database.ref('user_names/' + user.uid).on('value', (snapshot) => {
-                    let customerName = snapshot.val();
-                    if (customerName) {
-                        document.getElementById('userNameDisplay').innerText = customerName;
-                    } else {
-                        // Agar admin ne naam set nahi kiya hai toh number dikhega
-                        document.getElementById('userNameDisplay').innerText = phoneStr;
-                    }
-                });
-                // --- NAYA CODE END ---
 
                 listenToUserLikes(user.uid); 
                 listenForNotifications(); 
-                
-                // ... (baki ka code waisa hi rahega)
-
-                
-                if(!isDataFetched) {
-                    database.ref('products').on('value', (snap) => {
-                        productData = snap.val() || {};
-                        isProductsLoaded = true;
-                        if (isInventoryLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); }
-                    });
-                    
-                    database.ref('inventory').on('value', (snap) => {
-                        inventoryStatus = snap.val() || {};
-                        isInventoryLoaded = true;
-                        if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); }
-                    });
-                    
-                    isDataFetched = true;
-                }
             } else {
-                document.getElementById('loginModal').style.display = 'flex';
-                document.body.style.overflow = "hidden";
-                if (isLoginMode === true) {
-                    toggleAuthMode();
-                }
+                auth.signInAnonymously().catch((error) => {
+                    console.error("Anonymous auth failed: ", error);
+                    // Ab error aane par bhi website rukegi nahi, bas "Like" wale features mein error ayega.
+                });
             }
         });
-
-        function logoutUser() {
-            auth.signOut().then(() => {
-                window.location.reload(); 
-            });
-        }
 
         function updateDynamicThumbs() {
             const container = document.getElementById('chipContainer');
@@ -693,11 +639,21 @@
                     if (!categories[catName]) categories[catName] = item.image;
                 }
             });
-            container.innerHTML = `<div class="cat-card active" onclick="filterByCategory('all', this)"><div class="cat-thumb" style="background-image: url('https://i.ibb.co/zhHnrgPs/logo.jpg'); background-size: 60px; background-repeat: no-repeat; background-color: #fffaf0;"></div><span class="cat-name">SABHI</span></div>`;
+            container.innerHTML = `<div class="cat-card active" onclick="window.open(window.location.pathname, '_blank')">
+                <div class="cat-thumb">
+                    <img src="https://i.ibb.co/tPQQjFHZ/1775412992676-1.jpg" onload="this.style.opacity=1" alt="Sabhi">
+                </div>
+                <span class="cat-name">SABHI</span>
+            </div>`;
             Object.keys(categories).sort().forEach(cat => {
                 const card = document.createElement('div');
-                card.className = 'cat-card'; card.onclick = () => filterByCategory(cat, card);
-                card.innerHTML = `<div class="cat-thumb" style="background-image: url('${categories[cat]}')"></div><span class="cat-name">${cat}</span>`;
+                card.className = 'cat-card'; 
+                card.onclick = () => window.open('?offer=' + encodeURIComponent(cat), '_blank');
+                card.innerHTML = `
+                <div class="cat-thumb">
+                    <img src="${categories[cat]}" onload="this.style.opacity=1" alt="${cat}">
+                </div>
+                <span class="cat-name">${cat}</span>`;
                 container.appendChild(card);
             });
         }
@@ -712,8 +668,30 @@
             
             const urlParams = new URLSearchParams(window.location.search);
             const q = urlParams.get('search');
-            if (q) { showSearchPage(q); } else {
+            const offerCategory = urlParams.get('offer');
+            
+            const catChips = document.getElementById('chipContainer').parentNode;
+            const mainSlider = document.getElementById('homeSlider');
+            const specSlider = document.getElementById('specialSlider');
+            const specHeading = document.getElementById('specialHeading');
+
+            if (q || offerCategory) { 
+                if (q) showSearchPage(q, false); 
+                else {
+                    showSearchPage(offerCategory, true);
+                    document.getElementById('searchStatus').innerText = "Special Offers: " + offerCategory.toUpperCase();
+                }
+                
+                catChips.style.display = 'none';
+                if(mainSlider) mainSlider.style.display = 'none';
+                if(specSlider) specSlider.style.display = 'none';
+                if(specHeading) specHeading.style.display = 'none';
+            } else {
                 document.getElementById('searchNav').style.display = "none";
+                catChips.style.display = 'flex';
+                
+                updateMultiSlider(); 
+                
                 allKeys = Object.keys(productData).filter(id => !(inventoryStatus[id] && inventoryStatus[id].isSold === true));
                 allKeys.sort(() => Math.random() - 0.5); currentIndex = 0; renderNextBatch(); setupIntersectionObserver();
             }
@@ -812,7 +790,7 @@
             nextKeys.forEach(id => createCard(id, container)); currentIndex += itemsPerPage; isFetching = false;
         }
 
-        function showSearchPage(query) {
+        function showSearchPage(query, hideSoldItems = false) {
             showingFavoritesOnly = false;
             document.getElementById('favoritesBanner').style.display = "none";
             const container = document.getElementById('main-product-list'); 
@@ -823,9 +801,18 @@
             
             let filteredKeys = Object.keys(productData).filter(id => {
                 const item = productData[id];
-                return String(id).toLowerCase().includes(lowQuery) || 
+                let matchesSearch = String(id).toLowerCase().includes(lowQuery) || 
                        (item.title && String(item.title).toLowerCase().includes(lowQuery)) || 
                        (item.category && String(item.category).toLowerCase().includes(lowQuery));
+                       
+                if (!matchesSearch) return false;
+
+                if (hideSoldItems) {
+                    let isSold = inventoryStatus[id] && inventoryStatus[id].isSold === true;
+                    if (isSold) return false; 
+                }
+
+                return true;
             });
 
             filteredKeys.sort((a, b) => {
@@ -856,6 +843,7 @@
             
             if (category === "all") { 
                 currentState = 'home';
+                window.history.pushState({}, document.title, window.location.pathname);
                 initDisplay(); 
                 return; 
             }
@@ -885,6 +873,11 @@
             document.getElementById('favoritesBanner').style.display = "block";
             document.getElementById('loader-ring').style.display = "none";
             
+            document.getElementById('chipContainer').parentNode.style.display = 'none';
+            if(document.getElementById('homeSlider')) document.getElementById('homeSlider').style.display = 'none';
+            if(document.getElementById('specialSlider')) document.getElementById('specialSlider').style.display = 'none';
+            if(document.getElementById('specialHeading')) document.getElementById('specialHeading').style.display = 'none';
+
             document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
 
             const likedKeys = Object.keys(userLikes).filter(id => userLikes[id] === true && productData[id]);
@@ -899,7 +892,6 @@
             }
         }
 
-        /* --- Advanced Pinch to Zoom & Point Double Tap Logic --- */
         const modalImg = document.getElementById('modalImg');
         let scale = 1;
         let panning = false;
@@ -1007,7 +999,6 @@
             if (e.touches.length < 2) { initialScale = scale; }
             if (e.touches.length === 0) { panning = false; }
             
-            // --- Naya Point Double Tap Logic Yahan Add Kiya Hai ---
             let currentTime = new Date().getTime();
             let tapLength = currentTime - lastTapTime;
             
@@ -1015,7 +1006,7 @@
                 if (scale > 1) {
                     resetZoom();
                 } else {
-                    scale = 2.5; // Zoom ka level
+                    scale = 2.5; 
                     
                     const rect = modalImg.getBoundingClientRect();
                     
@@ -1042,8 +1033,166 @@
                 }
             }
             lastTapTime = currentTime;
-            // --------------------------------------------------------
         });
+
+        let currentSlide = 0;
+        let totalSlides = 0; 
+        const slidesWrapper = document.getElementById('slidesWrapper');
+        const sliderDotsContainer = document.getElementById('sliderDots');
+        let slideInterval;
+
+        function updateSlider() {
+            if(!slidesWrapper || totalSlides === 0) return;
+            slidesWrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+            const dots = sliderDotsContainer.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                if (index === currentSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        window.goToSlide = function(index) {
+            currentSlide = index;
+            updateSlider();
+            resetInterval(); 
+        }
+
+        function nextSlide() {
+            if(totalSlides === 0) return;
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSlider();
+        }
+
+        function prevSlide() {
+            if(totalSlides === 0) return;
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateSlider();
+        }
+
+        function startInterval() {
+            if(totalSlides > 1) {
+                slideInterval = setInterval(nextSlide, 5000); 
+            }
+        }
+
+        function resetInterval() {
+            clearInterval(slideInterval);
+            startInterval();
+        }
+
+        let sliderTouchStartX = 0;
+        let sliderTouchEndX = 0;
+        const homeSliderContainer = document.getElementById('homeSlider');
+
+        if(homeSliderContainer) {
+            homeSliderContainer.addEventListener('touchstart', (e) => {
+                sliderTouchStartX = e.touches[0].clientX;
+                clearInterval(slideInterval); 
+            }, {passive: true});
+
+            homeSliderContainer.addEventListener('touchmove', (e) => {
+                sliderTouchEndX = e.touches[0].clientX;
+            }, {passive: true});
+
+            homeSliderContainer.addEventListener('touchend', () => {
+                if (sliderTouchEndX > 0) {
+                    let diffX = sliderTouchStartX - sliderTouchEndX;
+                    if (diffX > 50) {
+                        nextSlide();
+                    } 
+                    else if (diffX < -50) {
+                        prevSlide();
+                    }
+                }
+                sliderTouchStartX = 0;
+                sliderTouchEndX = 0;
+                resetInterval(); 
+            });
+        }
+        
+        function updateMultiSlider() {
+            const multiWrapper = document.getElementById('multiSlidesWrapper');
+            const multiDotsContainer = document.getElementById('multiSliderDots');
+            const specialHeading = document.getElementById('specialHeading');
+            const specialSlider = document.getElementById('specialSlider');
+            
+            if(!multiWrapper || !multiDotsContainer) return;
+
+            let activeKeys = Object.keys(productData).filter(id => !(inventoryStatus[id] && inventoryStatus[id].isSold === true));
+            
+            activeKeys.sort((a, b) => {
+                let timeA = productData[a].timestamp || 0;
+                let timeB = productData[b].timestamp || 0;
+                if(timeA === timeB) {
+                    return b.localeCompare(a); 
+                }
+                return timeB - timeA; 
+            });
+            
+            let totalItemsToShow = 8; 
+            let topItems = activeKeys.slice(0, totalItemsToShow); 
+
+            if(topItems.length === 0) {
+                if(specialSlider) specialSlider.style.display = 'none';
+                if(specialHeading) specialHeading.style.display = 'none';
+                return;
+            }
+
+            if(specialSlider) specialSlider.style.display = 'block';
+            if(specialHeading) specialHeading.style.display = 'block';
+
+            let slidesHtml = '';
+            let dotsHtml = '';
+            let totalPages = Math.ceil(topItems.length / 2);
+
+            for(let i=0; i<totalPages; i++) {
+                slidesHtml += `<div class="multi-slide-page">`;
+                for(let j=0; j<2; j++) {
+                    let index = i*2 + j;
+                    if(topItems[index]) {
+                        let id = topItems[index];
+                        let item = productData[id];
+                        let title = item.title || 'Jewellery Item';
+                        let img = item.image || 'https://via.placeholder.com/150';
+                        slidesHtml += `
+                            <div class="multi-card" onclick="openPopup('${id}')">
+                                <div class="multi-card-img-wrap">
+                                    <img src="${img}" alt="${title}">
+                                    <div class="multi-card-title">${title}</div>
+                                </div>
+                                <div class="multi-card-btn">Explore</div>
+                            </div>
+                        `;
+                    }
+                }
+                slidesHtml += `</div>`;
+                dotsHtml += `<span class="multi-dot ${i === 0 ? 'active' : ''}" onclick="scrollMultiTo(${i})"></span>`;
+            }
+
+            multiWrapper.innerHTML = slidesHtml;
+            multiDotsContainer.innerHTML = dotsHtml;
+
+            const newMultiDots = multiDotsContainer.querySelectorAll('.multi-dot');
+            multiWrapper.onscroll = () => {
+                let pageIndex = Math.round(multiWrapper.scrollLeft / multiWrapper.clientWidth);
+                newMultiDots.forEach((dot, index) => {
+                    if(index === pageIndex) dot.classList.add('active');
+                    else dot.classList.remove('active');
+                });
+            };
+        }
+
+        window.scrollMultiTo = function(index) {
+            const multiWrapper = document.getElementById('multiSlidesWrapper');
+            if(multiWrapper) {
+                let width = multiWrapper.clientWidth;
+                multiWrapper.scrollTo({ left: width * index, behavior: 'smooth' });
+            }
+        }
+
     </script>
 </body>
 </html>

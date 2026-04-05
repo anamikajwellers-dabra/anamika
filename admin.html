@@ -29,7 +29,7 @@
         
         .top-action-bar { max-width: 550px; margin: 0 auto 10px auto; display: flex; flex-wrap: wrap; gap: 5px; padding: 0 10px; }
         .btn-action { flex: 1; min-width: 80px; padding: 8px 2px; border-radius: 6px; border: none; font-size: 9px; font-weight: 700; color: white; cursor: pointer; text-align: center; text-transform: uppercase; }
-        .bg-gold { background: #d4af37; } .bg-blue { background: #1976d2; } .bg-green { background: #2e7d32; } .bg-red { background: #c62828; } .bg-purple { background: #673ab7; } .bg-orange { background: #ff9800; } .bg-pink { background: #e91e63; }
+        .bg-gold { background: #d4af37; } .bg-blue { background: #1976d2; } .bg-green { background: #2e7d32; } .bg-red { background: #c62828; } .bg-purple { background: #673ab7; } .bg-orange { background: #ff9800; } .bg-pink { background: #e91e63; } .bg-teal { background: #009688; }
 
         .tabs-container { display: flex; max-width: 550px; margin: 0 auto 10px auto; padding: 0 10px; gap: 10px; }
         .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 13px; background: #e0e0e0; color: #666; }
@@ -40,16 +40,42 @@
         #smartSearch { width: 100%; height: 30px; padding: 12px 15px; border-radius: 25px; border: 1.5px solid #d4af37; outline: none; box-sizing: border-box; background: white; }
 
         .product-card { background: white; display: flex; align-items: center; padding: 10px; margin: 8px auto; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); max-width: 550px; gap: 12px; border: 1px solid #eee; }
-        .prod-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; }
+        
+        .prod-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; opacity: 0; transition: opacity 0.4s ease-in-out; background: #f4f4f4; }
+        
         .info { flex-grow: 1; } .info strong { display: block; font-size: 11px; }
         
         .action-area { display: flex; align-items: center; gap: 5px; } 
         .btn-status { padding: 8px 10px; border-radius: 6px; border: none; font-size: 10px; min-width: 75px; font-weight: 800; cursor: pointer; }
+        
+        /* NAYA: Restore Icon Style */
+        .btn-restore-icon { background: #e8f5e9; color: #2e7d32; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .btn-restore-icon:active { transform: scale(0.9); }
+
         .btn-delete { background: none; border: none; color: #ff5252; cursor: pointer; font-size: 18px; padding: 5px; border-radius: 5px; }
         .btn-info { background: none; border: none; cursor: pointer; font-size: 18px; padding: 5px; border-radius: 5px; }
         #excelFile { display: none; }
         
         .swal-custom-input { width: 90%; margin: 8px auto; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; display: block;}
+
+        .swal-delete-icon {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: #c62828;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 999;
+            background: #fff;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #eee;
+        }
     </style>
 </head>
 <body>
@@ -70,10 +96,9 @@
                 <button onclick="downloadBackup()" class="btn-action bg-blue">📥 Backup</button>
                 <label for="excelFile" class="btn-action bg-green">📤 Upload</label>
                 <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" onchange="importAndSync()">
+                <button onclick="manageOffers()" class="btn-action bg-teal">🎁 Offers</button>
                 <button onclick="showUsersList()" class="btn-action bg-orange">👥 Users</button>
-                
                 <button onclick="sendNotification()" class="btn-action bg-pink">📢 Notify</button>
-                
                 <button onclick="logout()" class="btn-action bg-red">Logout</button>
             </div>
             <div id="weight-box">
@@ -95,7 +120,6 @@
     </div>
 
     <script>
-        // === YAHAN APNI IMGBB API KEY PASTE KAREIN ===
         const IMGBB_API_KEY = "92c27dba00b654deddf7dadcbe8aa9a6"; 
         
         const firebaseConfig = {
@@ -107,6 +131,14 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const auth = firebase.auth();
+
+        history.pushState({ adminApp: true }, null, window.location.href);
+        window.addEventListener('popstate', function(event) {
+            if (typeof Swal !== 'undefined' && Swal.isVisible()) {
+                Swal.close();
+                history.pushState({ adminApp: true }, null, window.location.href);
+            }
+        });
 
         let allProducts = {}; let inventoryStatus = {}; let currentTab = 'live';
 
@@ -149,7 +181,120 @@
             database.ref('inventory').on('value', snap => { inventoryStatus = snap.val() || {}; renderList(); calculateWeights(); });
         }
 
-        // --- NAYA FUNCTION: NOTIFICATION BHEJNE KE LIYE ---
+        function manageOffers() {
+            database.ref('offers_banners').once('value').then(snap => {
+                let offers = snap.val() || {
+                    slide1: { image: "", link: "?offer=Bangles", discount: "" },
+                    slide2: { image: "", link: "?offer=Rings", discount: "" },
+                    slide3: { image: "", link: "?offer=Necklace", discount: "" },
+                    slide4: { image: "", link: "", discount: "" },
+                    slide5: { image: "", link: "", discount: "" }
+                };
+
+                Swal.fire({
+                    title: '🎁 Manage Slider Banners',
+                    html: `
+                        <div style="text-align:left; font-size:12px; margin-bottom:15px; padding:10px; background:#e0f2f1; border-radius:8px;">
+                            Yahan photo upload karein ya URL daalein, category link aur discount % set karein. Discount photo ke upar dikhega.
+                        </div>
+
+                        <div style="background:#f9f9f9; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">
+                            <h4 style="margin:0 0 5px 0; color:#d4af37; text-align:left;">Slide 1</h4>
+                            <input id="imgFile1" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">
+                            <div style="font-size:10px; font-weight:bold; margin:2px 0;">-- OR --</div>
+                            <input id="img1" class="swal-custom-input" placeholder="Paste Photo URL" value="${offers.slide1.image || ''}">
+                            <input id="link1" class="swal-custom-input" placeholder="Category Link (e.g. ?offer=Bangles)" value="${offers.slide1.link || ''}">
+                            <input id="discount1" class="swal-custom-input" placeholder="Discount % (Optional, Jaise: 10)" type="number" min="0" max="100" value="${offers.slide1.discount || ''}">
+                        </div>
+
+                        <div style="background:#f9f9f9; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">
+                            <h4 style="margin:0 0 5px 0; color:#d4af37; text-align:left;">Slide 2</h4>
+                            <input id="imgFile2" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">
+                            <div style="font-size:10px; font-weight:bold; margin:2px 0;">-- OR --</div>
+                            <input id="img2" class="swal-custom-input" placeholder="Paste Photo URL" value="${offers.slide2.image || ''}">
+                            <input id="link2" class="swal-custom-input" placeholder="Category Link (e.g. ?offer=Rings)" value="${offers.slide2.link || ''}">
+                            <input id="discount2" class="swal-custom-input" placeholder="Discount % (Optional, Jaise: 10)" type="number" min="0" max="100" value="${offers.slide2.discount || ''}">
+                        </div>
+
+                        <div style="background:#f9f9f9; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">
+                            <h4 style="margin:0 0 5px 0; color:#d4af37; text-align:left;">Slide 3</h4>
+                            <input id="imgFile3" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">
+                            <div style="font-size:10px; font-weight:bold; margin:2px 0;">-- OR --</div>
+                            <input id="img3" class="swal-custom-input" placeholder="Paste Photo URL" value="${offers.slide3.image || ''}">
+                            <input id="link3" class="swal-custom-input" placeholder="Category Link (e.g. ?offer=Necklace)" value="${offers.slide3.link || ''}">
+                            <input id="discount3" class="swal-custom-input" placeholder="Discount % (Optional, Jaise: 10)" type="number" min="0" max="100" value="${offers.slide3.discount || ''}">
+                        </div>
+
+                        <div style="background:#f9f9f9; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">
+                            <h4 style="margin:0 0 5px 0; color:#d4af37; text-align:left;">Slide 4</h4>
+                            <input id="imgFile4" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">
+                            <div style="font-size:10px; font-weight:bold; margin:2px 0;">-- OR --</div>
+                            <input id="img4" class="swal-custom-input" placeholder="Paste Photo URL" value="${offers.slide4 ? offers.slide4.image : ''}">
+                            <input id="link4" class="swal-custom-input" placeholder="Category Link" value="${offers.slide4 ? offers.slide4.link : ''}">
+                            <input id="discount4" class="swal-custom-input" placeholder="Discount %" type="number" min="0" max="100" value="${offers.slide4 ? offers.slide4.discount : ''}">
+                        </div>
+
+                        <div style="background:#f9f9f9; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                            <h4 style="margin:0 0 5px 0; color:#d4af37; text-align:left;">Slide 5</h4>
+                            <input id="imgFile5" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">
+                            <div style="font-size:10px; font-weight:bold; margin:2px 0;">-- OR --</div>
+                            <input id="img5" class="swal-custom-input" placeholder="Paste Photo URL" value="${offers.slide5 ? offers.slide5.image : ''}">
+                            <input id="link5" class="swal-custom-input" placeholder="Category Link" value="${offers.slide5 ? offers.slide5.link : ''}">
+                            <input id="discount5" class="swal-custom-input" placeholder="Discount %" type="number" min="0" max="100" value="${offers.slide5 ? offers.slide5.discount : ''}">
+                        </div>
+                    `,
+                    width: '95%',
+                    showCancelButton: true,
+                    confirmButtonText: 'Save Offers',
+                    confirmButtonColor: '#009688',
+                    showLoaderOnConfirm: true,
+                    preConfirm: async () => {
+                        async function uploadAndGetUrl(fileInputId, textInputId) {
+                            let finalUrl = document.getElementById(textInputId).value.trim();
+                            const imageFile = document.getElementById(fileInputId).files[0];
+                            if (imageFile) {
+                                const formData = new FormData();
+                                formData.append('image', imageFile);
+                                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+                                const result = await response.json();
+                                if(result.success) { finalUrl = result.data.url; } 
+                                else { throw new Error('Image upload fail: ' + result.error.message); }
+                            }
+                            return finalUrl;
+                        }
+
+                        try {
+                            const finalImg1 = await uploadAndGetUrl('imgFile1', 'img1');
+                            const finalImg2 = await uploadAndGetUrl('imgFile2', 'img2');
+                            const finalImg3 = await uploadAndGetUrl('imgFile3', 'img3');
+                            const finalImg4 = await uploadAndGetUrl('imgFile4', 'img4');
+                            const finalImg5 = await uploadAndGetUrl('imgFile5', 'img5');
+
+                            return {
+                                slide1: { image: finalImg1, link: document.getElementById('link1').value.trim(), discount: document.getElementById('discount1').value.trim() },
+                                slide2: { image: finalImg2, link: document.getElementById('link2').value.trim(), discount: document.getElementById('discount2').value.trim() },
+                                slide3: { image: finalImg3, link: document.getElementById('link3').value.trim(), discount: document.getElementById('discount3').value.trim() },
+                                slide4: { image: finalImg4, link: document.getElementById('link4').value.trim(), discount: document.getElementById('discount4').value.trim() },
+                                slide5: { image: finalImg5, link: document.getElementById('link5').value.trim(), discount: document.getElementById('discount5').value.trim() }
+                            };
+                        } catch (error) {
+                            Swal.showValidationMessage(error.message);
+                            return false;
+                        }
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((res) => {
+                    if(res.isConfirmed) {
+                        database.ref('offers_banners').set(res.value)
+                        .then(() => Swal.fire('Saved!', 'Aapke offers update ho gaye hain.', 'success'))
+                        .catch(err => Swal.fire('Error', err.message, 'error'));
+                    }
+                });
+            }).catch(err => {
+                Swal.fire('Error', 'Offers load nahi ho paye: ' + err.message, 'error');
+            });
+        }
+
         function sendNotification() {
             Swal.fire({
                 title: '📢 Sabhi ko Message bhejein',
@@ -170,13 +315,12 @@
                     return {
                         title: title,
                         body: body,
-                        timestamp: new Date().getTime(), // Current time bhej rahe hain
-                        readBy: {} // Ye list banegi baad mein padhne walo ki
+                        timestamp: new Date().getTime(),
+                        readBy: {} 
                     };
                 }
             }).then((res) => {
                 if (res.isConfirmed) {
-                    // Firebase mein message save karein
                     database.ref('global_notification').set(res.value)
                     .then(() => {
                         Swal.fire('Sent!', 'Message safaltapoorvak sabhi users ke database mein update kar diya gaya hai.', 'success');
@@ -187,7 +331,6 @@
                 }
             });
         }
-        // --------------------------------------------------
 
         function setUserName(uid, currentName, event) {
             event.preventDefault(); 
@@ -263,15 +406,13 @@
                 htmlContent += `<p style="color:#d4af37; font-size:16px; margin:10px 5px;"><strong>Total Active Users: ${userIds.length}</strong></p><ul style="padding:0; list-style:none; margin:0;">`;
                 
                                 userIds.forEach((uid, index) => {
-                    let userData = usersData[uid] || {}; // Pura user data nikala
+                    let userData = usersData[uid] || {}; 
                     let likesObj = userData.likes || {};
                     let likedIds = Object.keys(likesObj).filter(id => likesObj[id] === true);
                     let likesCount = likedIds.length;
                     
-                    // --- NAYA: Phone number nikalne ke liye ---
                     let userPhone = userData.phone ? userData.phone : '';
                     let contactHtml = userPhone ? `<br><span style="font-size:11px; color:#1976d2; font-weight:normal;">📞 ${userPhone}</span>` : '';
-                    // ------------------------------------------
 
                     let productListItems = '';
 
@@ -421,7 +562,8 @@
                         purity: document.getElementById('editPurity').value,
                         category: document.getElementById('editCategory').value,
                         desc: document.getElementById('editDesc').value,
-                        image: finalImageUrl 
+                        image: finalImageUrl,
+                        timestamp: Date.now()
                     };
                 },
                 allowOutsideClick: () => !Swal.isLoading()
@@ -494,7 +636,8 @@
                         purity: document.getElementById('addPurity').value,
                         category: document.getElementById('addCategory').value,
                         desc: document.getElementById('addDesc').value,
-                        image: finalImageUrl 
+                        image: finalImageUrl,
+                        timestamp: Date.now()
                     };
                 },
                 allowOutsideClick: () => !Swal.isLoading()
@@ -510,7 +653,8 @@
                             purity: data.purity,
                             category: data.category,
                             image: data.image,
-                            desc: data.desc
+                            desc: data.desc,
+                            timestamp: data.timestamp
                         }),
                         database.ref('inventory/' + pId).set({ isSold: false })
                     ])
@@ -547,10 +691,18 @@
                     let infoBtn = isSold ? `<button class="btn-info" onclick="viewSaleDetails('${id}')" title="Customer Details">👁️</button>` : '';
                     let editBtn = `<button class="btn-info" onclick="editProduct('${id}')" title="Edit Item">✏️</button>`;
 
+                    // NAYA: Condition to show [SOLD] button or Restore Icon
+                    let statusAction = "";
+                    if (!isSold) {
+                        statusAction = `<button class="btn-status" style="background:#e8f5e9; color:#2e7d32" onclick="toggleStatus('${id}', false, '${item.title}')">[SOLD]</button>`;
+                    } else {
+                        statusAction = `<button class="btn-restore-icon" onclick="toggleStatus('${id}', true, '${item.title}')" title="Restore Item"><i class="fa-solid fa-rotate-left"></i></button>`;
+                    }
+
                     const card = document.createElement('div');
                     card.className = 'product-card';
                     card.innerHTML = `
-                        <img src="${item.image}" class="prod-img" onerror="this.src='https://via.placeholder.com/50'">
+                        <img src="${item.image}" loading="lazy" onload="this.style.opacity=1" class="prod-img" onerror="this.src='https://via.placeholder.com/50'; this.style.opacity=1">
                         <div class="info">
                             <strong>${item.title}</strong>
                             <span style="font-size:11px; color:#888;">ID: ${id.toUpperCase()} </span>
@@ -559,11 +711,7 @@
                         <div class="action-area">
                             ${infoBtn}
                             ${editBtn}
-                            <button class="btn-status" 
-                                style="background:${isSold ? '#ffebee' : '#e8f5e9'}; color:${isSold ? '#c62828' : '#2e7d32'}"
-                                onclick="toggleStatus('${id}', ${isSold}, '${item.title}')">
-                                ${isSold ? 'RESTORE' : '[SOLD]'}
-                            </button>
+                            ${statusAction}
                             <button class="btn-delete" onclick="deleteItem('${id}', '${item.title}')" title="Delete Item">🗑️</button>
                         </div>`;
                     list.appendChild(card);
@@ -620,14 +768,39 @@
                     }
                     Swal.fire({
                         title: 'Customer Details',
-                        html: `<div style="text-align:left; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;"><p style="margin:5px 0;"><strong>Name:</strong> ${data.name || 'N/A'}</p><p style="margin:5px 0;"><strong>Phone:</strong> ${data.phone || 'N/A'}</p><p style="margin:5px 0;"><strong>Price:</strong> ${data.price || '0'} ₹ </p><p style="margin:5px 0;"><strong>Date:</strong> ${formattedDate}</p></div>`,
-                        showCancelButton: true, cancelButtonText: 'Close', confirmButtonText: 'Delete Details', confirmButtonColor: '#c62828'
-                    }).then((res) => {
-                        if(res.isConfirmed) {
-                            database.ref('sales_details/' + id).remove().then(() => Swal.fire('Deleted', 'Sale details delete ho gayi hain.', 'success')).catch(err => Swal.fire('Error', err.message, 'error'));
-                        }
+                        html: `
+                            <div class="swal-delete-icon" onclick="deleteSaleRecord('${id}')" title="Delete Details">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </div>
+                            <div style="text-align: left; padding: 15px; border: 1px solid #ddd; border-radius: 12px; background: #f9f9f9; margin-top: 10px;">
+                                <p style="margin:8px 0;"><strong><i class="fa-solid fa-user"></i> Name:</strong> ${data.name || 'N/A'}</p>
+                                <p style="margin:8px 0;"><strong><i class="fa-solid fa-phone"></i> Phone:</strong> ${data.phone || 'N/A'}</p>
+                                <p style="margin:8px 0;"><strong><i class="fa-solid fa-indian-rupee-sign"></i> Price:</strong> ${data.price || '0'} ₹ </p>
+                                <p style="margin:8px 0;"><strong><i class="fa-solid fa-calendar-days"></i> Date:</strong> ${formattedDate}</p>
+                            </div>`,
+                        showCancelButton: false,
+                        confirmButtonText: 'Close',
+                        confirmButtonColor: '#666'
                     });
                 } else { Swal.fire('No Data', 'Is product ki koi sale detail save nahi hai.', 'info'); }
+            });
+        }
+
+        window.deleteSaleRecord = function(id) {
+            Swal.fire({
+                title: 'Khatam Karein?',
+                text: "Kya aap sach mein customer details delete karna chahte hain?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#c62828',
+                cancelButtonColor: '#666',
+                confirmButtonText: 'Haan, mita do!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    database.ref('sales_details/' + id).remove()
+                    .then(() => Swal.fire('Deleted!', 'Detail delete ho gayi.', 'success'))
+                    .catch(err => Swal.fire('Error', err.message, 'error'));
+                }
             });
         }
 

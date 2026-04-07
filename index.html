@@ -172,7 +172,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* =========================================
-           PREMIUM HIGHLIGHT SLIDER CSS (No Banner/Showcase words)
+           PREMIUM BANNER SLIDER CSS 
         ========================================= */
         .slider-container { width: 100%; max-width: 800px; margin: 10px auto; position: relative; overflow: hidden; border-radius: 0px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .slides-wrapper { display: flex; width: 100%; transition: transform 0.5s ease-in-out; }
@@ -219,22 +219,22 @@
         .gift-promo-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(125, 28, 28, 0.9), transparent); color: white; padding: 30px 15px 15px 15px; text-align: center; }
         .gift-promo-overlay h2 { font-family: 'Playfair Display', serif; margin: 0; font-size: 24px; color: #fdfaf0; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
         .gift-promo-overlay p { margin: 5px 0 0; font-size: 12px; color: #ffd700; letter-spacing: 1px; }
-        
+
         /* =========================================
-           CATEGORY HIGHLIGHTS (Tanishq Premium Style - Anti Adblock)
+           PRODUCTDISPLE (NEW ANTI-ADBLOCK SLIDER)
         ========================================= */
-        #categoryHighlightSection, #categoryHighlightSection2, #categoryHighlightSection3 { margin-top: 15px; margin-bottom: 20px; }
-        .collection-box { position: relative; width: 95%; max-width: 800px; margin: 0 auto; border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .collection-box img { width: 100%; height: 280px; object-fit: cover; display: block; }
-        .collection-box::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); pointer-events: none; }
-        .collection-text { position: absolute; bottom: 20px; left: 0; width: 100%; text-align: center; z-index: 2; }
-        .collection-text h2 { color: #fff; font-family: 'Playfair Display', serif; font-size: 26px; text-shadow: 1px 1px 4px rgba(0,0,0,0.6); margin-bottom: 15px; letter-spacing: 1px; }
+        #productdisple { margin-top: 15px; margin-bottom: 20px; }
+        .disple-banner { position: relative; width: 95%; max-width: 800px; margin: 0 auto; border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .disple-banner img { width: 100%; height: 280px; object-fit: cover; display: block; }
+        .disple-banner::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); pointer-events: none; }
+        .disple-content { position: absolute; bottom: 20px; left: 0; width: 100%; text-align: center; z-index: 2; }
+        .disple-content h2 { color: #fff; font-family: 'Playfair Display', serif; font-size: 26px; text-shadow: 1px 1px 4px rgba(0,0,0,0.6); margin-bottom: 15px; letter-spacing: 1px; }
         .shop-now-btn { background: #fff; color: #333; padding: 8px 20px; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.2); border-radius: 2px; }
-        .collection-slider-wrap { display: flex; overflow-x: auto; gap: 12px; padding: 15px; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
-        .collection-slider-wrap::-webkit-scrollbar { display: none; }
-        .collection-item-card { min-width: 130px; max-width: 130px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 8px rgba(0,0,0,0.08); scroll-snap-align: start; cursor: pointer; border: 1px solid #eee; display: flex; flex-direction: column; }
-        .collection-item-card img { width: 100%; height: 130px; object-fit: cover; background: #fdfaf0; }
-        .collection-item-card-title { font-size: 13px; padding: 10px 5px; text-align: center; color: #511377; font-family: 'Playfair Display', serif; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .disple-slider-wrapper { display: flex; overflow-x: auto; gap: 12px; padding: 15px; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
+        .disple-slider-wrapper::-webkit-scrollbar { display: none; }
+        .disple-card { min-width: 130px; max-width: 130px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 8px rgba(0,0,0,0.08); scroll-snap-align: start; cursor: pointer; border: 1px solid #eee; display: flex; flex-direction: column; }
+        .disple-card img { width: 100%; height: 130px; object-fit: cover; background: #fdfaf0; }
+        .disple-card-title { font-size: 13px; padding: 10px 5px; text-align: center; color: #511377; font-family: 'Playfair Display', serif; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     </style>
 </head>
@@ -323,38 +323,15 @@
     </div>
     <div class="fancy-divider" style="display:none;"><span style="padding:10px 0px;">💍</span></div>
     
-    <div id="categoryHighlightSection" style="display:none;">
-        <div class="collection-box" id="collectionClickArea">
-            <img id="collectionHeroImg" src="" alt="Category Collection">
-            <div class="collection-text">
-                <h2 id="collectionHeroTitle">Loading...</h2>
+    <div id="productdispleSection" style="display:none;">
+        <div class="disple-banner" id="displeBannerBtn">
+            <img id="displeBannerImg" src="" alt="Category Collection">
+            <div class="disple-content">
+                <h2 id="displeBannerTitle">Loading...</h2>
                 <span class="shop-now-btn">SHOP NOW</span>
             </div>
         </div>
-        <div class="collection-slider-wrap" id="collectionSliderWrapper"></div>
-    </div>
-    <div class="fancy-divider" style="display:none;"><span style="padding:10px 0px;">💍</span></div>
-
-    <div id="categoryHighlightSection2" style="display:none;">
-        <div class="collection-box" id="collectionClickArea2">
-            <img id="collectionHeroImg2" src="" alt="Category Collection 2">
-            <div class="collection-text">
-                <h2 id="collectionHeroTitle2">Loading...</h2>
-                <span class="shop-now-btn">SHOP NOW</span>
-            </div>
-        </div>
-        <div class="collection-slider-wrap" id="collectionSliderWrapper2"></div>
-    </div>
-    
-    <div id="categoryHighlightSection3" style="display:none;">
-        <div class="collection-box" id="collectionClickArea3">
-            <img id="collectionHeroImg3" src="" alt="Category Collection 3">
-            <div class="collection-text">
-                <h2 id="collectionHeroTitle3">Loading...</h2>
-                <span class="shop-now-btn">SHOP NOW</span>
-            </div>
-        </div>
-        <div class="collection-slider-wrap" id="collectionSliderWrapper3"></div>
+        <div class="disple-slider-wrapper" id="displeSliderWrapper"></div>
     </div>
 
     <script>
@@ -365,10 +342,7 @@
             if(document.getElementById('specialHeading')) document.getElementById('specialHeading').style.display = 'none';
             if(document.getElementById('giftPromoContainer')) document.getElementById('giftPromoContainer').style.display = 'none';
             document.querySelectorAll('.fancy-divider').forEach(div => div.style.display = 'none');
-            
-            if(document.getElementById('categoryHighlightSection')) document.getElementById('categoryHighlightSection').style.display = 'none';
-            if(document.getElementById('categoryHighlightSection2')) document.getElementById('categoryHighlightSection2').style.display = 'none';
-            if(document.getElementById('categoryHighlightSection3')) document.getElementById('categoryHighlightSection3').style.display = 'none';
+            if(document.getElementById('productdispleSection')) document.getElementById('productdispleSection').style.display = 'none';
         }
     </script>
 
@@ -566,15 +540,13 @@
         let userLikes = {}; let showingFavoritesOnly = false; let currentState = 'home';
         const itemsPerPage = 06; let isFetching = false; let isDataFetched = false;
         let isProductsLoaded = false; let isInventoryLoaded = false; 
-        let showcaseData = null; let showcaseData2 = null; let showcaseData3 = null;
+        let displeData = null; 
 
         // ============== MAIN DATA FETCH ============== //
         if(!isDataFetched) {
             database.ref('products').on('value', (snap) => { productData = snap.val() || {}; isProductsLoaded = true; if (isInventoryLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); } });
             database.ref('inventory').on('value', (snap) => { inventoryStatus = snap.val() || {}; isInventoryLoaded = true; if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); } });
-            database.ref('category_showcase').on('value', (snap) => { showcaseData = snap.val(); if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateHighlightSlider(); } });
-            database.ref('category_showcase2').on('value', (snap) => { showcaseData2 = snap.val(); if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateHighlightSlider2(); } });
-            database.ref('category_showcase3').on('value', (snap) => { showcaseData3 = snap.val(); if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateHighlightSlider3(); } });
+            database.ref('productdisple').on('value', (snap) => { displeData = snap.val(); if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateDispleSlider(); } });
 
             database.ref('offers_banners').on('value', (snap) => {
                 let offers = snap.val();
@@ -685,18 +657,14 @@
                 if(specHeading) specHeading.style.display = 'none';
                 if(document.getElementById('giftPromoContainer')) document.getElementById('giftPromoContainer').style.display = 'none';
                 document.querySelectorAll('.fancy-divider').forEach(div => div.style.display = 'none');
-                if(document.getElementById('categoryHighlightSection')) document.getElementById('categoryHighlightSection').style.display = 'none';
-                if(document.getElementById('categoryHighlightSection2')) document.getElementById('categoryHighlightSection2').style.display = 'none';
-                if(document.getElementById('categoryHighlightSection3')) document.getElementById('categoryHighlightSection3').style.display = 'none';
+                if(document.getElementById('productdispleSection')) document.getElementById('productdispleSection').style.display = 'none';
             } else {            
                 document.getElementById('searchNav').style.display = "none"; catChips.style.display = 'flex';
                 if(document.getElementById('giftPromoContainer')) document.getElementById('giftPromoContainer').style.display = 'block';
                 document.querySelectorAll('.fancy-divider').forEach(div => div.style.display = 'flex');
              
                 updateMultiSlider(); 
-                if(document.getElementById('categoryHighlightSection')) document.getElementById('categoryHighlightSection').style.display = 'block'; updateHighlightSlider();
-                if(document.getElementById('categoryHighlightSection2')) document.getElementById('categoryHighlightSection2').style.display = 'block'; updateHighlightSlider2();
-                if(document.getElementById('categoryHighlightSection3')) document.getElementById('categoryHighlightSection3').style.display = 'block'; updateHighlightSlider3();
+                if(document.getElementById('productdispleSection')) document.getElementById('productdispleSection').style.display = 'block'; updateDispleSlider();
              
                 allKeys = Object.keys(productData).filter(id => !(inventoryStatus[id] && inventoryStatus[id].isSold === true));
                 allKeys.sort(() => Math.random() - 0.5); currentIndex = 0; renderNextBatch(); setupIntersectionObserver();
@@ -879,9 +847,7 @@
             if(document.getElementById('specialHeading')) document.getElementById('specialHeading').style.display = 'none';
             if(document.getElementById('giftPromoContainer')) document.getElementById('giftPromoContainer').style.display = 'none';
             document.querySelectorAll('.fancy-divider').forEach(div => div.style.display = 'none');
-            if(document.getElementById('categoryHighlightSection')) document.getElementById('categoryHighlightSection').style.display = 'none';
-            if(document.getElementById('categoryHighlightSection2')) document.getElementById('categoryHighlightSection2').style.display = 'none';
-            if(document.getElementById('categoryHighlightSection3')) document.getElementById('categoryHighlightSection3').style.display = 'none';
+            if(document.getElementById('productdispleSection')) document.getElementById('productdispleSection').style.display = 'none';
             
             document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
 
@@ -1011,21 +977,21 @@
 
         window.scrollMultiTo = function(index) { const multiWrapper = document.getElementById('multiSlidesWrapper'); if(multiWrapper) { let width = multiWrapper.clientWidth; multiWrapper.scrollTo({ left: width * index, behavior: 'smooth' }); } }
         
-        // === SHOWCASE HIGHLIGHT SLIDERS LOGIC ===
-        function updateHighlightSlider() {
-            const showcaseWrapper = document.getElementById('collectionSliderWrapper'); const showcaseSection = document.getElementById('categoryHighlightSection');
-            if(!showcaseWrapper || !showcaseSection) return;
-            if (new URLSearchParams(window.location.search).has('offer') || new URLSearchParams(window.location.search).has('search') || currentState !== 'home') { showcaseSection.style.display = 'none'; return; }
+        // === NEW PRODUCTDISPLE SLIDER LOGIC ===
+        function updateDispleSlider() {
+            const displeWrapper = document.getElementById('displeSliderWrapper'); const displeSection = document.getElementById('productdispleSection');
+            if(!displeWrapper || !displeSection) return;
+            if (new URLSearchParams(window.location.search).has('offer') || new URLSearchParams(window.location.search).has('search') || currentState !== 'home') { displeSection.style.display = 'none'; return; }
             
-            let isActive = showcaseData && (showcaseData.isActive === true || String(showcaseData.isActive) === "true");
-            if(!isActive) { showcaseSection.style.display = 'none'; return; }
+            let isActive = displeData && (displeData.isActive === true || String(displeData.isActive) === "true");
+            if(!isActive) { displeSection.style.display = 'none'; return; }
 
-            document.getElementById('collectionHeroImg').src = showcaseData.image || 'https://via.placeholder.com/800x400';
-            document.getElementById('collectionHeroTitle').innerText = showcaseData.title || 'Special Collection';
+            document.getElementById('displeBannerImg').src = displeData.image || 'https://via.placeholder.com/800x400';
+            document.getElementById('displeBannerTitle').innerText = displeData.title || 'Special Collection';
             
-            let targetCat = (showcaseData.category || "").trim().toUpperCase();
+            let targetCat = (displeData.category || "").trim().toUpperCase();
             let link = '?offer=' + encodeURIComponent(targetCat); 
-            document.getElementById('collectionClickArea').onclick = () => window.open(link, '_blank');
+            document.getElementById('displeBannerBtn').onclick = () => window.open(link, '_blank');
             
             let categoryKeys = Object.keys(productData).filter(id => { 
                 let item = productData[id]; 
@@ -1035,71 +1001,11 @@
             });
 
             categoryKeys.sort(() => Math.random() - 0.5); let top10 = categoryKeys.slice(0, 10);
-            if(top10.length === 0) { showcaseSection.style.display = 'none'; return; }
+            if(top10.length === 0) { displeSection.style.display = 'none'; return; }
             
-            showcaseSection.style.display = 'block'; let slidesHtml = '';
-            top10.forEach(id => { let item = productData[id]; let title = item.title || 'Jewellery Item'; let img = item.image || 'https://via.placeholder.com/150'; slidesHtml += `<div class="collection-item-card" onclick="openPopup('${id}')"><img src="${img}" alt="${title}"><div class="collection-item-card-title">${title}</div></div>`; });
-            showcaseWrapper.innerHTML = slidesHtml;
-        }
-
-        function updateHighlightSlider2() {
-            const showcaseWrapper = document.getElementById('collectionSliderWrapper2'); const showcaseSection = document.getElementById('categoryHighlightSection2');
-            if(!showcaseWrapper || !showcaseSection) return;
-            if (new URLSearchParams(window.location.search).has('offer') || new URLSearchParams(window.location.search).has('search') || currentState !== 'home') { showcaseSection.style.display = 'none'; return; }
-            
-            let isActive = showcaseData2 && (showcaseData2.isActive === true || String(showcaseData2.isActive) === "true");
-            if(!isActive) { showcaseSection.style.display = 'none'; return; }
-
-            document.getElementById('collectionHeroImg2').src = showcaseData2.image || 'https://via.placeholder.com/800x400';
-            document.getElementById('collectionHeroTitle2').innerText = showcaseData2.title || 'Special Collection';
-            
-            let targetCat = (showcaseData2.category || "").trim().toUpperCase();
-            let link = '?offer=' + encodeURIComponent(targetCat); 
-            document.getElementById('collectionClickArea2').onclick = () => window.open(link, '_blank');
-            
-            let categoryKeys = Object.keys(productData).filter(id => { 
-                let item = productData[id]; 
-                let isSold = inventoryStatus[id] && inventoryStatus[id].isSold === true; 
-                let itemCat = (item.category || "").trim().toUpperCase();
-                return !isSold && itemCat !== "" && itemCat === targetCat; 
-            });
-
-            categoryKeys.sort(() => Math.random() - 0.5); let top10 = categoryKeys.slice(0, 10);
-            if(top10.length === 0) { showcaseSection.style.display = 'none'; return; }
-            
-            showcaseSection.style.display = 'block'; let slidesHtml = '';
-            top10.forEach(id => { let item = productData[id]; let title = item.title || 'Jewellery Item'; let img = item.image || 'https://via.placeholder.com/150'; slidesHtml += `<div class="collection-item-card" onclick="openPopup('${id}')"><img src="${img}" alt="${title}"><div class="collection-item-card-title">${title}</div></div>`; });
-            showcaseWrapper.innerHTML = slidesHtml;
-        }
-
-        function updateHighlightSlider3() {
-            const showcaseWrapper = document.getElementById('collectionSliderWrapper3'); const showcaseSection = document.getElementById('categoryHighlightSection3');
-            if(!showcaseWrapper || !showcaseSection) return;
-            if (new URLSearchParams(window.location.search).has('offer') || new URLSearchParams(window.location.search).has('search') || currentState !== 'home') { showcaseSection.style.display = 'none'; return; }
-            
-            let isActive = showcaseData3 && (showcaseData3.isActive === true || String(showcaseData3.isActive) === "true");
-            if(!isActive) { showcaseSection.style.display = 'none'; return; }
-
-            document.getElementById('collectionHeroImg3').src = showcaseData3.image || 'https://via.placeholder.com/800x400';
-            document.getElementById('collectionHeroTitle3').innerText = showcaseData3.title || 'Special Collection';
-            
-            let targetCat = (showcaseData3.category || "").trim().toUpperCase();
-            let link = '?offer=' + encodeURIComponent(targetCat); 
-            document.getElementById('collectionClickArea3').onclick = () => window.open(link, '_blank');
-            
-            let categoryKeys = Object.keys(productData).filter(id => { 
-                let item = productData[id]; 
-                let isSold = inventoryStatus[id] && inventoryStatus[id].isSold === true; 
-                let itemCat = (item.category || "").trim().toUpperCase();
-                return !isSold && itemCat !== "" && itemCat === targetCat; 
-            });
-
-            categoryKeys.sort(() => Math.random() - 0.5); let top10 = categoryKeys.slice(0, 10);
-            if(top10.length === 0) { showcaseSection.style.display = 'none'; return; }
-            
-            showcaseSection.style.display = 'block'; let slidesHtml = '';
-            top10.forEach(id => { let item = productData[id]; let title = item.title || 'Jewellery Item'; let img = item.image || 'https://via.placeholder.com/150'; slidesHtml += `<div class="collection-item-card" onclick="openPopup('${id}')"><img src="${img}" alt="${title}"><div class="collection-item-card-title">${title}</div></div>`; });
-            showcaseWrapper.innerHTML = slidesHtml;
+            displeSection.style.display = 'block'; let slidesHtml = '';
+            top10.forEach(id => { let item = productData[id]; let title = item.title || 'Jewellery Item'; let img = item.image || 'https://via.placeholder.com/150'; slidesHtml += `<div class="disple-card" onclick="openPopup('${id}')"><img src="${img}" alt="${title}"><div class="disple-card-title">${title}</div></div>`; });
+            displeWrapper.innerHTML = slidesHtml;
         }
 
     </script>

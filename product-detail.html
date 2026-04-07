@@ -213,3 +213,182 @@
     </script>
 </body>
 </html>
+        .product-page-wrapper { max-width: 600px; margin: auto; padding: 15px; position: relative; }
+        
+        .image-container { position: relative; width: 100%; overflow: hidden; border-radius: 12px; }
+        .main-img { width: 100%; transition: 0.4s; min-height: 300px; background: #f9f9f9; object-fit: cover; display: block; }
+        
+        .product-main-title { font-family: 'Playfair Display', serif; color: #d4af37; font-size: 26px; margin-top: 15px; }
+        
+        .spec-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .spec-table td { padding: 12px 0; border-bottom: 1px solid #f6f6f6; font-size: 14px; }
+        .spec-data { text-align: right; font-weight: 600; }
+
+        .desc-container { margin-top: 25px; padding: 15px; background: #fdfaf0; border-left: 4px solid #d4af37; border-radius: 8px; }
+        .desc-label { font-weight: 600; color: #d4af37; font-size: 15px; margin-bottom: 5px; display: block; }
+        .desc-text { color: #555; font-size: 14px; line-height: 1.6; white-space: pre-wrap; margin: 0; }
+
+        .whatsapp-btn { background: #25d366; color: white; text-decoration: none; padding: 16px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: 600; margin-top: 30px; }
+        
+        .is-sold-out-img { filter: grayscale(1); opacity: 0.6; }
+        .btn-disabled { background: #999 !important; pointer-events: none; }
+        #loading-msg { text-align: center; margin-top: 100px; color: #d4af37; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div id="soldBanner" class="sold-banner">⚠️ यह आइटम बिक चुका है / Sold Out</div>
+    <div id="loading-msg">डेटा लोड हो रहा है...</div>
+
+    <div class="product-page-wrapper" id="main-content" style="display:none;">
+        <div class="image-container">
+            <img id="main-product-img" src="" class="main-img" onerror="this.src='https://via.placeholder.com/400'">
+        </div>
+
+        <h1 id="product-title" class="product-main-title">Loading...</h1>
+        <strong style="color: #511377; font-size:12px; font-family: 'Playfair Display'"> By ANAMIKA JWELLER'S</strong>
+        
+        <div id="modalStonePriceBox" style="display: none; margin-top: 15px; margin-bottom: 5px;">
+            <span style="font-size: 22px; font-weight: 800; color: #2e7d32; background: #e8f5e9; padding: 8px 20px; border-radius: 8px; border: 1.5px dashed #2e7d32; display: inline-block;">
+                ₹ <span id="modalStonePrice">0</span> /-
+            </span>
+            <div style="font-size: 10px; color: #777; margin-top: 5px; font-weight: 600;">*Govt. Taxes & Lab Charges Extra</div>
+        </div>
+
+        <table class="spec-table" id="normal-spec-table">
+            <tr><td>✨ Purity</td><td id="spec-purity" class="spec-data" style="font-weight: 600; font-size: 13px;">---</td></tr> 
+            <tr><td>⚖️ Weight</td><td id="spec-weight" class="spec-data" style="font-weight: 600; font-size: 13px;">grams</td></tr>
+            <tr><td>🏷️ Code</td><td id="spec-code" class="spec-data" style="font-weight: 600; font-size: 13px;">---</td></tr>
+        </table>
+
+        <table class="spec-table" id="gemsSpecialSection" style="display: none; table-layout: fixed; width: 100%;">
+            <tr>
+                <td colspan="2" style="text-align: center; color: #d4af37; font-weight: 800; font-size: 16px; padding-bottom: 12px; border-bottom: none;">
+                    <i class="fa-solid fa-gem"></i> GEMS & STONE DETAILS
+                </td>
+            </tr>
+            <tr><td style="width: 50%;">💎 Stone Name</td><td id="modalStoneName" class="spec-data" style="width: 50%; word-wrap: break-word;"></td></tr> 
+            <tr><td>📜 Lab Certified</td><td id="modalCertified" class="spec-data" style="word-wrap: break-word;"></td></tr> 
+            <tr><td>⚖️ Ratti / Carat</td><td id="modalRatti" class="spec-data" style="word-wrap: break-word;"></td></tr>
+            <tr><td>♈ Zodiac (Rashi)</td><td id="modalZodiac" class="spec-data" style="word-wrap: break-word;"></td></tr>
+            <tr><td>🪐 Planet (Grah)</td><td id="modalPlanet" class="spec-data" style="word-wrap: break-word;"></td></tr>
+            <tr><td>✨ Treatment</td><td id="modalTreatment" class="spec-data" style="word-wrap: break-word;"></td></tr>
+            <tr><td>💍 Metal With</td><td id="modalMetal" class="spec-data" style="word-wrap: break-word;"></td></tr>
+            <tr><td>☝️ Dharan Ungli</td><td id="modalFinger" class="spec-data" style="word-wrap: break-word;"></td></tr>
+            <tr><td>🏷️ Code</td><td id="gems-spec-code" class="spec-data" style="word-wrap: break-word; color: #511377;">---</td></tr>
+        </table>
+
+        <div id="desc-box" class="desc-container" style="display:none;">
+            <span class="desc-label">Product Description:</span>
+            <p id="product-desc" class="desc-text"></p>
+        </div>
+
+        <a href="#" id="whatsapp-btn" class="whatsapp-btn">Inquiry on WhatsApp</a>
+        <center><a href="index.html" style="display:block; margin-top:20px; color:#d4af37; text-decoration:none; font-size:14px; padding-bottom: 20px;">← Back to Collection</a></center>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoY6noSIMt-YiIVOY7yNiYsKqQLgGmk_M",
+            databaseURL: "https://anamika-jwellers-default-rtdb.firebaseio.com",
+            projectId: "anamika-jwellers",
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let productId = urlParams.get('id') ? urlParams.get('id').toLowerCase() : null; 
+
+        if (productId) {
+            database.ref('products/' + productId).on('value', (snapshot) => {
+                const item = snapshot.val();
+                
+                if (item) {
+                    database.ref('inventory/' + productId).once('value').then((invSnapshot) => {
+                        const inv = invSnapshot.val();
+
+                        document.getElementById('loading-msg').style.display = 'none';
+                        document.getElementById('main-content').style.display = 'block';
+
+                        document.getElementById('product-title').innerText = item.title || "Jewellery Item";
+                        document.getElementById('main-product-img').src = item.image || "https://via.placeholder.com/400";
+                        
+                        // --- GEMS & STONE SMART LOGIC START ---
+                        const gemsSection = document.getElementById('gemsSpecialSection');
+                        const normalTable = document.getElementById('normal-spec-table'); 
+                        const itemCat = (item.category || "").toUpperCase();
+
+                        let isStone = itemCat.includes("GEMS") || itemCat.includes("STONE") || itemCat === "GEM" || itemCat === "STONES";
+
+                        if (isStone) {
+                            if(gemsSection) gemsSection.style.display = "table";
+                            if(normalTable) normalTable.style.display = "none"; 
+
+                            const priceBox = document.getElementById('modalStonePriceBox');
+                            if(item.stonePrice && item.stonePrice.trim() !== "") {
+                                priceBox.style.display = "block";
+                                document.getElementById('modalStonePrice').innerText = item.stonePrice;
+                            } else {
+                                priceBox.style.display = "none";
+                            }
+
+                            document.getElementById('modalStoneName').innerText = item.stoneName || "N/A";
+                            document.getElementById('modalCertified').innerHTML = (item.certified === "Yes" || item.certified === "certified") ? "Certified ✅" : "Natural";
+                            document.getElementById('modalRatti').innerText = item.ratti || "N/A";
+                            document.getElementById('modalZodiac').innerText = item.zodiac || "N/A";
+                            document.getElementById('modalPlanet').innerText = item.planet || "N/A";
+                            document.getElementById('modalTreatment').innerText = item.treatment || "Natural / Unheated";
+                            document.getElementById('modalMetal').innerText = item.metal || "Gold/Silver/Panchdhatu";
+                            document.getElementById('modalFinger').innerText = item.finger || "N/A";
+                            document.getElementById('gems-spec-code').innerText = productId.toUpperCase();
+                        } else {
+                            if(gemsSection) gemsSection.style.display = "none";
+                            if(normalTable) normalTable.style.display = "table"; 
+                            
+                            document.getElementById('spec-purity').innerText = item.purity || "22K / 916"; 
+                            document.getElementById('spec-weight').innerText = (item.weight || "0") + "gm";
+                            document.getElementById('spec-code').innerText = productId.toUpperCase();
+                            
+                            const priceBox = document.getElementById('modalStonePriceBox');
+                            if(priceBox) priceBox.style.display = "none";
+                        }
+                        // --- GEMS & STONE SMART LOGIC END ---
+
+                        const description = item.description || item.desc || "";
+                        if (description.trim() !== "") {
+                            document.getElementById('product-desc').innerText = description;
+                            document.getElementById('desc-box').style.display = 'block';
+                        } else {
+                            document.getElementById('desc-box').style.display = 'none';
+                        }
+
+                        const currentUrl = window.location.href;
+                        const waMsg = `Hi Anamika Jewellers, mujhe is item ki enquiry karni hai:\n*Item:* ${item.title || productId.toUpperCase()}\n*Code:* ${productId.toUpperCase()}\n*Link:* ${currentUrl}`;
+                        document.getElementById('whatsapp-btn').href = `https://wa.me/919977441399?text=${encodeURIComponent(waMsg)}`;
+
+                        const isSold = inv && inv.isSold === true;
+                        if (isSold) {
+                            document.getElementById('soldBanner').style.display = 'block';
+                            document.getElementById('main-product-img').classList.add('is-sold-out-img');
+                            document.getElementById('whatsapp-btn').classList.add('btn-disabled');
+                            document.getElementById('whatsapp-btn').innerText = "SOLD OUT";
+                        } else {
+                            document.getElementById('soldBanner').style.display = 'none';
+                            document.getElementById('main-product-img').classList.remove('is-sold-out-img');
+                            document.getElementById('whatsapp-btn').classList.remove('btn-disabled');
+                            document.getElementById('whatsapp-btn').innerText = "Inquiry on WhatsApp";
+                        }
+                    });
+
+                } else {
+                    document.getElementById('loading-msg').innerHTML = "<h3 style='color:red;'>Product Not Found</h3><p>यह प्रोडक्ट डेटाबेस में नहीं मिला। कृपया ID चेक करें।</p><a href='index.html' style='color:#d4af37; text-decoration:underline;'>Back to Home</a>";
+                }
+            }, (error) => {
+                console.error("Firebase Error:", error);
+                document.getElementById('loading-msg').innerHTML = `<h3 style='color:red;'>Database Error: ${error.message}</h3>`;
+            });
+        } else {
+            document.getElementById('loading-msg').innerHTML = "<h1>No Product Selected</h1><a href='index.html' style='color:#d4af37; text-decoration:underline;'>Go to Collection</a>";
+        }
+    </script>
+</body>
+</html>

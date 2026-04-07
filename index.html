@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -16,20 +15,16 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="https://unpkg.com/html5-qrcode"></script>
 
     <style>
-        /* =========================================
-           RESET & BASE STYLES 
-           (Pure page ka default margin, padding aur font set karta hai)
-        ========================================= */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent;  }
         body { font-family: 'Poppins', sans-serif; background-color: #fcfcfb; width: 100%; }
 
-        /* =========================================
-           MAIN HEADER LOGO & BACKGROUND WAVES 
-           (Upar ka gradient background aur animated waves ka design)
-        ========================================= */
         .header {
             position:relative;
             text-align:center;
@@ -89,17 +84,10 @@
 
         @media (max-width: 768px) { .waves { height:20px; min-height:20px; } }
         
-        /* =========================================
-           STICKY SEARCH CONTAINER 
-           (Search bar area jo scroll karne par upar chipka rehta hai)
-        ========================================= */
         .header-section { background: white; padding: 10px 0px 5px 0px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; width: 100%; }
         .search-container { width: 90%; max-width: 500px; margin: 10px; display: flex; flex-direction: column; gap: 8px; }
         
-        /* =========================================
-           SMART BOTTOM SHEET DRAWER CSS 
-           (Neeche se aane wala slide-up menu/drawer ka design)
-        ========================================= */
+        /* --- SMART BOTTOM SHEET DRAWER CSS --- */
         .nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 999998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(3px); }
         .nav-overlay.active { opacity: 1; visibility: visible; }
         .nav-drawer { position: fixed; bottom: -100%; left: 0; width: 100%; background: #fff; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); z-index: 999999; transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15); border-radius: 35px 35px 0 0; display: flex; flex-direction: column; padding-bottom: 20px; }
@@ -115,10 +103,7 @@
         .drawer-links li a:active { background: #d4af37; color: white; }
         .drawer-links li a:active i { color: white; }
 
-        /* =========================================
-           SEARCH BAR WITH MENU BUTTON AND QR 
-           (Search input field aur uske aas pass ke buttons ka design)
-        ========================================= */
+        /* SEARCH BAR WITH MENU BUTTON AND QR */
         .search-bar-wrapper { display: flex; align-items: center; gap: 8px; width: 100%; }
         .search-menu-btn { background: #d4af37; color: white; border: none; width: 40px; height: 40px; min-width: 40px; border-radius: 50%; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; box-shadow: 0 3px 8px rgba(212,175,55,0.3);}
         .search-menu-btn:active { transform: scale(0.9); }
@@ -127,68 +112,79 @@
         .inner-qr-btn { position: absolute; right: 12px; color: #d4af37; font-size: 18px; background: none; border: none; outline: none; cursor: pointer; transition: 0.2s; }
         .inner-qr-btn:active { transform: scale(0.9); color: #673ab7; }
         
-        /* =========================================
-           CATEGORY HORIZONTAL SCROLL LIST 
-           (Sabhi category ke gol images aur scroll bar hide karne ka design)
-        ========================================= */
         .category-scroll-wrapper { width: 100%; overflow-x: auto; white-space: nowrap; padding-bottom: 15px; display: flex; gap: 2px; scrollbar-width: none; -ms-overflow-style: none; }
         .category-scroll-wrapper::-webkit-scrollbar { display: none; }
         .cat-card { display: flex; flex-direction: column; align-items: center; gap: 0px; cursor: pointer; min-width: 90px; }
-        .cat-thumb { width: 80px; height: 80px; border-radius: 5px 5px 0px 0px; position: relative; overflow: hidden; background-color: #fffaf0; transition: 0.3s; }
-        .cat-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.5s ease-in-out; }
+        .cat-thumb { 
+    width: 80px; 
+    height: 80px; 
+    border-radius: 5px 5px 0px 0px; 
+    position: relative; 
+    overflow: hidden; /* Taki image chip se bahar na nikle */
+    background-color: #fffaf0;
+    transition: 0.3s;
+}
+
+/* Ye naya CSS add karein image ko fade karne ke liye: */
+.cat-thumb img {
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; /* Ye background-size: cover jaisa hi kaam karega */
+    opacity: 0; /* Shuru mein invisible */
+    transition: opacity 0.5s ease-in-out; /* Smooth fade effect */
+}
         .active .cat-thumb { box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3); transform: scale(1.05); }
-        .cat-name { width: 80px; font-size: 10px; padding:5px 0px 5px 0px; font-weight: 800; color: maroon; border-radius: 0px 0px 5px 5px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #ffffff; box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; }
+        .cat-name { width: 80px; font-size: 10px; padding:5px 0px 5px 0px; font-weight: 800; color: maroon; border-radius: 0px 0px 5px 5px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #ffffff;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+        }
         .active .cat-name { color: #d4af37; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3); transform: scale(1.05);  }
 
-        /* =========================================
-           PRODUCT CARDS GRID
-           (Jewelry items dikhane wala box, Grid layout)
-        ========================================= */
         .container01 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; max-width: 800px; margin: auto; }
+        
         .gift-item { position: relative; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); text-align: center; overflow: hidden; border: 1px solid #f0f0f0; cursor: pointer; display: flex; flex-direction: column; height: 100%; }
         
-        /* =========================================
-           LIKE BUTTON CSS 
-           (Heart icon aur uska animation)
-        ========================================= */
+        /* --- LIKE BUTTON CSS --- */
         .like-btn { position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.3s; }
         .like-btn i { color: #ccc; transition: 0.3s; font-size: 16px; }
         .like-btn.liked i { color: #e74c3c; }
 
-        #modalLikeBtn { width: 45px !important; height: 45px !important; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-        #modalLikeBtn i { font-size: 22px !important; }
+        #modalLikeBtn {
+            width: 45px !important;
+            height: 45px !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
 
-        /* =========================================
-           PRODUCT IMAGE & DETAILS 
-           (Product ke photo aur SOLD OUT tag ka design)
-        ========================================= */
-        .gift-item img { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; display: block; background-color: #f4f4f4; opacity: 0; transition: opacity 0.5s ease-in-out; }
+        #modalLikeBtn i {
+            font-size: 22px !important; 
+        }
+
+        /* IMAGE FADE-IN CSS */
+        .gift-item img { 
+            width: 100%; 
+            height: 140px; 
+            object-fit: cover; 
+            border-radius: 8px; 
+            display: block; 
+            background-color: #f4f4f4; 
+            opacity: 0; 
+            transition: opacity 0.5s ease-in-out; 
+        }
+        
         .item-label { font-size: 13px; font-weight: 600; margin: 8px 0 2px; display: block; color: #333; }
         .item-weight { font-size: 11px; color: #777; margin-bottom: 5px; display: block; }
         .buy-btn { display: block; padding: 7px; background: #d4af37; color: #000 !important; text-decoration: none; border-radius: 15px; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-top: auto; }
         .sold-tag { position: absolute; top: 12px; left: -32px; background: #e74c3c; color: white; padding: 5px 35px; font-size: 9px; font-weight: bold; transform: rotate(-45deg); z-index: 2; }
         
-        /* =========================================
-           POPUP / MODAL CSS 
-           (Product par click karne ke baad open hone wala bada popup)
-        ========================================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-content { width: 100%; max-width: 500px; padding:10px; background: white; border-radius: 20px; position: relative; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .close-modal { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #333; cursor: pointer; z-index: 2010; background: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         
-        /* =========================================
-           PINCH TO ZOOM & DRAG CSS 
-           (Popup ki image ko zoom aur drag karne ka container)
-        ========================================= */
+        /* --- Pinch to Zoom & Drag CSS --- */
         .modal-body { padding: 10px; padding-bottom: 10px; position: relative; overflow: hidden; }
         .img-zoom-wrapper { width: 100%; max-height: 350px; border-radius: 12px; overflow: hidden; position: relative; background-color: #fff; }
         .modal-img { width: 100%; border-radius: 12px; object-fit: cover; max-height: 350px; touch-action: none; user-select: none; -webkit-user-drag: none; transform-origin: center center; }
         
-        /* =========================================
-           POPUP DETAILS STYLING
-           (Product ki details, WhatsApp button aur table ka design)
-        ========================================= */
         .modal-title { font-family: 'Playfair Display', serif; color: #d4af37; font-size: 18px; margin-top: 15px; }
         .spec-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .spec-table td { padding: 10px 20px; border-bottom: 1px solid #f6f6f6; font-size: 14px; }
@@ -198,20 +194,70 @@
         .is-sold-out-img { filter: grayscale(1); opacity: 0.6; }
         .btn-disabled { background: #999 !important; pointer-events: none; }
 
-        /* =========================================
-           SEARCH NAV & LOADER 
-           (Search page par Back button aur loading spinner)
-        ========================================= */
         .search-nav { padding: 11px 20px; max-width: 800px; margin: auto; display: none; }
         .back-link { text-decoration: none; color: #d4af37; font-weight: bold; font-size: 14px; border: 1px solid #d4af37; padding: 5px 12px; border-radius: 20px; cursor: pointer; }
         #loader-ring { text-align: center; padding: 30px; width: 100%; }
         .ring-anim { display: inline-block; width: 30px; height: 30px; border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #d4af37; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* =========================================
-           PREMIUM BANNER SLIDER CSS 
-           (Offers wale banners ka sliding design)
-        ========================================= */
+        /* --- LOGIN SYSTEM CSS --- */
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999999; display: flex; align-items: centre; justify-content: center; flex-direction: column; }
+        
+        /* Top Header Area with Image */
+  .top-container {
+    position: relative;
+    background-color: #7d1c1c; 
+    height: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    overflow: hidden; 
+}
+
+.top-bg-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    z-index: 1; 
+    opacity: 0; 
+    transition: opacity 0.8s ease-in-out; 
+}
+
+.top-container:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background-color: white;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 40%, 15% 30%, 30% 30%, 45% 45%, 60% 30%, 75% 15%, 90% 10%);
+    z-index: 2; 
+        }
+        
+       .login-box { background: white; padding: 0px 0px; border-radius: 0px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);  max-width: 380px; height :100%;text-align: center; border: 0px solid #d4af37; transition: background-color 0.3s ease; }
+        .login-box h2 { font-family: 'Playfair Display', serif; color: #d4af37; margin-bottom: 5px; font-size: 22px;}
+        .login-input { border: none; border-bottom: 2px solid maroon; padding: 10px; width: 60%; font-size: 16px;}
+        .login-input:focus { 
+    outline: none; 
+    border-bottom: 2px solid maroon; 
+    background: #ffffff; 
+}
+        .login-btn { background-color: maroon; color: white; border: none; padding: 15px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 5px;}
+        .login-btn:active { transform: scale(0.96); }
+        .login-logo { width: 80px; height: 80px; margin-bottom: 15px; border-radius: 50%; border: 2px solid #d4af37; padding: 10px; background: #fffaf0;}
+        .google-btn { background: white; color: #444; border: 1.5px solid #ddd; padding: 12px; width: 100%; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; transition: 0.2s; font-family: 'Poppins', sans-serif;}
+        .google-btn:active { background: #f4f4f4; transform: scale(0.96); }
+        .google-btn img { width: 20px; }
+        .divider { display: flex; align-items: center; text-align: center; margin: 15px 0; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #eee; }
+        .divider span { padding: 0 10px; color: #999; font-size: 12px; font-weight: 600; }
+        
+        /* --- PREMIUM SLIDER CSS --- */
         .slider-container { width: 100%; max-width: 800px; margin: 10px auto; position: relative; overflow: hidden; border-radius: 0px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .slides-wrapper { display: flex; width: 100%; transition: transform 0.5s ease-in-out; }
         .slide { position: relative; min-width: 100%; box-sizing: border-box; display: block; text-decoration: none; }
@@ -219,23 +265,66 @@
         .slider-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; background: rgba(255, 255, 255, 0.6); padding: 5px 10px; border-radius: 20px; backdrop-filter: blur(4px); }
         .dot { width: 8px; height: 8px; background-color: #999; border-radius: 50%; cursor: pointer; transition: 0.3s all ease; }
         .dot.active { background-color: maroon; width: 20px; border-radius: 5px; }
-        .discount-badge { position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; padding: 5px 10px; border-radius: 10px; font-size: 12px; text-align:center; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10; }
 
-        /* =========================================
-           PREMIUM HEADING & FANCY DIVIDER CSS 
-           (Anamika Special text aur design wali line)
-        ========================================= */
-        .special-heading { text-align: center; margin: 20px 15px 20px 15px; }
-        .special-heading h2 { color: #7d1c1c; font-family: 'Playfair Display', serif; font-size: 26px; margin-bottom: 5px; }
-        .special-heading p { color: #555; font-size: 13px; margin-bottom: 15px; }
-        .fancy-divider { display: flex; align-items: center; justify-content: center; width: 90%; max-width: 350px; margin: 0 auto; }
-        .fancy-divider::before, .fancy-divider::after { content: ''; flex: 1; border-bottom: 1.5px solid #7d1c1c; }
-        .fancy-divider span { padding: 0 5px; color: #7d1c1c; font-size: 22px; line-height: 1;  }
+        /* NAYA CODE: Discount Badge CSS */
+        .discount-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            text-align:center;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
 
-        /* =========================================
-           MULTI-ITEM PRODUCT SLIDER CSS 
-           (Top items ka horizontal scroll slider)
-        ========================================= */
+        /* --- PREMIUM HEADING & FANCY DIVIDER CSS --- */
+        .special-heading {
+            text-align: center;
+            margin: 20px 15px 20px 15px;
+        }
+        
+        .special-heading h2 {
+            color: #7d1c1c;
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+        
+        .special-heading p {
+            color: #555;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .fancy-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+
+        .fancy-divider::before,
+        .fancy-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1.5px solid #7d1c1c;
+        }
+
+        .fancy-divider span {
+            padding: 0 5px;
+            color: #7d1c1c;
+            font-size: 22px;
+            line-height: 1;
+        }
+
+        /* --- MULTI-ITEM PRODUCT SLIDER CSS --- */
         .multi-slider-container { width: 95%; max-width: 800px; margin: 5px auto 25px; position: relative; -webkit-tap-highlight-color: transparent;}
         .multi-slides-wrapper { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth;}
         .multi-slides-wrapper::-webkit-scrollbar { display: none; }
@@ -244,85 +333,69 @@
         .multi-card { flex: 1; background: white; border-radius: 8px; box-shadow: 0 3px 8px rgba(0,0,0,0.08); overflow: hidden; cursor: pointer; border: 1px solid #eee; display: flex; flex-direction: column; }
         .multi-card-img-wrap { position: relative; width: 100%; }
         .multi-card-img-wrap img { width: 100%; height: 160px; object-fit: cover; display: block; }
+        
         .multi-card-title { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white; font-family: 'Playfair Display', serif; font-size: 13px; text-align: center; padding: 25px 5px 8px 5px; letter-spacing: 0.5px; }
+        
         .multi-card-img-wrap::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid rgba(255,255,255,0.4); pointer-events: none; z-index: 2; border-radius: 4px;}
+
         .multi-card-btn { color: #7d1c1c; text-align: center; padding: 12px 5px; font-weight: 600; font-size: 14px; background: white; font-family: 'Poppins', sans-serif;}
         
         .multi-slider-dots { display: flex; justify-content: center; gap: 8px; margin-top: 5px; }
         .multi-dot { width: 8px; height: 8px; background-color: #ddd; border-radius: 50%; cursor: pointer; transition: 0.3s; }
         .multi-dot.active { background-color: #7d1c1c; }
-
-        /* =========================================
-           GIFT BANNER CSS 
-           (Gifts for Loved Ones wala image banner)
-        ========================================= */
-        .gift-banner-container {
-            position: relative;
-            width: 100%;
-            max-width: 800px;
-            margin: 15px auto;
-            border-radius: 0px;
-            overflow: hidden;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            -webkit-tap-highlight-color: transparent;
-        }
-        .gift-banner-container img {
-            width: 100%;
-            aspect-ratio: 1 / 1; 
-            object-fit: cover;
-            display: block;
-            transition: transform 0.5s ease;
-        }
-        .gift-banner-container:active img {
-            transform: scale(1.05);
-        }
-        .gift-banner-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(to top, rgba(125, 28, 28, 0.9), transparent);
-            color: white;
-            padding: 30px 15px 15px 15px;
-            text-align: center;
-        }
-        .gift-banner-overlay h2 {
-            font-family: 'Playfair Display', serif;
-            margin: 0;
-            font-size: 24px;
-            color: #fdfaf0;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-        }
-        .gift-banner-overlay p {
-            margin: 5px 0 0;
-            font-size: 12px;
-            color: #ffd700;
-            letter-spacing: 1px;
-        }
-        
-        /* =========================================
-           CATEGORY SHOWCASE (Tanishq Premium Style)
-        ========================================= */
-        #categoryShowcaseSection, #categoryShowcaseSection2 { margin-top: 15px; margin-bottom: 20px; }
-        .showcase-banner { position: relative; width: 95%; max-width: 800px; margin: 0 auto; border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .showcase-banner img { width: 100%; height: 280px; object-fit: cover; display: block; }
-        .showcase-banner::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); pointer-events: none; }
-        .showcase-content { position: absolute; bottom: 20px; left: 0; width: 100%; text-align: center; z-index: 2; }
-        .showcase-content h2 { color: #fff; font-family: 'Playfair Display', serif; font-size: 26px; text-shadow: 1px 1px 4px rgba(0,0,0,0.6); margin-bottom: 15px; letter-spacing: 1px; }
-        .shop-now-btn { background: #fff; color: #333; padding: 8px 20px; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.2); border-radius: 2px; }
-        
-        .showcase-slider-wrapper { display: flex; overflow-x: auto; gap: 12px; padding: 15px; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
-        .showcase-slider-wrapper::-webkit-scrollbar { display: none; }
-        .showcase-card { min-width: 130px; max-width: 130px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 8px rgba(0,0,0,0.08); scroll-snap-align: start; cursor: pointer; border: 1px solid #eee; display: flex; flex-direction: column; }
-        .showcase-card img { width: 100%; height: 130px; object-fit: cover; background: #fdfaf0; }
-        .showcase-card-title { font-size: 13px; padding: 10px 5px; text-align: center; color: #511377; font-family: 'Playfair Display', serif; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
     </style>
 </head>
 <body>
     
+    <div id="loginModal" class="login-overlay" style="display: none;">              
+        <div class="login-box">   
+            
+              <div class="top-container">
+    <img src="https://i.ibb.co/hJn77tX9/logo.webp" class="top-bg-img" onload="this.style.opacity=1" alt="Anamika Jewellers Banner">
+    
+    <h1 style="position: relative; z-index: 2;"> </h1>
+</div>
+
+ 
+    <div style="align: centre;">     
+            <p style="font-size: 12px; color: grey;">Please login to view our exclusive collections.</p></div>            
+            <div style="padding: 20px 20px 5px 30px;  text-align: left;">                
+        <h2>Login / Sign Up</h3>
+        <p style="color: grey;">Enter mobile number for OTP</p>
+        </div>                                   
+                <div style="display: flex; align-items: center; justify-content: center; margin: 10px 20px 15px 30px;">
+    <span style="font-size: 16px; margin-right: 10px;">🇮🇳 </span>
+    <div id="phoneStep" style="width: 100%;">
+        <input type="tel" id="phoneNumber" class="login-input" placeholder="Enter Mobile Number" value="+91" style="width: 100%;">
+    </div>
+</div>
+
+<div style="padding: 0 30px; margin-bottom: 10px;">
+    <button class="login-btn" onclick="sendOTP()" id="sendOtpBtn">Get OTP</button>
+</div>
+            <div id="otpStep" style="display: none;">
+                <p style="font-size: 12px; color: #2e7d32; font-weight: 600;">OTP sent successfully!</p>
+                <input type="number" id="otpCode" class="login-input" placeholder="Enter 6-digit OTP">
+                <button class="login-btn" onclick="verifyOTP()" id="verifyOtpBtn">Verify & Login</button>
+                <button onclick="window.location.reload()" style="background:none; border:none; color:#d4af37; font-size:12px; margin-top:15px; cursor:pointer; font-weight:600;">Edit Number</button>
+            </div>           
+            <div id="recaptcha-container" style="margin-top: 0px; display: flex; justify-content: center;"></div> 
+            
+            <div class="divider"><span>OR</span></div>
+            
+            
+<button class="google-btn" onclick="signInWithGoogle()">
+                <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="G"> Continue with Google
+            </button>
+            
+            
+            <p id="loginError" style="color: #e74c3c; font-size: 12px; margin-top: 15px; display: none; font-weight: 600; line-height: 1.4;"></p>
+        </div>
+        <div style="position: absolute; bottom: 20px; left: 0; width: 100%; text-align: center; font-size: 11px; color: #888;">Anamika Jewellers - Since 1981</div>
+    </div>
+          
     <div class="header">
+  
         <div class="disable-select">
             <div class="hader-01">ANAMIKA JEWELLER'S</div> 
             <div class="hader-02">since 1981</div>
@@ -337,17 +410,18 @@
             </g>
         </svg>
     </div>
-    
     <div class="header-section">
     <div id="navOverlay" class="nav-overlay"></div>
     <div id="navDrawer" class="nav-drawer">
         <div class="drawer-pull-line"></div>
         
+        <!-- wellcome note -->
         <div id="userGreeting" style="text-align: center; padding: 0px; font-size: 13px; color: maroon; font-family: 'PLAYFAIR DISPLAY', serif; font-weight: bold; padding-bottom: 8px; display: none;">
-            Welcome <i class="fa-solid fa-gem"></i>
+            Welcome, <span id="userNameDisplay"></span> <i class="fa-solid fa-welcome"></i>
         </div>
        
-        <div class="drawer-header">
+    <!-- wellcome note close -->
+    <div class="drawer-header">
             <h2>Menu</h2>
             <button id="closeNavDrawerBtn" class="close-nav-btn">×</button>
         </div>
@@ -357,9 +431,11 @@
             <li><a href="#" onclick="closeNavMenu(); showFavorites(); return false;"><i class="fa-solid fa-heart" style="color: #e74c3c;"></i> My Favorites</a></li>
             <li><a href="https://wa.me/919977441399" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></li>
             <li><a href="#" onclick="closeNavMenu(); openQrScanner(); return false;"><i class="fa-solid fa-qrcode"></i> Smart Scan</a></li>
+            <li><a href="#" onclick="closeNavMenu(); logoutUser(); return false;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
         </ul>
     </div>
 
+    
         <div class="search-container">
             <div class="search-bar-wrapper">
                 <button id="openNavDrawerBtn" class="search-menu-btn"><i class="fa-solid fa-bars-staggered"></i></button>
@@ -369,83 +445,56 @@
                 </div>
             </div>
         </div>
+        
     </div>
+
+
         
     <div class="search-container" style="margin-top: 10px; margin-bottom: 5px;">
         <div class="category-scroll-wrapper" id="chipContainer">
             <div class="cat-card active" onclick="window.open(window.location.pathname, '_blank')">
-                <div class="cat-thumb">
-                    <img src="https://i.ibb.co/tPQQjFHZ/1775412992676-1.jpg" onload="this.style.opacity=1" alt="Sabhi">
-                </div>
-                <span class="cat-name">SABHI</span>
-            </div>
+    <div class="cat-thumb">
+        <img src="https://i.ibb.co/tPQQjFHZ/1775412992676-1.jpg" onload="this.style.opacity=1" alt="Sabhi">
+    </div>
+    <span class="cat-name">SABHI</span>
+</div>
+
         </div>
     </div>
     
-    <div class="slider-container" id="homeSlider" style="display:none;"> 
-        <div class="slides-wrapper" id="slidesWrapper"></div>
-        <div class="slider-dots" id="sliderDots"></div>
+<div class="slider-container" id="homeSlider" style="display:none;"> <div class="slides-wrapper" id="slidesWrapper">
+            </div>
+        <div class="slider-dots" id="sliderDots">
+            </div>
     </div>
     
-    <div class="special-heading" id="specialHeading" style="display:none;">
+<div class="special-heading" id="specialHeading" style="display:none;">
         <h2>Anamika Special</h2>
         <p>Our top picks, just for you !</p>
-        <div class="fancy-divider" style="display:none;"><span style="padding:10px 0px;">💍</span></div>
+        
+        <div class="fancy-divider">
+            <span> 💍 </span>
+            </div>
     </div>
     
     <div class="multi-slider-container" id="specialSlider" style="display:none;">
-        <div class="multi-slides-wrapper" id="multiSlidesWrapper"></div>
-        <div class="multi-slider-dots" id="multiSliderDots"></div>
-    </div>
-
-    <div class="gift-banner-container" id="giftBannerContainer" style="display:none;" onclick="window.location.href='?offer=gifts'">
-        <img src="https://i.ibb.co/4gNBw4hM/IMG-20260406-124614.webp" alt="Gift for Loved">
-        <div class="gift-banner-overlay">
-            <h2>Gifts for Loved Ones</h2>
-            <p>Special collection from all categories</p>
-        </div>     
-    </div>
-    <div class="fancy-divider" style="display:none;"><span style="padding:10px 0px;">💍</span></div>
-    
-    <div id="categoryShowcaseSection" style="display:none;">
-        <div class="showcase-banner" id="showcaseBannerBtn">
-            <img id="showcaseBannerImg" src="" alt="Category Collection">
-            <div class="showcase-content">
-                <h2 id="showcaseBannerTitle">Loading...</h2>
-                <span class="shop-now-btn">SHOP NOW</span>
+        <div class="multi-slides-wrapper" id="multiSlidesWrapper">
             </div>
-        </div>
         
-        <div class="showcase-slider-wrapper" id="showcaseSliderWrapper">
-        </div>
+        <div class="multi-slider-dots" id="multiSliderDots">
+            
     </div>
+    <div class="fancy-divider">
+            <span style="padding:10px 0px;"></span>
+            </div>            
     
-<div class="fancy-divider" style="display:none;"><span style="padding:10px 0px;">💍</span></div>
-
-    <div id="categoryShowcaseSection2" style="display:none;">
-        <div class="showcase-banner" id="showcaseBannerBtn2">
-            <img id="showcaseBannerImg2" src="" alt="Category Collection 2">
-            <div class="showcase-content">
-                <h2 id="showcaseBannerTitle2">Loading...</h2>
-                <span class="shop-now-btn">SHOP NOW</span>
             </div>
-        </div>
-        
-        <div class="showcase-slider-wrapper" id="showcaseSliderWrapper2">
-        </div>
-    </div>
-
     <script>
         if (new URLSearchParams(window.location.search).has('offer') || new URLSearchParams(window.location.search).has('search')) {
             document.getElementById('chipContainer').parentNode.style.display = 'none';
             if(document.getElementById('homeSlider')) document.getElementById('homeSlider').style.display = 'none';
             if(document.getElementById('specialSlider')) document.getElementById('specialSlider').style.display = 'none';
             if(document.getElementById('specialHeading')) document.getElementById('specialHeading').style.display = 'none';
-            if(document.getElementById('giftBannerContainer')) document.getElementById('giftBannerContainer').style.display = 'none';
-            document.querySelectorAll('.fancy-divider').forEach(div => div.style.display = 'none');
-            
-            if(document.getElementById('categoryShowcaseSection')) document.getElementById('categoryShowcaseSection').style.display = 'none';
-            if(document.getElementById('categoryShowcaseSection2')) document.getElementById('categoryShowcaseSection2').style.display = 'none';
         }
     </script>
 
@@ -525,7 +574,7 @@
         </button>
     </div>
 
-        <footer style="text-align: center; color: #888; padding-bottom: 20px; font-size: 12px; width: 100%; user-select: none;">
+    <footer style="text-align: center; color: #888; padding-bottom: 20px; font-size: 12px; width: 100%; user-select: none;">
         Anamika Jewellers - Since 1981 <br>   
         <strong>
             <script type="text/javascript">
@@ -536,11 +585,7 @@
         </strong>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-
     <script>
-        // === NAV DRAWER LOGIC (Menu ko kholne/band karne aur drag karne ka code) ===
         const navOverlay = document.getElementById('navOverlay');
         const navDrawer = document.getElementById('navDrawer');
         
@@ -595,7 +640,6 @@
             drawerCurrentY = 0;
         });
 
-        // === QR SCANNER LOGIC (html5-qrcode use karke camera kholne ka code) ===
         let html5QrCode = null;
 
         function openQrScanner() {
@@ -637,7 +681,6 @@
             }
         }
 
-        // === FIREBASE SETUP (Database aur Authentication ko connect karna) ===
         const firebaseConfig = {
             apiKey: "AIzaSyBoY6noSIMt-YiIVOY7yNiYsKqQLgGmk_M",
             authDomain: "anamika-jwellers.firebaseapp.com",
@@ -654,76 +697,86 @@
         let currentState = 'home';
         const itemsPerPage = 06; let isFetching = false; let isDataFetched = false;
         let isProductsLoaded = false; let isInventoryLoaded = false; 
-        let showcaseData = null; let showcaseData2 = null;
 
-        // ============== MAIN DATA FETCH (OUTSIDE AUTH) ============== //
-        // Isse data hamesha load hoga, chahe login fail ho ya pass (Products, Inventory aur Banners)
-        if(!isDataFetched) {
-            database.ref('products').on('value', (snap) => {
-                productData = snap.val() || {};
-                isProductsLoaded = true;
-                if (isInventoryLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); }
-            });
+        let isLoginMode = true; 
+
+        function forgotPassword() {
+            let phone = document.getElementById('userPhone').value.trim();
+            let errorMsg = document.getElementById('loginError');
             
-            database.ref('inventory').on('value', (snap) => {
-                inventoryStatus = snap.val() || {};
-                isInventoryLoaded = true;
-                if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); }
-            });
+            if(!phone || phone.length < 10) {
+                errorMsg.innerText = "Kripya upar apna Mobile Number dalein aur phir 'Password bhool gaye?' par click karein.";
+                errorMsg.style.display = 'block';
+                return;
+            }
 
-            database.ref('category_showcase').on('value', (snap) => {
-                showcaseData = snap.val();
-                if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateShowcaseSlider(); }
-            });
-
-            database.ref('category_showcase2').on('value', (snap) => {
-                showcaseData2 = snap.val();
-                if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateShowcaseSlider2(); }
-            });
-
-            database.ref('offers_banners').on('value', (snap) => {
-                let offers = snap.val();
-                if(offers && !new URLSearchParams(window.location.search).has('offer') && !new URLSearchParams(window.location.search).has('search')) {
-                    let slidesHtml = '';
-                    let dotsHtml = '';
-                    let slideCount = 0;
-                    
-                    ['slide1', 'slide2', 'slide3', 'slide4', 'slide5'].forEach((key, index) => {
-                        if(offers[key] && offers[key].image) {
-                            let badgeHtml = offers[key].discount ? `<div class="discount-badge">${offers[key].discount}% OFF <br><div style="font-size: 1px; opacity: 0.8; font-weight: normal; ">on making charge.</div></div>` : '';
-                            slidesHtml += `
-                            <a href="${offers[key].link}" target="_blank" class="slide">
-                                ${badgeHtml}
-                                <img src="${offers[key].image}" alt="Offer ${index+1}">
-                            </a>`;
-                            dotsHtml += `<span class="dot ${slideCount === 0 ? 'active' : ''}" onclick="goToSlide(${slideCount})"></span>`;
-                            slideCount++;
-                        }
-                    });
-
-                    if(slideCount > 0) {
-                        document.getElementById('slidesWrapper').innerHTML = slidesHtml;
-                        document.getElementById('sliderDots').innerHTML = dotsHtml;
-                        document.getElementById('homeSlider').style.display = 'block';
-                        totalSlides = slideCount; 
-                        resetInterval();
-                    } else {
-                        document.getElementById('homeSlider').style.display = 'none';
-                    }
-                }
-            });
-            
-            isDataFetched = true;
+            let waMsg = `Hi Anamika Jewellers, main apna password bhool gaya/gayi hu. Kripya mera account reset karein.\n\nMera mobile number hai: ${phone}`;
+            window.open(`https://wa.me/919977441399?text=${encodeURIComponent(waMsg)}`, '_blank');
         }
-        // ======================================================= //
 
-        // === LIKE BUTTON LOGIC (User dwara product like/unlike karna) ===
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('authTitle').innerText = isLoginMode ? "Login" : "Sign Up";
+            document.getElementById('authBtn').innerText = isLoginMode ? "Login" : "Create Account";
+            document.getElementById('toggleLink').innerText = isLoginMode ? "Naya account banayein? Sign Up" : "Pehle se account hai? Login karein";
+            document.getElementById('userPass').placeholder = isLoginMode ? "Password" : "Password banayein";
+            document.getElementById('userNameInput').style.display = isLoginMode ? "none" : "block";
+            
+            let loginBox = document.querySelector('.login-box');
+            if(isLoginMode) {
+                loginBox.style.backgroundColor = "white"; // Login mode (Safed)
+            } else {
+                loginBox.style.backgroundColor = "#f0f8ff"; // Sign Up mode (Halka Blue)
+            }
+        }
+
+        function handleAuth() {
+            let phone = document.getElementById('userPhone').value.trim();
+            let pass = document.getElementById('userPass').value.trim();
+            let nameInput = document.getElementById('userNameInput').value.trim();
+            let errorMsg = document.getElementById('loginError');
+            errorMsg.style.display = 'none';
+
+            phone = phone.replace('+91', '').trim();
+
+            if (!isLoginMode && nameInput === "") {
+                errorMsg.innerText = "Kripya apna naam dalein.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            if(phone.length < 10 || pass.length < 6) {
+                errorMsg.innerText = "Sahi Mobile Number (10 digits) aur Password (kam se kam 6 akshar) dalein.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            let fakeEmail = phone + "@anamikajewellers.com";
+            document.getElementById('authBtn').innerText = "Processing...";
+
+            if(isLoginMode) {
+                auth.signInWithEmailAndPassword(fakeEmail, pass).catch(err => {
+                    errorMsg.innerText = "Login Failed: " + err.message;
+                    errorMsg.style.display = 'block';
+                    document.getElementById('authBtn').innerText = "Login";
+                });
+            } else {
+                auth.createUserWithEmailAndPassword(fakeEmail, pass).then((userCredential) => {
+                    database.ref('user_names/' + userCredential.user.uid).set(nameInput);
+                }).catch(err => {
+                    errorMsg.innerText = "Sign Up Failed: " + err.message;
+                    errorMsg.style.display = 'block';
+                    document.getElementById('authBtn').innerText = "Create Account";
+                });
+            }
+        }
+
         function toggleLike(productId, event) {
             if (event) event.stopPropagation(); 
             
             const user = auth.currentUser;
             if (!user) {
-                alert("Bina login ke abhi Like option chal nahi payega. Humne background mein try kiya, thodi der baad koshish karein.");
+                alert("Kripya pehle login karein!");
                 return;
             }
 
@@ -760,7 +813,6 @@
             });
         }
 
-        // === NOTIFICATIONS LOGIC (Database se Global Notifications receive karna) ===
         function listenForNotifications() {
             database.ref('global_notification').on('value', (snap) => {
                 const noti = snap.val();
@@ -787,26 +839,96 @@
             });
         }
 
-        // === USER AUTH LOGIC (Silent Anonymous Auth for tracking likes) ===
         auth.onAuthStateChanged((user) => {
             if (user) {
+                let phoneStr = user.email.replace('@anamikajewellers.com', '');
                 database.ref('users/' + user.uid).update({
+                    phone: phoneStr,
+                    email: user.email,
                     lastLogin: new Date().toLocaleString()
                 }).catch(err => console.log("User entry error:", err));
 
+                document.getElementById('loginModal').style.display = 'none';
+                document.body.style.overflow = "auto";
+                
                 document.getElementById('userGreeting').style.display = 'block';
+
+                database.ref('user_names/' + user.uid).on('value', (snapshot) => {
+                    let customerName = snapshot.val();
+                    if (customerName) {
+                        document.getElementById('userNameDisplay').innerText = customerName;
+                    } else {
+                        document.getElementById('userNameDisplay').innerText = phoneStr;
+                    }
+                });
 
                 listenToUserLikes(user.uid); 
                 listenForNotifications(); 
+                
+                if(!isDataFetched) {
+                    database.ref('products').on('value', (snap) => {
+                        productData = snap.val() || {};
+                        isProductsLoaded = true;
+                        if (isInventoryLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); }
+                    });
+                    
+                    database.ref('inventory').on('value', (snap) => {
+                        inventoryStatus = snap.val() || {};
+                        isInventoryLoaded = true;
+                        if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); }
+                    });
+
+                    database.ref('offers_banners').on('value', (snap) => {
+                        let offers = snap.val();
+                        if(offers && !new URLSearchParams(window.location.search).has('offer') && !new URLSearchParams(window.location.search).has('search')) {
+                            let slidesHtml = '';
+                            let dotsHtml = '';
+                            let slideCount = 0;
+                            
+                            // YAHAN 5 SLIDES KE LIYE LOOP UPDATE KIYA HAI
+                            ['slide1', 'slide2', 'slide3', 'slide4', 'slide5'].forEach((key, index) => {
+                                if(offers[key] && offers[key].image) {
+                                    let badgeHtml = offers[key].discount ? `<div class="discount-badge">${offers[key].discount}% OFF <br><div style="font-size: 1px; opacity: 0.8; font-weight: normal; ">on making charge.</div>
+                                    </div>` : '';
+                                    slidesHtml += `
+                                    <a href="${offers[key].link}" target="_blank" class="slide">
+                                        ${badgeHtml}
+                                        <img src="${offers[key].image}" alt="Offer ${index+1}">
+                                    </a>`;
+                                    dotsHtml += `<span class="dot ${slideCount === 0 ? 'active' : ''}" onclick="goToSlide(${slideCount})"></span>`;
+                                    slideCount++;
+                                }
+                            });
+
+                            if(slideCount > 0) {
+                                document.getElementById('slidesWrapper').innerHTML = slidesHtml;
+                                document.getElementById('sliderDots').innerHTML = dotsHtml;
+                                document.getElementById('homeSlider').style.display = 'block';
+                                totalSlides = slideCount; 
+                                resetInterval();
+                            } else {
+                                document.getElementById('homeSlider').style.display = 'none';
+                            }
+                        }
+                    });
+                    
+                    isDataFetched = true;
+                }
             } else {
-                auth.signInAnonymously().catch((error) => {
-                    console.error("Anonymous auth failed: ", error);
-                    // Ab error aane par bhi website rukegi nahi, bas "Like" wale features mein error ayega.
-                });
+                document.getElementById('loginModal').style.display = 'flex';
+                document.body.style.overflow = "hidden";
+                if (isLoginMode === true) {
+                    toggleAuthMode();
+                }
             }
         });
 
-        // === UI RENDERING (Categories ke chips / buttons banana) ===
+        function logoutUser() {
+            auth.signOut().then(() => {
+                window.location.reload(); 
+            });
+        }
+
         function updateDynamicThumbs() {
             const container = document.getElementById('chipContainer');
             const categories = {};
@@ -818,25 +940,26 @@
                 }
             });
             container.innerHTML = `<div class="cat-card active" onclick="window.open(window.location.pathname, '_blank')">
-                <div class="cat-thumb">
-                    <img src="https://i.ibb.co/tPQQjFHZ/1775412992676-1.jpg" onload="this.style.opacity=1" alt="Sabhi">
-                </div>
-                <span class="cat-name">SABHI</span>
-            </div>`;
+    <div class="cat-thumb">
+        <img src="https://i.ibb.co/tPQQjFHZ/1775412992676-1.jpg" onload="this.style.opacity=1" alt="Sabhi">
+    </div>
+    <span class="cat-name">SABHI</span>
+</div>
+`;
             Object.keys(categories).sort().forEach(cat => {
                 const card = document.createElement('div');
                 card.className = 'cat-card'; 
                 card.onclick = () => window.open('?offer=' + encodeURIComponent(cat), '_blank');
                 card.innerHTML = `
-                <div class="cat-thumb">
-                    <img src="${categories[cat]}" onload="this.style.opacity=1" alt="${cat}">
-                </div>
-                <span class="cat-name">${cat}</span>`;
+    <div class="cat-thumb">
+        <img src="${categories[cat]}" onload="this.style.opacity=1" alt="${cat}">
+    </div>
+    <span class="cat-name">${cat}</span>
+`;
                 container.appendChild(card);
             });
         }
 
-        // === INITIAL DISPLAY SETUP (Page load par kya dikhega tay karta hai) ===
         function initDisplay() {
             showingFavoritesOnly = false;
             document.getElementById('favoritesBanner').style.display = "none";
@@ -857,43 +980,25 @@
             if (q || offerCategory) { 
                 if (q) showSearchPage(q, false); 
                 else {
-                    if (offerCategory === 'gifts') {
-                        showGiftCollection();
-                        document.getElementById('searchStatus').innerText = "🎁 Gifts for Loved Ones (Special Picks)";
-                    } else {
-                        showSearchPage(offerCategory, true);
-                        document.getElementById('searchStatus').innerText = "Special Offers: " + offerCategory.toUpperCase();
-                    }
+                    showSearchPage(offerCategory, true);
+                    document.getElementById('searchStatus').innerText = "Special Offers: " + offerCategory.toUpperCase();
                 }
                 
                 catChips.style.display = 'none';
                 if(mainSlider) mainSlider.style.display = 'none';
                 if(specSlider) specSlider.style.display = 'none';
                 if(specHeading) specHeading.style.display = 'none';
-                if(document.getElementById('giftBannerContainer')) document.getElementById('giftBannerContainer').style.display = 'none';
-                document.querySelectorAll('.fancy-divider').forEach(div => div.style.display = 'none');
-                if(document.getElementById('categoryShowcaseSection')) document.getElementById('categoryShowcaseSection').style.display = 'none';
-                if(document.getElementById('categoryShowcaseSection2')) document.getElementById('categoryShowcaseSection2').style.display = 'none';
-            } else {            
+            } else {
                 document.getElementById('searchNav').style.display = "none";
                 catChips.style.display = 'flex';
-                if(document.getElementById('giftBannerContainer')) document.getElementById('giftBannerContainer').style.display = 'block';
-                document.querySelectorAll('.fancy-divider').forEach(div => div.style.display = 'flex');
-             
+                
                 updateMultiSlider(); 
                 
-                if(document.getElementById('categoryShowcaseSection')) document.getElementById('categoryShowcaseSection').style.display = 'block';
-                updateShowcaseSlider();
-
-                if(document.getElementById('categoryShowcaseSection2')) document.getElementById('categoryShowcaseSection2').style.display = 'block';
-                updateShowcaseSlider2();
-             
                 allKeys = Object.keys(productData).filter(id => !(inventoryStatus[id] && inventoryStatus[id].isSold === true));
                 allKeys.sort(() => Math.random() - 0.5); currentIndex = 0; renderNextBatch(); setupIntersectionObserver();
             }
         }
 
-        // === INFINITE SCROLL LOGIC (Neeche scroll karne par aur items load karna) ===
         let scrollObserver = null; 
         function setupIntersectionObserver() {
             if (scrollObserver) {
@@ -907,7 +1012,6 @@
             scrollObserver.observe(document.getElementById('loader-ring'));
         }
 
-        // === CARD CREATION LOGIC (Har ek product box banana HTML me) ===
         function createCard(id, container) {
             const item = productData[id]; if(!item) return;
             const isSold = inventoryStatus[id] && inventoryStatus[id].isSold === true;
@@ -928,7 +1032,6 @@
             container.insertAdjacentHTML('beforeend', itemHtml);
         }
 
-        // === POPUP MODAL LOGIC (Product kholna, details aur WhatsApp logic) ===
         function openPopup(id) {
             const item = productData[id]; const inv = inventoryStatus[id];
             const modal = document.getElementById('productModal');
@@ -982,7 +1085,6 @@
             history.pushState({ popupOpen: true }, null, window.location.href);
         }
 
-        // === BATCH RENDER LOGIC (Thode thode items karke load karna) ===
         function renderNextBatch() {
             if (currentIndex >= allKeys.length) { document.getElementById('loader-ring').style.display = 'none'; return; }
             isFetching = true; const container = document.getElementById('main-product-list');
@@ -990,44 +1092,6 @@
             nextKeys.forEach(id => createCard(id, container)); currentIndex += itemsPerPage; isFetching = false;
         }
 
-        // ============== GIFTS FOR LOVED ONES LOGIC ============== //
-        function showGiftCollection() {
-            const container = document.getElementById('main-product-list');
-            container.innerHTML = ""; 
-            document.getElementById('searchNav').style.display = "block";
-            document.getElementById('loader-ring').style.display = "block";
-
-            let categoriesMap = {};
-            
-            Object.keys(productData).forEach(id => {
-                let isSold = inventoryStatus[id] && inventoryStatus[id].isSold === true;
-                if (!isSold) {
-                    let cat = productData[id].category || "Other";
-                    if (!categoriesMap[cat]) categoriesMap[cat] = [];
-                    categoriesMap[cat].push(id);
-                }
-            });
-
-            let selectedKeys = [];
-
-            Object.keys(categoriesMap).forEach(cat => {
-                let items = categoriesMap[cat];
-                items.sort(() => Math.random() - 0.5);
-                 // Pehle 3 items select karein
-                selectedKeys.push(...items.slice(0, 3));
-            });
-
-            selectedKeys.sort(() => Math.random() - 0.5);
-
-            document.getElementById('loader-ring').style.display = "none";
-            if (selectedKeys.length === 0) {
-                container.innerHTML = "<p style='text-align:center; width:100%; color:#777;'>Abhi koi product available nahi hai.</p>";
-            } else {
-                selectedKeys.forEach(id => createCard(id, container));
-            }
-        }
-
-        // === SEARCH RESULTS LOGIC (Search karne par data filter karna) ===
         function showSearchPage(query, hideSoldItems = false) {
             showingFavoritesOnly = false;
             document.getElementById('favoritesBanner').style.display = "none";
@@ -1066,7 +1130,6 @@
 
         function handleSearch(e) { if (e.key === 'Enter') { const val = document.getElementById('mainSearch').value.trim(); if (val) window.location.href = window.location.pathname + "?search=" + encodeURIComponent(val); } }
         
-        // === CATEGORY FILTER LOGIC (Achi tarah category filter karna) ===
         function filterByCategory(category, el) {
             showingFavoritesOnly = false;
             document.getElementById('favoritesBanner').style.display = "none";
@@ -1097,7 +1160,6 @@
             showSearchPage(category);
         }
 
-        // === FAVORITES PAGE LOGIC (User ke liked items dikhana) ===
         function showFavorites() {
             if (currentState === 'home') {
                 history.pushState({ view: 'favorites' }, null, window.location.href);
@@ -1117,11 +1179,7 @@
             if(document.getElementById('homeSlider')) document.getElementById('homeSlider').style.display = 'none';
             if(document.getElementById('specialSlider')) document.getElementById('specialSlider').style.display = 'none';
             if(document.getElementById('specialHeading')) document.getElementById('specialHeading').style.display = 'none';
-            if(document.getElementById('giftBannerContainer')) document.getElementById('giftBannerContainer').style.display = 'none';
-            document.querySelectorAll('.fancy-divider').forEach(div => div.style.display = 'none');
-            if(document.getElementById('categoryShowcaseSection')) document.getElementById('categoryShowcaseSection').style.display = 'none';
-            if(document.getElementById('categoryShowcaseSection2')) document.getElementById('categoryShowcaseSection2').style.display = 'none';
-            
+
             document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
 
             const likedKeys = Object.keys(userLikes).filter(id => userLikes[id] === true && productData[id]);
@@ -1136,7 +1194,7 @@
             }
         }
 
-        // === IMAGE ZOOM & DRAG LOGIC (Popup image ko Pinch karke bada karna) ===
+        /* --- Advanced Pinch to Zoom & Point Double Tap Logic --- */
         const modalImg = document.getElementById('modalImg');
         let scale = 1;
         let panning = false;
@@ -1280,7 +1338,84 @@
             lastTapTime = currentTime;
         });
 
-        // === MAIN BANNER SLIDER LOGIC (Premium Banners ko auto scroll karne ka code) ===
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const errorMsg = document.getElementById('loginError');
+            errorMsg.style.display = 'none';
+            
+            auth.signInWithPopup(provider).catch((error) => {
+                errorMsg.innerText = "Google Login Failed: " + error.message;
+                errorMsg.style.display = 'block';
+            });
+        }
+
+        let confirmationResult;
+
+        function sendOTP() {
+            let phone = document.getElementById('phoneNumber').value.trim();
+            const errorMsg = document.getElementById('loginError');
+            errorMsg.style.display = 'none';
+
+            if (!phone.startsWith('+')) { phone = '+91' + phone; }
+
+            if(phone.length < 12) {
+                errorMsg.innerText = "Kripya sahi mobile number daalein (10 digits).";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                    'size': 'invisible'
+                });
+            }
+
+            let sendBtn = document.getElementById('sendOtpBtn');
+            sendBtn.innerText = "Sending OTP...";
+            sendBtn.disabled = true;
+            
+            auth.signInWithPhoneNumber(phone, window.recaptchaVerifier)
+                .then((result) => {
+                    confirmationResult = result;
+                    document.getElementById('phoneStep').style.display = 'none';
+                    sendBtn.style.display = 'none';
+                    document.getElementById('otpStep').style.display = 'block';
+                }).catch((error) => {
+                    errorMsg.innerText = "OTP Error: " + error.message;
+                    errorMsg.style.display = 'block';
+                    sendBtn.innerText = "Get OTP";
+                    sendBtn.disabled = false;
+                    if(window.recaptchaVerifier) { 
+                        window.recaptchaVerifier.render().then(widgetId => grecaptcha.reset(widgetId)); 
+                    }
+                });
+        }
+
+        function verifyOTP() {
+            const code = document.getElementById('otpCode').value.trim();
+            const errorMsg = document.getElementById('loginError');
+            errorMsg.style.display = 'none';
+
+            if(code.length !== 6) {
+                errorMsg.innerText = "Kripya 6-digit ka OTP daalein.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            let verifyBtn = document.getElementById('verifyOtpBtn');
+            verifyBtn.innerText = "Verifying...";
+            verifyBtn.disabled = true;
+
+            confirmationResult.confirm(code).then((result) => {
+                console.log("Phone Login Successful!");
+            }).catch((error) => {
+                errorMsg.innerText = "Galat OTP. Kripya dobara try karein.";
+                errorMsg.style.display = 'block';
+                verifyBtn.innerText = "Verify & Login";
+                verifyBtn.disabled = false;
+            });
+        }
+
         let currentSlide = 0;
         let totalSlides = 0; 
         const slidesWrapper = document.getElementById('slidesWrapper');
@@ -1359,7 +1494,6 @@
             });
         }
         
-        // === MULTI-ITEM SLIDER LOGIC (Anamika Special items slider ka code) ===
         function updateMultiSlider() {
             const multiWrapper = document.getElementById('multiSlidesWrapper');
             const multiDotsContainer = document.getElementById('multiSliderDots');
@@ -1438,122 +1572,6 @@
                 let width = multiWrapper.clientWidth;
                 multiWrapper.scrollTo({ left: width * index, behavior: 'smooth' });
             }
-        }
-        
-                // === CATEGORY SHOWCASE SLIDER LOGIC ===
-        function updateShowcaseSlider() {
-            const showcaseWrapper = document.getElementById('showcaseSliderWrapper');
-            const showcaseSection = document.getElementById('categoryShowcaseSection');
-            if(!showcaseWrapper || !showcaseSection) return;
-
-            // Agar offer ya search page khula hai, toh ise hamesha hide rakhein
-            if (new URLSearchParams(window.location.search).has('offer') || new URLSearchParams(window.location.search).has('search') || currentState !== 'home') {
-                showcaseSection.style.display = 'none';
-                return;
-            }
-
-            if(!showcaseData || showcaseData.isActive === false) {
-                showcaseSection.style.display = 'none';
-                return;
-            }
-
-
-            document.getElementById('showcaseBannerImg').src = showcaseData.image || 'https://via.placeholder.com/800x400';
-            document.getElementById('showcaseBannerTitle').innerText = showcaseData.title || 'Special Collection';
-            
-            let link = '?offer=' + encodeURIComponent(showcaseData.category);
-            document.getElementById('showcaseBannerBtn').onclick = () => window.open(link, '_blank');
-
-            const targetCategory = showcaseData.category || ""; 
-
-            let categoryKeys = Object.keys(productData).filter(id => {
-                let item = productData[id];
-                let isSold = inventoryStatus[id] && inventoryStatus[id].isSold === true;
-                return !isSold && item.category && item.category.trim().toUpperCase() === targetCategory.toUpperCase();
-            });
-
-            categoryKeys.sort(() => Math.random() - 0.5);
-            let top10 = categoryKeys.slice(0, 10);
-
-            if(top10.length === 0) {
-                showcaseSection.style.display = 'none';
-                return;
-            }
-
-            showcaseSection.style.display = 'block';
-            let slidesHtml = '';
-            top10.forEach(id => {
-                let item = productData[id];
-                let title = item.title || 'Jewellery Item';
-                let img = item.image || 'https://via.placeholder.com/150';
-                
-                slidesHtml += `
-                    <div class="showcase-card" onclick="openPopup('${id}')">
-                        <img src="${img}" alt="${title}">
-                        <div class="showcase-card-title">${title}</div>
-                    </div>
-                `;
-            });
-
-            showcaseWrapper.innerHTML = slidesHtml;
-        }
-
-                // === CATEGORY SHOWCASE 2 SLIDER LOGIC ===
-        function updateShowcaseSlider2() {
-            const showcaseWrapper = document.getElementById('showcaseSliderWrapper2');
-            const showcaseSection = document.getElementById('categoryShowcaseSection2');
-            if(!showcaseWrapper || !showcaseSection) return;
-
-            // Agar offer ya search page khula hai, toh ise hamesha hide rakhein
-            if (new URLSearchParams(window.location.search).has('offer') || new URLSearchParams(window.location.search).has('search') || currentState !== 'home') {
-                showcaseSection.style.display = 'none';
-                return;
-            }
-
-            if(!showcaseData2 || showcaseData2.isActive === false) {
-                showcaseSection.style.display = 'none';
-                return;
-            }
-
-
-            document.getElementById('showcaseBannerImg2').src = showcaseData2.image || 'https://via.placeholder.com/800x400';
-            document.getElementById('showcaseBannerTitle2').innerText = showcaseData2.title || 'Special Collection';
-            
-            let link = '?offer=' + encodeURIComponent(showcaseData2.category);
-            document.getElementById('showcaseBannerBtn2').onclick = () => window.open(link, '_blank');
-
-            const targetCategory = showcaseData2.category || ""; 
-
-            let categoryKeys = Object.keys(productData).filter(id => {
-                let item = productData[id];
-                let isSold = inventoryStatus[id] && inventoryStatus[id].isSold === true;
-                return !isSold && item.category && item.category.trim().toUpperCase() === targetCategory.toUpperCase();
-            });
-
-            categoryKeys.sort(() => Math.random() - 0.5);
-            let top10 = categoryKeys.slice(0, 10);
-
-            if(top10.length === 0) {
-                showcaseSection.style.display = 'none';
-                return;
-            }
-
-            showcaseSection.style.display = 'block';
-            let slidesHtml = '';
-            top10.forEach(id => {
-                let item = productData[id];
-                let title = item.title || 'Jewellery Item';
-                let img = item.image || 'https://via.placeholder.com/150';
-                
-                slidesHtml += `
-                    <div class="showcase-card" onclick="openPopup('${id}')">
-                        <img src="${img}" alt="${title}">
-                        <div class="showcase-card-title">${title}</div>
-                    </div>
-                `;
-            });
-
-            showcaseWrapper.innerHTML = slidesHtml;
         }
 
     </script>

@@ -47,6 +47,7 @@
         .action-area { display: flex; align-items: center; gap: 5px; } 
         .btn-status { padding: 8px 10px; border-radius: 6px; border: none; font-size: 10px; min-width: 75px; font-weight: 800; cursor: pointer; }
         
+        /* NAYA: Restore Icon Style */
         .btn-restore-icon { background: #e8f5e9; color: #2e7d32; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; transition: 0.2s; }
         .btn-restore-icon:active { transform: scale(0.9); }
 
@@ -345,6 +346,7 @@
 
                     <div id="add-stone-fields" style="display:none; border: 1px solid #d4af37; padding: 10px; border-radius: 8px; background: #fffaf0; margin: 10px auto; width: 90%;">
                         <p style="font-size:11px; color:#d4af37; font-weight:bold; margin-bottom:5px;">💎 GEMS & STONE DETAILS</p>
+                        <input id="addStonePrice" class="swal-custom-input" placeholder="Selling Price (₹) e.g. 5500" type="number">
                         <input id="addStoneName" class="swal-custom-input" placeholder="Stone Name">
                         <select id="addCertified" class="swal-custom-input">
                             <option value="No">Lab Certified: No</option>
@@ -353,7 +355,7 @@
                         <input id="addRatti" class="swal-custom-input" placeholder="Ratti / Carat">
                         <input id="addZodiac" class="swal-custom-input" placeholder="Zodiac (Rashi)">
                         <input id="addPlanet" class="swal-custom-input" placeholder="Planet (Grah)">
-                        <input id="addTreatment" class="swal-custom-input" placeholder="Treatment">
+                        <input id="addTreatment" class="swal-custom-input" placeholder="Treatment(Natural)">
                         <input id="addMetal" class="swal-custom-input" placeholder="Metal (Gold/Silver)">
                         <input id="addFinger" class="swal-custom-input" placeholder="Finger (Ungli)">
                     </div>
@@ -386,6 +388,7 @@
                         category: document.getElementById('addCategory').value,
                         weight: document.getElementById('addWeight').value,
                         purity: document.getElementById('addPurity').value,
+                        stonePrice: document.getElementById('addStonePrice').value,
                         stoneName: document.getElementById('addStoneName').value,
                         certified: document.getElementById('addCertified').value,
                         ratti: document.getElementById('addRatti').value,
@@ -406,7 +409,7 @@
                     Promise.all([
                         database.ref('products/' + d.id).set({ 
                             title: d.title, weight: d.weight, purity: d.purity, category: d.category, 
-                            image: d.image, desc: d.desc, timestamp: d.timestamp, stoneName: d.stoneName, 
+                            image: d.image, desc: d.desc, timestamp: d.timestamp, stonePrice: d.stonePrice, stoneName: d.stoneName, 
                             certified: d.certified, ratti: d.ratti, zodiac: d.zodiac, planet: d.planet, 
                             treatment: d.treatment, metal: d.metal, finger: d.finger 
                         }),
@@ -445,6 +448,7 @@
 
                     <div id="edit-stone-fields" style="display:none; border: 1px solid #d4af37; padding: 10px; border-radius: 8px; background: #fffaf0; margin: 10px auto; width: 90%;">
                         <p style="font-size:11px; color:#d4af37; font-weight:bold; margin-bottom:5px;">💎 GEMS & STONE DETAILS</p>
+                        <input id="editStonePrice" class="swal-custom-input" placeholder="Selling Price (₹) e.g. 5500" type="number" value="${item.stonePrice || ''}">
                         <input id="editStoneName" class="swal-custom-input" placeholder="Stone Name" value="${item.stoneName || ''}">
                         <select id="editCertified" class="swal-custom-input">
                             <option value="No" ${item.certified === 'No' ? 'selected' : ''}>Lab Certified: No</option>
@@ -453,7 +457,7 @@
                         <input id="editRatti" class="swal-custom-input" placeholder="Ratti / Carat" value="${item.ratti || ''}">
                         <input id="editZodiac" class="swal-custom-input" placeholder="Zodiac (Rashi)" value="${item.zodiac || ''}">
                         <input id="editPlanet" class="swal-custom-input" placeholder="Planet (Grah)" value="${item.planet || ''}">
-                        <input id="editTreatment" class="swal-custom-input" placeholder="Treatment" value="${item.treatment || ''}">
+                        <input id="editTreatment" class="swal-custom-input" placeholder="Treatment(Natural)" value="${item.treatment || ''}">
                         <input id="editMetal" class="swal-custom-input" placeholder="Metal (Gold/Silver)" value="${item.metal || ''}">
                         <input id="editFinger" class="swal-custom-input" placeholder="Finger (Ungli)" value="${item.finger || ''}">
                     </div>
@@ -484,6 +488,7 @@
                         category: document.getElementById('editCategory').value,
                         weight: document.getElementById('editWeight').value,
                         purity: document.getElementById('editPurity').value,
+                        stonePrice: document.getElementById('editStonePrice').value,
                         stoneName: document.getElementById('editStoneName').value,
                         certified: document.getElementById('editCertified').value,
                         ratti: document.getElementById('editRatti').value,

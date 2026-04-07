@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="hi">
 <head>
     <meta charset="utf-8" />
@@ -17,7 +17,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <style>
         body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background: #fff; }
         
@@ -54,12 +53,20 @@
         
         .is-sold-out-img { filter: grayscale(1); opacity: 0.6; }
         .btn-disabled { background: #999 !important; pointer-events: none; }
-        #loading-msg { text-align: center; margin-top: 100px; color: #d4af37; font-weight: 600; }
+        
+        /* PREMIUM LOADER CSS */
+        #loader-ring { text-align: center; padding: 100px 20px; width: 100%; }
+        .ring-anim { display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #d4af37; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div id="soldBanner" class="sold-banner">⚠️ यह आइटम बिक चुका है / Sold Out</div>
-    <div id="loading-msg">डेटा लोड हो रहा है...</div>
+    
+    <div id="loader-ring">
+        <div class="ring-anim"></div>
+        <p style="font-size:14px; color:#d4af37; margin-top:10px; font-weight:600;">डेटा लोड हो रहा है...</p>
+    </div>
 
     <div class="product-page-wrapper" id="main-content" style="display:none;">
         <div class="image-container">
@@ -128,7 +135,8 @@
                     database.ref('inventory/' + productId).once('value').then((invSnapshot) => {
                         const inv = invSnapshot.val();
 
-                        document.getElementById('loading-msg').style.display = 'none';
+                        // HIIDE LOADER, SHOW CONTENT
+                        document.getElementById('loader-ring').style.display = 'none';
                         document.getElementById('main-content').style.display = 'block';
 
                         document.getElementById('product-title').innerText = item.title || "Jewellery Item";
@@ -202,15 +210,16 @@
                     });
 
                 } else {
-                    document.getElementById('loading-msg').innerHTML = "<h3 style='color:red;'>Product Not Found</h3><p>यह प्रोडक्ट डेटाबेस में नहीं मिला। कृपया ID चेक करें।</p><a href='index.html' style='color:#d4af37; text-decoration:underline;'>Back to Home</a>";
+                    document.getElementById('loader-ring').innerHTML = "<h3 style='color:red;'>Product Not Found</h3><p>यह प्रोडक्ट डेटाबेस में नहीं मिला। कृपया ID चेक करें।</p><a href='index.html' style='color:#d4af37; text-decoration:underline;'>Back to Home</a>";
                 }
             }, (error) => {
                 console.error("Firebase Error:", error);
-                document.getElementById('loading-msg').innerHTML = `<h3 style='color:red;'>Database Error: ${error.message}</h3>`;
+                document.getElementById('loader-ring').innerHTML = `<h3 style='color:red;'>Database Error: ${error.message}</h3>`;
             });
         } else {
-            document.getElementById('loading-msg').innerHTML = "<h1>No Product Selected</h1><a href='index.html' style='color:#d4af37; text-decoration:underline;'>Go to Collection</a>";
+            document.getElementById('loader-ring').innerHTML = "<h1>No Product Selected</h1><a href='index.html' style='color:#d4af37; text-decoration:underline;'>Go to Collection</a>";
         }
     </script>
 </body>
 </html>
+                                     

@@ -17,7 +17,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
+    
+<style>
             /* =========================================
            RESET & BASE STYLES 
         ========================================= */
@@ -97,6 +98,19 @@
           50% { fill: #511377; }
           100% { fill: var(--logo-color); }
         }
+
+           /* =========================================
+           SMART FADE-IN ANIMATION (Smooth Entry)
+        ========================================= */
+        #main-content {
+            animation: smoothFadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes smoothFadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
     </style>
 </head>
 <body>

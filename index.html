@@ -67,14 +67,15 @@
            STICKY SEARCH CONTAINER 
         ========================================= */
         .header-section { background: white; padding: 10px 0px 5px 0px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; width: 100%; }
-        .search-container { width: 90%; max-width: 500px; margin: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .search-container { width: 90%; max-width: 500px; margin: 10px auto; display: flex; flex-direction: column; gap: 8px; }
         
         /* =========================================
            SMART BOTTOM SHEET DRAWER CSS 
         ========================================= */
         .nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 999998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(3px); }
         .nav-overlay.active { opacity: 1; visibility: visible; }
-        .nav-drawer { position: fixed; bottom: -100%; left: 0; width: 100%; background: #fff; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); z-index: 999999; transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15); border-radius: 35px 35px 0 0; display: flex; flex-direction: column; padding-bottom: 20px; }
+        .nav-drawer { position: fixed; bottom: -100%; left: 0; width: 100%; background: #fff; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); z-index: 999999; transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15); border-radius: 35px 35px 0 0; display: flex; flex-direction: column; padding-bottom: 20px; max-height: 85vh; overflow-y: auto; }
+
         .nav-drawer.open { bottom: 0; }
         .drawer-pull-line { width: 40px; height: 5px; background: #ddd; border-radius: 10px; margin: 15px auto 5px auto; }
         .drawer-header { display: flex; justify-content: center; align-items: center; position: relative; padding: 5px 25px 10px ; }
@@ -154,9 +155,26 @@
            POPUP DETAILS STYLING
         ========================================= */
         .modal-title { font-family: 'Playfair Display', serif; color: #d4af37; font-size: 18px; margin-top: 15px; }
-        .spec-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .spec-table td { padding: 10px 10px; border-bottom: 1px solid #f6f6f6; font-size: 14px; }
-        .spec-data { text-align: right; font-weight: 600; }
+        .spec-table { 
+    width: 100%; 
+    border-collapse: collapse; /* Double borders hatane ke liye */
+    margin-top: 15px; 
+    border: 1px solid black; /* Table ka bahari border */
+}
+
+.spec-table td { 
+    border: 1px solid black; /* Har cell ka black border */
+    width: 50%; 
+    padding: 10px 10px; 
+    font-size: 12px; 
+}
+
+.spec-data { 
+    text-align: right; 
+    padding-right: 0px; 
+    font-weight: 800; 
+}
+
         .desc-container { margin-top: 10px; padding: 12px; background: #fdfaf0; border-left: 2px solid #d4af37; border-radius: 8px; }
         .whatsapp-btn { background: #25d366; color: white; text-decoration: none; padding: 14px; border-radius: 50px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; margin-top: 20px; }
         .is-sold-out-img { filter: grayscale(1); opacity: 0.6; }
@@ -195,7 +213,7 @@
         .special-heading p { color: #555; font-size: 13px; margin-bottom: 15px; }
         .fancy-divider { display: flex; align-items: center; justify-content: center; width: 90%; max-width: 350px; margin: 0 auto; }
         .fancy-divider::before, .fancy-divider::after { content: ''; flex: 1; border-bottom: 1.5px solid #7d1c1c; }
-        .fancy-divider span { padding: 0 5px; color: #7d1c1c; font-size: 22px; line-height: 1;  }
+        .fancy-divider span { padding: 0 0px; color: #7d1c1c; font-size: 16px; line-height: 1;  }
 
         /* =========================================
            MULTI-ITEM PRODUCT SLIDER CSS 
@@ -227,17 +245,39 @@
         /* =========================================
            CATEGORY SHOWCASE (Tanishq Premium Style)
         ========================================= */
-        #categoryShowcaseSection, #categoryShowcaseSection2, #categoryShowcaseSection3 { margin-top: 15px; margin-bottom: 20px; }
-        .showcase-banner { position: relative; width: 95%; max-width: 800px; margin: 0 auto; border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .showcase-banner img { width: 100%; height: 280px; object-fit: cover; display: block; }
-        .showcase-banner::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); pointer-events: none; }
-        .showcase-content { position: absolute; bottom: 20px; left: 0; width: 100%; text-align: center; z-index: 2; }
-        .showcase-content h2 { color: #fff; font-family: 'Playfair Display', serif; font-size: 26px; text-shadow: 1px 1px 4px rgba(0,0,0,0.6); margin-bottom: 15px; letter-spacing: 1px; }
-        .shop-now-btn { background: #fff; color: #333; padding: 8px 20px; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.2); border-radius: 2px; }
-        .showcase-slider-wrapper { display: flex; overflow-x: auto; gap: 12px; padding: 15px; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
+        #categoryShowcaseSection, #categoryShowcaseSection2, #categoryShowcaseSection3 { margin-top: 15px; margin-bottom: 15px; }
+        .showcase-banner { position: relative; width: 95%; max-width: 800px; margin: 0 auto; border-radius: 5px; overflow: hidden; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .showcase-banner img { width: 100%; height: 170px; object-fit: cover; display: block; }
+        .showcase-banner::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to botom, rgba(0,0,0,0.6)0%, transparent 40%, transparent 60%, rgba(0,0,0,0.7) 100%); pointer-events: none;  }
+        .showcase-content { position: absolute; top: 0px; left: 0; width: 100%; height:100%; text-align: center; z-index: 2; }
+        .showcase-content h2 { position: absolute; 
+    top: 10px; 
+    left: 10px; 
+    color: #fff; 
+    font-family: 'Playfair Display', serif; 
+    font-size: 16px; 
+    text-shadow: 1px 1px 4px rgba(50,50,93,0.99); 
+    margin: 0; letter-spacing: 1px;  }
+           .shop-now-btn { 
+        position: absolute; 
+    bottom: 10px; 
+    right: 10px; 
+    background: rgba(222, 555, 222, 0.65); 
+    /* Premium glass blur effect */
+    backdrop-filter: blur(1px); 
+    color: #333; 
+    padding: 5px 10px; 
+    font-size: 10px; 
+    font-weight: 700; 
+    letter-spacing: 1.5px; 
+    text-transform: uppercase; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+    border-radius: 4px;  }
+   
+            .showcase-slider-wrapper { display: flex; overflow-x: auto; margin-left:10px; gap: 15px; padding: 10px; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
         .showcase-slider-wrapper::-webkit-scrollbar { display: none; }
-        .showcase-card { min-width: 130px; max-width: 130px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 8px rgba(0,0,0,0.08); scroll-snap-align: start; cursor: pointer; border: 1px solid #eee; display: flex; flex-direction: column; }
-        .showcase-card img { width: 100%; height: 130px; object-fit: cover; background: #fdfaf0; }
+        .showcase-card { min-width: 162px; max-width: 162px; background: #fff; border-radius: 5px; overflow: hidden; box-shadow: 0 3px 8px rgba(0,0,0,0.08); scroll-snap-align: start; cursor: pointer; border: 1px solid #eee; display: flex; flex-direction: column; }
+        .showcase-card img { width: 100%; height: 150px; object-fit: cover; background: #fdfaf0; }
         .showcase-card-title { font-size: 13px; padding: 10px 5px; text-align: center; color: #511377; font-family: 'Playfair Display', serif; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
                  /* =========================================
            SMART FADE-IN ANIMATION (Smooth Entry)
@@ -250,6 +290,23 @@
             0% { opacity: 0; transform: translateY(20px); }
             100% { opacity: 1; transform: translateY(0); }
         }
+        
+        /* =========================================
+   LANDSCAPE MODE FIX (Phone rotate karne par) 
+========================================= */
+@media (orientation: landscape) {
+    /* Product ki photo ki height badhane ke liye */
+    .gift-item img {
+        height: 220px; /* Aap isko apne hisaab se 200px ya 250px bhi kar sakte hain */
+    }
+    
+    /* (Bonus Tip) Landscape me screen chodi hoti hai, 
+       isliye ek line me 2 ki jagah 3 ya 4 product dikhane se aur sundar lagega */
+    .container01 {
+        grid-template-columns: repeat(3, 1fr); 
+    }
+}
+
 
     </style>
 </head>
@@ -302,7 +359,7 @@
         </div>
     </div>
         
-    <div class="search-container" style="margin-top: 10px; margin-bottom: 5px;">
+    <div class="search-container" style="margin-top: 10px auto 5px auto;">
         <div class="category-scroll-wrapper" id="chipContainer">
             <div class="cat-card active" onclick="window.open(window.location.pathname, '_blank')">
                 <div class="cat-thumb">
@@ -321,7 +378,7 @@
     <div class="special-heading" id="specialHeading" style="display:none;">
         <h2>Anamika Special</h2>
         <p>Our top picks, just for you !</p>
-        <div class="fancy-divider" style="display:none;"><span style="padding:10px 0px;">💍</span></div>
+        <div class="fancy-divider" style="display:none;"><span style="padding:0px 0px;">💍</span></div>
     </div>
     
     <div class="multi-slider-container" id="specialSlider" style="display:none;">
@@ -336,7 +393,7 @@
             <p>Special collection from all categories</p>
         </div>     
     </div>
-    <div class="fancy-divider" style="display:none;"><span style="padding:10px 0px;">💍</span></div>
+    <div class="fancy-divider" style="display:none;"><span style="padding:0px 0px;">💍</span></div>
     
     <div id="categoryShowcaseSection" style="display:none;">
         <div class="showcase-banner" id="showcaseBannerBtn">
@@ -345,10 +402,11 @@
                 <h2 id="showcaseBannerTitle">Loading...</h2>
                 <span class="shop-now-btn">SHOP NOW</span>
             </div>
-        </div>
-        <div class="showcase-slider-wrapper" id="showcaseSliderWrapper"></div>
-    </div>
-    <div class="fancy-divider" style="display:none;"><span style="padding:10px 0px;">💍</span></div>
+        </div>       
+        <div class="showcase-slider-wrapper" id="showcaseSliderWrapper">            
+        </div>   
+        <div class="fancy-divider" style="display:none;"><span style="padding:0px 0px;">💍</span></div>
+    </div>    
 
     <div id="categoryShowcaseSection2" style="display:none;">
         <div class="showcase-banner" id="showcaseBannerBtn2">
@@ -356,22 +414,28 @@
             <div class="showcase-content">
                 <h2 id="showcaseBannerTitle2">Loading...</h2>
                 <span class="shop-now-btn">SHOP NOW</span>
-            </div>
-        </div>
-        <div class="showcase-slider-wrapper" id="showcaseSliderWrapper2"></div>
-    </div>
+            </div>            
+        </div>              
+        <div class="showcase-slider-wrapper" id="showcaseSliderWrapper2">                       
+        </div>        
+             <div class="fancy-divider" style="display:none;"><span style="padding:0px 0px;">💍</span></div>            
+               </div>
+            
     
-    <div id="categoryShowcaseSection3" style="display:none;">
+        <div id="categoryShowcaseSection3" style="display:none;">
         <div class="showcase-banner" id="showcaseBannerBtn3">
             <img id="showcaseBannerImg3" src="" alt="Category Collection 3">
             <div class="showcase-content">
                 <h2 id="showcaseBannerTitle3">Loading...</h2>
                 <span class="shop-now-btn">SHOP NOW</span>
-            </div>
+            </div>            
         </div>
         <div class="showcase-slider-wrapper" id="showcaseSliderWrapper3"></div>
+        <div class="fancy-divider" style="display:none;"><span style="padding:0px 0px;">💍</span></div>
     </div>
 
+    
+        
     <script>
         if (new URLSearchParams(window.location.search).has('offer') || new URLSearchParams(window.location.search).has('search')) {
             document.getElementById('chipContainer').parentNode.style.display = 'none';
@@ -448,7 +512,8 @@
 
                 <table class="spec-table" id="gemsSpecialSection" style="display: none; table-layout: fixed; width: 100%;">
     <tr>
-        <td colspan="2" style="text-align: center; color: #d4af37; font-weight: 800; font-size: 15px; padding-bottom: 10px; border-bottom: none;">
+        <td colspan="2" style="text-align: center; color: #d4af37; font-weight: 600; font-size: 15px; padding-bottom: 10px; border-bottom: 1px solid black;">
+
             <i class="fa-solid fa-gem"></i> GEMS & STONE DETAILS
         </td>
     </tr>
@@ -503,13 +568,10 @@
 
     <footer style="text-align: center; color: #888; padding-bottom: 20px; font-size: 12px; width: 100%; user-select: none;">
         Anamika Jewellers - Since 1981 <br>   
-        <strong>
-            <script type="text/javascript">
-                copyright=new Date();
-                update=copyright.getFullYear();
-                document.write("QUALITY & TRUST-"+ update + "");
-            </script>
-        </strong>
+                <strong>QUALITY & TRUST - <span id="currentYear"></span></strong>
+        <script type="text/javascript">
+            document.getElementById("currentYear").innerText = new Date().getFullYear();
+        </script>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -592,7 +654,7 @@
 
         let productData = {}; let inventoryStatus = {}; let allKeys = []; let currentIndex = 0;
         let userLikes = {}; let showingFavoritesOnly = false; let currentState = 'home';
-        const itemsPerPage = 06; let isFetching = false; let isDataFetched = false;
+        const itemsPerPage = 6; let isFetching = false; let isDataFetched = false;
         let isProductsLoaded = false; let isInventoryLoaded = false; 
         let showcaseData = null; let showcaseData2 = null; let showcaseData3 = null;
 
@@ -776,7 +838,7 @@
 
             // Agar category mein GEMS ya STONE likha hai toh naya box dikhao
             if (itemCat.includes("GEMS") || itemCat.includes("STONE")) {
-                if(gemsSection) gemsSection.style.display = "block";
+                if(gemsSection) gemsSection.style.display = "table";
                 if(normalTable) normalTable.style.display = "none"; 
 
                 // NAYA PRICE LOGIC

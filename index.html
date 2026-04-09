@@ -66,7 +66,7 @@
         /* =========================================
            STICKY SEARCH CONTAINER 
         ========================================= */
-        .header-section { background: white; padding: 10px 0px 5px 0px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; width: 100%; }
+        .header-section { background: rgba(255, 255, 255, 0.70); padding: 10px 0px 5px 0px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; width: 100%; }
         .search-container { width: 90%; max-width: 500px; margin: 10px auto; display: flex; flex-direction: column; gap: 8px; }
         
         /* =========================================
@@ -95,7 +95,7 @@
         .search-menu-btn { background: #d4af37; color: white; border: none; width: 40px; height: 40px; min-width: 40px; border-radius: 50%; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; box-shadow: 0 3px 8px rgba(212,175,55,0.3);}
         .search-menu-btn:active { transform: scale(0.9); }
         .input-qr-box { position: relative; flex: 1; display: flex; align-items: center; }
-        #mainSearch { width: 100%; padding: 10px 45px 10px 15px; border-radius: 30px; border: 1.5px solid #d4af37; outline: none; font-size: 13px; background: #fffaf0; }
+        #mainSearch { width: 100%; padding: 10px 45px 10px 15px; border-radius: 30px; border: 1.5px solid #d4af37; outline: none; font-size: 13px; background: rgba(255,255,255,1); }
         .inner-qr-btn { position: absolute; right: 12px; color: #d4af37; font-size: 18px; background: none; border: none; outline: none; cursor: pointer; transition: 0.2s; }
         .inner-qr-btn:active { transform: scale(0.9); color: #673ab7; }
         
@@ -414,10 +414,10 @@
     <div class="search-container" style="margin-top: 10px auto 5px auto;">
         <div class="category-scroll-wrapper" id="chipContainer">
             <div class="cat-card active" onclick="window.open(window.location.pathname, '_blank')">
-                <div class="cat-thumb">
+              <!--    <div class="cat-thumb">
                     <img src="https://i.ibb.co/tPQQjFHZ/1775412992676-1.jpg" onload="this.style.opacity=1" alt="Sabhi">
                 </div>
-                <span class="cat-name">SABHI</span>
+                <span class="cat-name">SABHI</span> -->
             </div>
         </div>
     </div>
@@ -426,7 +426,7 @@
         <div class="slides-wrapper" id="slidesWrapper"></div>
         <div class="slider-dots" id="sliderDots"></div>
     </div>
-    
+  <!-- ANAMIKA SPECIAL -->
     <div class="special-heading" id="specialHeading" style="display:none;">
         <h2>Anamika Special</h2>
         <p>Our top picks, just for you !</p>
@@ -437,7 +437,7 @@
         <div class="multi-slides-wrapper" id="multiSlidesWrapper"></div>
         <div class="multi-slider-dots" id="multiSliderDots"></div>
     </div>
-
+<!-- gift for loved one -->
     <div class="gift-banner-container" id="giftBannerContainer" style="display:none;" onclick="window.location.href='?offer=gifts'">
         <img src="https://i.ibb.co/4gNBw4hM/IMG-20260406-124614.webp" alt="Gift for Loved">
         <div class="gift-banner-overlay">
@@ -618,13 +618,23 @@
         </button>
     </div>
 
-    <footer style="text-align: center; color: #888; padding-bottom: 20px; font-size: 12px; width: 100%; user-select: none;">
+        <footer style="text-align: center; color: #888; padding: 20px 10px; font-size: 12px; width: 100%; user-select: none; background: #fdfcfb; border-top: 1px solid #eee;">
+        
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 15px; font-weight: 600;">
+            <a href="about.html" style="color: #d4af37; text-decoration: none;">About Us</a>
+            <a href="contact.html" style="color: #d4af37; text-decoration: none;">Contact Us</a>
+            <a href="privacy.html" style="color: #d4af37; text-decoration: none;">Privacy Policy</a>
+            <a href="terms.html" style="color: #d4af37; text-decoration: none;">Terms & Conditions</a>
+            <a href="refund.html" style="color: #d4af37; text-decoration: none;">Refund Policy</a>
+        </div>
+
         Anamika Jewellers - Since 1981 <br>   
-                <strong>QUALITY & TRUST - <span id="currentYear"></span></strong>
+        <strong>QUALITY & TRUST - <span id="currentYear"></span></strong>
         <script type="text/javascript">
             document.getElementById("currentYear").innerText = new Date().getFullYear();
         </script>
     </footer>
+
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
@@ -797,7 +807,11 @@ database.ref('category_discounts').on('value', (snap) => { categoryDiscounts = s
                 const item = productData[id];
                 if (item.category && item.category.trim() !== "") { const catName = item.category.trim(); if (!categories[catName]) categories[catName] = item.image; }
             });
-            container.innerHTML = `<div class="cat-card active" onclick="window.open(window.location.pathname, '_blank')"><div class="cat-thumb"><img src="https://i.ibb.co/tPQQjFHZ/1775412992676-1.jpg" onload="this.style.opacity=1" alt="Sabhi"></div><span class="cat-name">SABHI</span></div>`;
+        //=======================================================
+// 👉 INDICATOR: SABHI WALA CARD YAHAN CHHUPAYA HAI 👈
+// Note: Ise wapas dikhane ke liye 'style="display: none;"' hata dein
+// =======================================================
+            container.innerHTML = `<div class="cat-card active" style="display: none;" onclick="window.open(window.location.pathname, '_blank')"><div class="cat-thumb"><img src="https://i.ibb.co/tPQQjFHZ/1775412992676-1.jpg" onload="this.style.opacity=1" alt="Sabhi"></div><span class="cat-name">SABHI</span></div>`;
             Object.keys(categories).sort().forEach(cat => {
                 const card = document.createElement('div'); card.className = 'cat-card'; card.onclick = () => window.open('?offer=' + encodeURIComponent(cat), '_blank');
                 card.innerHTML = `<div class="cat-thumb"><img src="${categories[cat]}" onload="this.style.opacity=1" alt="${cat}"></div><span class="cat-name">${cat}</span>`;

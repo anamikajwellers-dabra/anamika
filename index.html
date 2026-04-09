@@ -291,40 +291,74 @@
             100% { opacity: 1; transform: translateY(0); }
         }
         
-        /* =========================================
-   LANDSCAPE MODE FIX (Phone rotate karne par) 
+/* =========================================
+   📱 PREMIUM LANDSCAPE MODE CSS (Rotate Fix & 50-50 Popup)
 ========================================= */
 @media (orientation: landscape) {
-    /* Product ki photo ki height badhane ke liye */
-    .gift-item img {
-        height: 220px; /* Aap isko apne hisaab se 200px ya 250px bhi kar sakte hain */
+    /* 1. Header thoda adjust kiya */
+    .waves { height: 10vh; min-height: 30px; }
+    .hader-01 { font-size: 18px; }
+
+    /* 2. Search aur Category Bar */
+    .search-container { max-width: 90% !important; width: 90% !important; }
+    .cat-card { min-width: 120px; }
+    .cat-thumb { width: 110px; height: 110px; }
+    .cat-name { width: 110px; font-size: 13px; padding: 8px 0px; }
+
+    /* 3. Products ko Auto 3 ya 4 Columns me dikhayein */
+    .container01 { 
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+        max-width: 95%; 
+        gap: 15px; 
+    }
+    .gift-item img { height: 200px; }
+
+    /* 4. Banners ki setting */
+    .slider-container, .multi-slider-container, .showcase-banner, .gift-banner-container { max-width: 90%; }
+    .slide img { aspect-ratio: 21 / 9; } 
+    .showcase-banner img { height: 200px; }
+    .multi-card-img-wrap img { height: 200px; }
+
+    /* ==============================================
+       🌟 NAYA: POPUP KO 50-50 (LEFT/RIGHT) KAREIN
+    ============================================== */
+    .modal-content { 
+        max-width: 850px !important; /* Popup ko choda kiya */
+        width: 95%; 
     }
     
-    /* (Bonus Tip) Landscape me screen chodi hoti hai, 
-       isliye ek line me 2 ki jagah 3 ya 4 product dikhane se aur sundar lagega */
-    .container01 {
-        grid-template-columns: repeat(3, 1fr); 
+    .modal-body {
+        display: grid;
+        grid-template-columns: 45% 50%; /* Left me 45% photo, Right me 50% Details */
+        justify-content: space-between; /* Dono ke beech jagah */
+        align-items: start;
+        column-gap: 20px;
+        overflow: visible !important; /* Photo ko chipkane ke liye zaroori */
     }
-/* 3. NAYA: Search Bar aur Category list ko puri screen par failane ke liye */
-    .search-container {
-        max-width: 900px !important; /* 500px limit hata kar badha di */
-        width: 95% !important;
-    }
-/* 4. NAYA: Category Chips ko bada karne ke liye */
-    .cat-card {
-        min-width: 120px; /* Card ki kul chaudai badhayi */
-    }
-    .cat-thumb {
-        width: 110px;    /* Photo ki chaudai 80px se 110px ki */
-        height: 110px;   /* Photo ki lambaai 80px se 110px ki */
-    }
-    .cat-name {
-        width: 110px;    /* Naam ki patti ko photo ke barabar kiya */
-        font-size: 13px; /* Font size thoda bada kiya taki padhne me aasani ho */
-        padding: 8px 0px 8px 0px; 
-    }
-}
 
+    /* Photo wali div ko Left me fix karna */
+    .img-zoom-wrapper {
+        grid-column: 1;
+        grid-row: 1 / 50; /* Taki photo ke samne right side ki sari line aa sakein */
+        position: sticky; /* Niche scroll karne par photo apni jagah ruki rahegi */
+        top: 0px;
+    }
+
+    /* Photo ki maximum height taaki wo screen se bahar na jaye */
+    .modal-img {
+        height: auto;
+        max-height: 75vh;
+        object-fit: cover;
+    }
+
+    /* Photo chhod kar baki SARI details ko Right side (Column 2) bhej diya */
+    .modal-body > :not(.img-zoom-wrapper) {
+        grid-column: 2;
+    }
+
+    /* 6. Contact Us Form */
+    div[style*="max-width: 450px"] { max-width: 600px !important; }
+}
 
     </style>
 </head>
@@ -412,7 +446,7 @@
         </div>     
     </div>
     <div class="fancy-divider" style="display:none;"><span style="padding:0px 0px;">💍</span></div>
-    
+    <!--  SHOWCASE 1 -->
     <div id="categoryShowcaseSection" style="display:none;">
         <div class="showcase-banner" id="showcaseBannerBtn">
             <img id="showcaseBannerImg" src="" alt="Category Collection">
@@ -425,7 +459,7 @@
         </div>   
         <div class="fancy-divider" style="display:none;"><span style="padding:0px 0px;">💍</span></div>
     </div>    
-
+<!-- SHOWCASE 2 -->
     <div id="categoryShowcaseSection2" style="display:none;">
         <div class="showcase-banner" id="showcaseBannerBtn2">
             <img id="showcaseBannerImg2" src="" alt="Category Collection 2">
@@ -439,7 +473,7 @@
              <div class="fancy-divider" style="display:none;"><span style="padding:0px 0px;">💍</span></div>            
                </div>
             
-    
+    <!--  SHOWCASE 3 -->
         <div id="categoryShowcaseSection3" style="display:none;">
         <div class="showcase-banner" id="showcaseBannerBtn3">
             <img id="showcaseBannerImg3" src="" alt="Category Collection 3">
@@ -517,8 +551,8 @@
                 
                 <div id="modalStonePriceBox" style="display: none; margin-top: 10px; margin-bottom: 5px;">
                     <span style="font-size: 18px; font-weight: 800; color: #2e7d32; background: #e8f5e9; padding: 5px 15px; border-radius: 8px; border: 1.5px dashed #2e7d32; display: inline-block;">
-                        ₹ <span id="modalStonePrice">0</span> /-
-                    </span>
+                        <span id="modalStonePrice">0</span>
+
                     <div style="font-size: 9px; color: #777; margin-top: 3px; font-weight: 600;">*Govt. Taxes & Lab Charges Extra</div>
                 </div>
                 
@@ -671,6 +705,7 @@
         const auth = firebase.auth();
 
         let productData = {}; let inventoryStatus = {}; let allKeys = []; let currentIndex = 0;
+        let categoryDiscounts = {};
         let userLikes = {}; let showingFavoritesOnly = false; let currentState = 'home';
         const itemsPerPage = 6; let isFetching = false; let isDataFetched = false;
         let isProductsLoaded = false; let isInventoryLoaded = false; 
@@ -683,6 +718,8 @@
             database.ref('category_showcase').on('value', (snap) => { showcaseData = snap.val(); if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateShowcaseSlider(); } });
             database.ref('category_showcase2').on('value', (snap) => { showcaseData2 = snap.val(); if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateShowcaseSlider2(); } });
             database.ref('category_showcase3').on('value', (snap) => { showcaseData3 = snap.val(); if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateShowcaseSlider3(); } });
+            
+database.ref('category_discounts').on('value', (snap) => { categoryDiscounts = snap.val() || {}; });
 
             database.ref('offers_banners').on('value', (snap) => {
                 let offers = snap.val();
@@ -859,14 +896,34 @@
                 if(gemsSection) gemsSection.style.display = "table";
                 if(normalTable) normalTable.style.display = "none"; 
 
-                // NAYA PRICE LOGIC
+                     // NAYA PRICE LOGIC (WITH DISCOUNT)
                 const priceBox = document.getElementById('modalStonePriceBox');
                 if(item.stonePrice && item.stonePrice.trim() !== "") {
                     priceBox.style.display = "block";
-                    document.getElementById('modalStonePrice').innerText = item.stonePrice;
+                    let originalPrice = parseFloat(item.stonePrice);
+                    
+                    // Check karein ki is item ki category par koi discount hai ya nahi
+                    let catDiscount = categoryDiscounts[itemCat] || categoryDiscounts[(item.category || "").trim()] || 0;
+
+                    if (catDiscount > 0) {
+                        let discountAmount = (originalPrice * catDiscount) / 100;
+                        let finalPrice = originalPrice - discountAmount;
+                        
+                        // Purana price, naya price, phir "/-", aur aakhir mein "(10% OFF)"
+                        document.getElementById('modalStonePrice').innerHTML = `
+                            <span style="text-decoration: line-through; color: #999; font-size: 14px; margin-right: 8px;">₹${originalPrice}</span>
+                            ₹${Math.round(finalPrice)} /-
+                            <span style="font-size: 11px; color: #e74c3c; margin-left: 5px; background: #ffebee; padding: 2px 5px; border-radius: 4px;">(${catDiscount}% OFF)</span>
+                        `;
+                    } else {
+                        // Agar discount nahi hai, toh normal price dikhaye
+                        document.getElementById('modalStonePrice').innerText = `₹ ${originalPrice} /-`;
+                    }
                 } else {
                     priceBox.style.display = "none";
                 }
+
+
 
                 document.getElementById('modalStoneName').innerText = item.stoneName || "N/A";
                 document.getElementById('modalCertified').innerHTML = (item.certified === "Yes" || item.certified === "certified") ? "Certified ✅" : "Natural";

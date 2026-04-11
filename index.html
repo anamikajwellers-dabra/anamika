@@ -140,15 +140,15 @@
            POPUP / MODAL CSS 
         ========================================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-content { width: 100%; max-width: 500px; padding:10px; background: white; border-radius: 20px; position: relative; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease-out; }
+        .modal-content { width: 100%; max-width: 500px; padding:2px; background: white; border-radius: 5px; position: relative; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .close-modal { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #333; cursor: pointer; z-index: 2010; background: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         
         /* =========================================
            PINCH TO ZOOM & DRAG CSS 
         ========================================= */
-        .modal-body { padding: 10px; padding-bottom: 10px; position: relative; overflow: hidden; }
-        .img-zoom-wrapper { width: 100%; min-height: 250px; position: relative; overflow: hidden; border-radius: 12px; background-color: #fff; display: flex; align-items: center; justify-content: center;}
+        .modal-body { padding: 2px; padding-bottom: 10px; position: relative; overflow: hidden; }
+        .img-zoom-wrapper { width: 100%; min-height: 250px; position: relative; overflow: hidden; border-radius: 5px; background-color: #fff; display: flex; align-items: center; justify-content: center;}
         
         /* =========================================
            POPUP MEDIA SLIDER CSS (PERFECT FIX)
@@ -166,7 +166,7 @@
         .spec-table td { border: 0px solid black; width: 50%; padding: 10px 10px; font-size: 12px; }
         tr:nth-child(even) { background-color: #D6EEEE; } 
         .spec-data { text-align: right; padding-right: 0px; font-weight: 800; }
-        .desc-container { margin-top: 10px; padding: 12px; background: #fdfaf0; border-left: 2px solid #d4af37; border-radius: 8px; }
+        .desc-container { margin-top: 10px; padding: 12px; background: #ffffff; border-left: 2px solid #d4af37; border-radius: 8px; }
         .whatsapp-btn { background: #25d366; color: white; text-decoration: none; padding: 14px; border-radius: 50px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; margin-top: 20px; }
         .is-sold-out-img { filter: grayscale(1); opacity: 0.6; }
         .btn-disabled { background: #999 !important; pointer-events: none; }
@@ -468,7 +468,7 @@
                     <div style="font-size: 9px; color: #777; margin-top: 3px; font-weight: 600;">*Govt. Taxes & Lab Charges Extra</div>
                 </div>
                 
-                <table class="spec-table">
+                <table class="spec-table">                    
                     <tr><td>✨ Purity</td><td id="modalPurity" class="spec-data"></td></tr> 
                     <tr><td>⚖️ Weight</td><td id="modalWeight" class="spec-data"></td></tr>
                     <tr><td>🏷️ Code</td><td id="modalCode" class="spec-data"></td></tr>
@@ -491,7 +491,7 @@
                 </table>
 
                 <div id="modalDescBox" class="desc-container">
-                    <p id="modalDesc" style="font-size:12px; color:#555; line-height:1.5;"></p>
+                    <p id="modalDesc" style="font-size:14px; color:#555; line-height:1.5;"></p>
                 </div>
                 <a href="#" id="modalWaBtn" class="whatsapp-btn">Inquiry on WhatsApp</a>
 
@@ -625,20 +625,30 @@
         let categoryDiscounts = {};
         let userLikes = {}; let showingFavoritesOnly = false; let currentState = 'home';
         const itemsPerPage = 6; let isFetching = false; let isDataFetched = false;
-        let isProductsLoaded = false; let isInventoryLoaded = false; 
+                let isProductsLoaded = false; let isInventoryLoaded = false; let isDiscountsLoaded = false; // ✅ Naya variable add kiya
         let showcaseData = null; let showcaseData2 = null; let showcaseData3 = null;
 
         // ============== MAIN DATA FETCH ============== //
         if(!isDataFetched) {
-            database.ref('products').on('value', (snap) => { productData = snap.val() || {}; isProductsLoaded = true; if (isInventoryLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); } });
-            database.ref('inventory').on('value', (snap) => { inventoryStatus = snap.val() || {}; isInventoryLoaded = true; if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateDynamicThumbs(); initDisplay(); } });
+            
+            // ✅ Naya function banaya jo teeno data load hone ka wait karega
+            function tryInitDisplay() {
+                if (isProductsLoaded && isInventoryLoaded && isDiscountsLoaded && !showingFavoritesOnly && currentState === 'home') { 
+                    updateDynamicThumbs(); 
+                    initDisplay(); 
+                }
+            }
+
+            database.ref('products').on('value', (snap) => { productData = snap.val() || {}; isProductsLoaded = true; tryInitDisplay(); });
+            database.ref('inventory').on('value', (snap) => { inventoryStatus = snap.val() || {}; isInventoryLoaded = true; tryInitDisplay(); });
+            database.ref('category_discounts').on('value', (snap) => { categoryDiscounts = snap.val() || {}; isDiscountsLoaded = true; tryInitDisplay(); }); // ✅ Ab yeh bhi wait karega
+
             database.ref('category_showcase').on('value', (snap) => { showcaseData = snap.val(); if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateShowcaseSlider(); } });
             database.ref('category_showcase2').on('value', (snap) => { showcaseData2 = snap.val(); if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateShowcaseSlider2(); } });
             database.ref('category_showcase3').on('value', (snap) => { showcaseData3 = snap.val(); if (isProductsLoaded && !showingFavoritesOnly && currentState === 'home') { updateShowcaseSlider3(); } });
             
-            database.ref('category_discounts').on('value', (snap) => { categoryDiscounts = snap.val() || {}; });
-
             database.ref('offers_banners').on('value', (snap) => {
+
                 let offers = snap.val();
                 if(offers && !new URLSearchParams(window.location.search).has('offer') && !new URLSearchParams(window.location.search).has('search')) {
                     let slidesHtml = ''; let dotsHtml = ''; let slideCount = 0;
@@ -785,13 +795,17 @@
             if (cat.includes("GEMS") || cat.includes("STONE")) { weightText = item.ratti ? `${item.ratti} Carats` : `N/A`; } 
             else { weightText = item.weight ? `${item.weight}gm` : `0gm`; }
 
-            let displayPrice = item.price || item.stonePrice;
+                        let displayPrice = item.price || item.stonePrice;
             if (displayPrice && displayPrice.trim() !== "") {
                 let originalPrice = parseFloat(displayPrice);
                 let catDiscount = categoryDiscounts[cat] || categoryDiscounts[(item.category || "").trim()] || 0;
+                
+                // Naya logic: Agar item ka apna special discount hai, toh usko priority do
+                let specialDisc = parseFloat(item.indDiscount) || 0;
+                let finalDiscountPercentage = specialDisc > 0 ? specialDisc : catDiscount;
 
-                if (catDiscount > 0) {
-                    let discountAmount = (originalPrice * catDiscount) / 100;
+                if (finalDiscountPercentage > 0) {
+                    let discountAmount = (originalPrice * finalDiscountPercentage) / 100;
                     let finalPrice = Math.round(originalPrice - discountAmount);
                     priceHtml = `
                         <div style="margin-bottom:5px;">
@@ -803,6 +817,7 @@
                     priceHtml = `<span style="display:block; color:#2e7d32; font-weight:bold; font-size:14px; margin-bottom:5px;"><i class="fa-solid fa-indian-rupee-sign" style="font-size:11px;"></i> ${originalPrice}</span>`;
                 }
             }
+
 
             const itemHtml = `<div class="gift-item ${isSold ? 'is-sold' : ''}" onclick="openPopup('${id}')">
                 <button class="like-btn ${isLikedClass}" data-id="${id}" onclick="toggleLike('${id}', event)"><i class="${heartIconClass}"></i></button>
@@ -863,18 +878,22 @@
             const priceBox = document.getElementById('modalStonePriceBox');
             let displayPrice = item.price || item.stonePrice;
 
-            if (displayPrice && displayPrice.trim() !== "") {
+                        if (displayPrice && displayPrice.trim() !== "") {
                 priceBox.style.display = "block";
                 let originalPrice = parseFloat(displayPrice);
                 let catDiscount = categoryDiscounts[itemCat] || categoryDiscounts[(item.category || "").trim()] || 0;
 
-                if (catDiscount > 0) {
-                    let discountAmount = (originalPrice * catDiscount) / 100;
+                // Naya logic: Popup mein bhi special discount ko priority do
+                let specialDisc = parseFloat(item.indDiscount) || 0;
+                let finalDiscountPercentage = specialDisc > 0 ? specialDisc : catDiscount;
+
+                if (finalDiscountPercentage > 0) {
+                    let discountAmount = (originalPrice * finalDiscountPercentage) / 100;
                     let finalPrice = originalPrice - discountAmount;
                     document.getElementById('modalStonePrice').innerHTML = `
                         <span style="text-decoration: line-through; color: #999; font-size: 14px; margin-right: 8px;">₹${originalPrice}</span>
                         ₹${Math.round(finalPrice)} /-
-                        <span style="font-size: 11px; color: #e74c3c; margin-left: 5px; background: #ffebee; padding: 2px 5px; border-radius: 4px;">(${catDiscount}% OFF)</span>
+                        <span style="font-size: 11px; color: #e74c3c; margin-left: 5px; background: #ffebee; padding: 2px 5px; border-radius: 4px;">(${finalDiscountPercentage}% OFF)</span>
                     `;
                 } else {
                     document.getElementById('modalStonePrice').innerHTML = `<i class="fa-solid fa-indian-rupee-sign" style="font-size:16px;"></i> ${originalPrice} /-`;
@@ -882,6 +901,7 @@
             } else {
                 priceBox.style.display = "none";
             }
+
 
             const gemsSection = document.getElementById('gemsSpecialSection');
             const normalTable = document.querySelector('.spec-table'); 
@@ -897,7 +917,8 @@
                 document.getElementById('modalTreatment').innerText = item.treatment || "Natural / Unheated";
                 document.getElementById('modalMetal').innerText = item.metal || "Gold/Silver/Panchdhatu";
                 document.getElementById('modalFinger').innerText = item.finger || "N/A";
-            } else {
+           } else {
+                // Normal Jewelry ke liye purani table dikhao
                 if(gemsSection) gemsSection.style.display = "none";
                 if(normalTable) normalTable.style.display = "table"; 
                 document.getElementById('modalPurity').innerText = item.purity || "22K / 916";
@@ -906,7 +927,7 @@
 
             const desc = item.description || item.desc || "";
             document.getElementById('modalDescBox').style.display = desc.trim() !== "" ? "block" : "none";
-            document.getElementById('modalDesc').innerText = desc;
+            document.getElementById('modalDesc').innerHTML = desc.replace(/\n/g, '<br>');                        
             
             const productLink = `https://anamikajwellers-dabra.github.io/anamika/product-detail.html?id=${id}`;
             const waMsg = `Hi Anamika Jewellers, mujhe is item ki enquiry karni hai:\n\n*Item:* ${item.title || id.toUpperCase()}\n*Code:* ${id.toUpperCase()}\n*Link:* ${productLink}`;

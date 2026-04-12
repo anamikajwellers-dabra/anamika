@@ -599,18 +599,13 @@
         function openQrScanner() {
             document.getElementById('qrScannerModal').style.display = 'flex';
             if (!html5QrCode) { html5QrCode = new Html5Qrcode("qr-reader"); }
-            
-            // Wapas Safe Mode par set kiya (HD hta diya) aur FPS 15 rakha speed ke liye
-            html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: { width: 250, height: 250 } },
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } },
                 (decodedText) => {
                     closeQrScanner();
                     if (decodedText.startsWith('http')) { window.location.href = decodedText; } 
                     else { document.getElementById('mainSearch').value = decodedText; window.location.href = window.location.pathname + "?search=" + encodeURIComponent(decodedText); }
                 }, (errorMessage) => {}
-            ).catch((err) => { 
-                alert("Camera Permission allow karein ya page refresh karein."); 
-                closeQrScanner(); 
-            });
+            ).catch((err) => { alert("Live Camera nahi khul paya. Local file ke jagah ise Netlify par chalayein."); closeQrScanner(); });
         }
 
         function closeQrScanner() {

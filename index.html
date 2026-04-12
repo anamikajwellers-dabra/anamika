@@ -656,7 +656,7 @@
                     ['slide1', 'slide2', 'slide3', 'slide4', 'slide5'].forEach((key, index) => {
                         if(offers[key] && offers[key].image) {
                             let badgeHtml = offers[key].discount ? `<div class="discount-badge">${offers[key].discount}% OFF <br><div style="font-size: 1px; opacity: 0.8; font-weight: normal; ">on making charge.</div></div>` : '';
-                            slidesHtml += `<a href="${offers[key].link}" target="_blank" class="slide">${badgeHtml}<img src="${offers[key].image}" alt="Offer ${index+1}"></a>`;
+                            slidesHtml += `<a href="${offers[key].link}" class="slide">${badgeHtml}<img src="${offers[key].image}" alt="Offer ${index+1}"></a>`;
                             dotsHtml += `<span class="dot ${slideCount === 0 ? 'active' : ''}" onclick="goToSlide(${slideCount})"></span>`;
                             slideCount++;
                         }
@@ -725,7 +725,7 @@
                 const item = productData[id];
                 if (item.category && item.category.trim() !== "") { const catName = item.category.trim(); if (!categories[catName]) categories[catName] = item.image; }
             });
-            container.innerHTML = `<div class="cat-card active"  onclick="window.open(window.location.pathname, '_blank')"><div class="cat-thumb"><img src="https://i.ibb.co/tPQQjFHZ/1775412992676-1.jpg" onload="this.style.opacity=1" alt="Sabhi"></div><span class="cat-name">SABHI</span></div>`;
+            container.innerHTML = `<div class="cat-card active"  onclick="window.open(window.location.pathname, '_self')"><div class="cat-thumb"><img src="https://i.ibb.co/tPQQjFHZ/1775412992676-1.jpg" onload="this.style.opacity=1" alt="Sabhi"></div><span class="cat-name">SABHI</span></div>`;
             Object.keys(categories).sort().forEach(cat => {
                 const card = document.createElement('div'); card.className = 'cat-card'; card.onclick = () => window.open('?offer=' + encodeURIComponent(cat), '_self');
 
@@ -1236,7 +1236,7 @@
 
             document.getElementById('showcaseBannerImg').src = showcaseData.image || 'https://via.placeholder.com/800x400';
             document.getElementById('showcaseBannerTitle').innerText = showcaseData.title || 'Special Collection';
-            let link = '?offer=' + encodeURIComponent(showcaseData.category); document.getElementById('showcaseBannerBtn').onclick = () => window.open(link, '_blank');
+            let link = '?offer=' + encodeURIComponent(showcaseData.category); document.getElementById('showcaseBannerBtn').onclick = () => window.open(link, '_self');
             const targetCategory = showcaseData.category || ""; 
             let categoryKeys = Object.keys(productData).filter(id => { let item = productData[id]; let isSold = inventoryStatus[id] && inventoryStatus[id].isSold === true; return !isSold && item.category && item.category.trim().toUpperCase() === targetCategory.toUpperCase(); });
 
@@ -1255,7 +1255,7 @@
 
             document.getElementById('showcaseBannerImg2').src = showcaseData2.image || 'https://via.placeholder.com/800x400';
             document.getElementById('showcaseBannerTitle2').innerText = showcaseData2.title || 'Special Collection';
-            let link = '?offer=' + encodeURIComponent(showcaseData2.category); document.getElementById('showcaseBannerBtn2').onclick = () => window.open(link, '_blank');
+            let link = '?offer=' + encodeURIComponent(showcaseData2.category); document.getElementById('showcaseBannerBtn2').onclick = () => window.open(link, '_self');
             const targetCategory = showcaseData2.category || ""; 
             let categoryKeys = Object.keys(productData).filter(id => { let item = productData[id]; let isSold = inventoryStatus[id] && inventoryStatus[id].isSold === true; return !isSold && item.category && item.category.trim().toUpperCase() === targetCategory.toUpperCase(); });
 
@@ -1274,7 +1274,7 @@
 
             document.getElementById('showcaseBannerImg3').src = showcaseData3.image || 'https://via.placeholder.com/800x400';
             document.getElementById('showcaseBannerTitle3').innerText = showcaseData3.title || 'Special Collection';
-            let link = '?offer=' + encodeURIComponent(showcaseData3.category); document.getElementById('showcaseBannerBtn3').onclick = () => window.open(link, '_blank');
+            let link = '?offer=' + encodeURIComponent(showcaseData3.category); document.getElementById('showcaseBannerBtn3').onclick = () => window.open(link, '_self');
             const targetCategory = showcaseData3.category || ""; 
             let categoryKeys = Object.keys(productData).filter(id => { let item = productData[id]; let isSold = inventoryStatus[id] && inventoryStatus[id].isSold === true; return !isSold && item.category && item.category.trim().toUpperCase() === targetCategory.toUpperCase(); });
 

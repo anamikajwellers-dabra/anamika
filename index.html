@@ -601,7 +601,8 @@
             if (!html5QrCode) { html5QrCode = new Html5Qrcode("qr-reader"); }
             
             // Yahan humne width aur height ideal 1920x1080 (HD) kardi hai aur FPS 15 kar diya hai
-            html5QrCode.start({ facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } }, { fps: 15, qrbox: { width: 250, height: 250 } },
+                        // Wapas safe mode par set kiya gaya hai
+            html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: { width: 250, height: 250 } },
                 (decodedText) => {
 
                     closeQrScanner();

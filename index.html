@@ -600,8 +600,7 @@
             document.getElementById('qrScannerModal').style.display = 'flex';
             if (!html5QrCode) { html5QrCode = new Html5Qrcode("qr-reader"); }
             
-            // Yahan humne width aur height ideal 1920x1080 (HD) kardi hai aur FPS 15 kar diya hai
-            html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: { width: 250, height: 250 } },
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } },
                 (decodedText) => {
                     closeQrScanner();
                     if (decodedText.startsWith('http')) { window.location.href = decodedText; } 

@@ -509,7 +509,11 @@
         <div class="modal-content" style="text-align: center; padding: 20px; background: white; border-radius: 20px; position: relative; width: 95%; max-width: 400px;">
             <span class="close-modal" onclick="closeQrScanner()" style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; background: #eee; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">×</span>
             <h3 style="margin-bottom: 15px; font-family: 'Playfair Display', serif; color: #d4af37;">Smart Scan</h3>
-            <div id="qr-reader" style="width: 100%; border: none; border-radius: 12px; overflow: hidden; background: #f4f4f4;"></div>
+            <div style="width: 100%; border-radius: 12px; overflow: hidden; background: #000; position: relative; height: 250px;">
+    <video id="qr-video" style="width: 100%; height: 100%; object-fit: cover;" playsinline></video>
+    <canvas id="qr-canvas" style="display: none;"></canvas>
+</div>
+
             <p style="font-size: 11px; color: #777; margin-top: 15px;">QR Code ya Barcode scan karein</p>
         </div>
     </div>
@@ -546,7 +550,8 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
 
     <script>
         // === NAV DRAWER LOGIC ===
@@ -595,27 +600,75 @@
         });
 
         // === QR SCANNER LOGIC ===
-                let html5QrCode = null;
-                        function openQrScanner() {
-            document.getElementById('qrScannerModal').style.display = 'flex';
-            if (!html5QrCode) { html5QrCode = new Html5Qrcode("qr-reader"); }
-            
-            // Yahan humne width aur height ideal 1920x1080 (HD) kardi hai aur FPS 15 kar diya hai
-                        // Wapas safe mode par set kiya gaya hai
-            html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: { width: 250, height: 250 } },
-                (decodedText) => {
+                let qrStream = null;
+        let qrAnimationId = null;
+        let isScanning = false;
 
-                    closeQrScanner();
-                    if (decodedText.startsWith('http')) { window.location.href = decodedText; } 
-                    else { document.getElementById('mainSearch').value = decodedText; window.location.href = window.location.pathname + "?search=" + encodeURIComponent(decodedText); }
-                }, (errorMessage) => {}
-            ).catch((err) => { alert("Live Camera nahi khul paya. Local file ke jagah ise Netlify par chalayein."); closeQrScanner(); });
+        function openQrScanner() {
+            document.getElementById('qrScannerModal').style.display = 'flex';
+            const video = document.getElementById('qr-video');
+            const canvas = document.getElementById('qr-canvas');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            isScanning = true;
+
+            // Camera chalu karna
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(function(stream) {
+                qrStream = stream;
+                video.srcObject = stream;
+                video.setAttribute("playsinline", true); 
+                video.play();
+                requestAnimationFrame(tick);
+            })
+            .catch(function(err) {
+                alert("Camera start nahi ho paya. Permission check karein.");
+                closeQrScanner();
+            });
+
+            // Har frame ko scan karne ka logic
+            function tick() {
+                if (!isScanning) return;
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    canvas.height = video.videoHeight;
+                    canvas.width = video.videoWidth;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    
+                    // jsQR library se code padhna
+                    var code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "dontInvert",
+                    });
+                    
+                    if (code && code.data) {
+                        // QR code mil gaya!
+                        let decodedText = code.data;
+                        closeQrScanner();
+                        if (decodedText.startsWith('http')) { 
+                            window.location.href = decodedText; 
+                        } else { 
+                            document.getElementById('mainSearch').value = decodedText; 
+                            window.location.href = window.location.pathname + "?search=" + encodeURIComponent(decodedText); 
+                        }
+                        return; // Scan rok do
+                    }
+                }
+                qrAnimationId = requestAnimationFrame(tick);
+            }
         }
 
         function closeQrScanner() {
+            isScanning = false;
             document.getElementById('qrScannerModal').style.display = 'none';
-            if (html5QrCode) { html5QrCode.stop().then(() => { html5QrCode.clear(); html5QrCode = null; }).catch(() => { html5QrCode.clear(); html5QrCode = null; }); }
+            if (qrStream) {
+                qrStream.getTracks().forEach(track => track.stop());
+                qrStream = null;
+            }
+            if (qrAnimationId) {
+                cancelAnimationFrame(qrAnimationId);
+                qrAnimationId = null;
+            }
         }
+
 
         // === FIREBASE SETUP ===
         const firebaseConfig = {

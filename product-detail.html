@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
 <style>
-            /* =========================================
+        /* =========================================
            RESET & BASE STYLES 
         ========================================= */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent;  }
@@ -39,11 +39,15 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        .product-page-wrapper { max-width: 600px; margin: auto; padding: 15px; position: relative; }
+        /* PREMIUM 100% WIDTH LAYOUT */
+        .product-page-wrapper { max-width: 800px; margin: 0 auto; position: relative; background: #fff; }
         
-        .image-container { position: relative; width: 100%; overflow: hidden; border-radius: 12px; }
-        .main-img { width: 100%; transition: 0.4s; min-height: 300px; background: #f9f9f9; object-fit: cover; display: block; }
+        .image-container { position: relative; width: 100%; height: 50vh; min-height: 350px; overflow: hidden; border-radius: 0px; background-color: #fdfaf0; display: flex; align-items: center; justify-content: center; }
+        .main-img { width: 100%; height: 100%; max-height: 50vh; object-fit: cover; border-radius: 0px; display: block; }
         
+        /* CONTENT PADDING */
+        .content-wrapper { padding: 0px 15px 25px 15px; }
+
         .product-main-title { font-family: 'Playfair Display', serif; color: #d4af37; font-size: 26px; margin-top: 15px; }
         
         .spec-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -60,7 +64,6 @@
         .btn-disabled { background: #999 !important; pointer-events: none; }
         
         /* PREMIUM LOADER CSS */
-            /* PREMIUM RIPPLE LOADER CSS */
         #loader-ring { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 80px 20px; width: 100%; overflow: hidden; }
         .loader {
           --size: 150px;
@@ -99,9 +102,7 @@
           100% { fill: var(--logo-color); }
         }
 
-           /* =========================================
-           SMART FADE-IN ANIMATION (Smooth Entry)
-        ========================================= */
+        /* SMART FADE-IN ANIMATION */
         #main-content {
             animation: smoothFadeIn 0.8s ease-out forwards;
         }
@@ -116,7 +117,7 @@
 <body>
     <div id="soldBanner" class="sold-banner">⚠️ यह आइटम बिक चुका है / Sold Out</div>
     
-        <div id="loader-ring">
+    <div id="loader-ring">
         <div class="loader">
             <div class="box">
                 <div class="logo">AJ</div>
@@ -129,52 +130,53 @@
         <p style="font-size:14px; color:#d4af37; margin-top:20px; font-weight:600; letter-spacing: 1px;">डेटा लोड हो रहा है...</p>
     </div>
 
-
     <div class="product-page-wrapper" id="main-content" style="display:none;">
         <div class="image-container">
             <img id="main-product-img" src="" class="main-img" onerror="this.src='https://via.placeholder.com/400'">
         </div>
 
-        <h1 id="product-title" class="product-main-title">Loading...</h1>
-        <strong style="color: #511377; font-size:12px; font-family: 'Playfair Display'"> By ANAMIKA JWELLER'S</strong>
-        
-        <div id="modalStonePriceBox" style="display: none; margin-top: 15px; margin-bottom: 5px;">
-            <span style="font-size: 22px; font-weight: 800; color: #2e7d32; background: #e8f5e9; padding: 8px 20px; border-radius: 8px; border: 1.5px dashed #2e7d32; display: inline-block;">
-                <span id="modalStonePrice">0</span>
-            </span>
-            <div style="font-size: 10px; color: #777; margin-top: 5px; font-weight: 600;">*Govt. Taxes & Lab Charges Extra</div>
+        <div class="content-wrapper">
+            <h1 id="product-title" class="product-main-title">Loading...</h1>
+            <strong style="color: #511377; font-size:12px; font-family: 'Playfair Display'"> By ANAMIKA JWELLER'S</strong>
+            
+            <div id="modalStonePriceBox" style="display: none; margin-top: 15px; margin-bottom: 5px;">
+                <span style="font-size: 22px; font-weight: 800; color: #2e7d32; background: #e8f5e9; padding: 8px 20px; border-radius: 8px; border: 1.5px dashed #2e7d32; display: inline-block;">
+                    <span id="modalStonePrice">0</span>
+                </span>
+                <div style="font-size: 10px; color: #777; margin-top: 5px; font-weight: 600;">*Govt. Taxes & Lab Charges Extra</div>
+            </div>
+
+            <table class="spec-table" id="normal-spec-table">
+                <tr><td>✨ Purity</td><td id="spec-purity" class="spec-data" style="font-weight: 600; font-size: 13px;">---</td></tr> 
+                <tr><td>⚖️ Weight</td><td id="spec-weight" class="spec-data" style="font-weight: 600; font-size: 13px;">grams</td></tr>
+                <tr><td>🏷️ Code</td><td id="spec-code" class="spec-data" style="font-weight: 600; font-size: 13px;">---</td></tr>
+            </table>
+
+            <table class="spec-table" id="gemsSpecialSection" style="display: none; table-layout: fixed; width: 100%;">
+                <tr>
+                    <td colspan="2" style="text-align: center; color: #d4af37; font-weight: 800; font-size: 16px; padding-bottom: 12px; border-bottom: none;">
+                        <i class="fa-solid fa-gem"></i> GEMS & STONE DETAILS
+                    </td>
+                </tr>
+                <tr><td style="width: 50%;">💎 Stone Name</td><td id="modalStoneName" class="spec-data" style="width: 50%; word-wrap: break-word;"></td></tr> 
+                <tr><td>📜 Lab Certified</td><td id="modalCertified" class="spec-data" style="word-wrap: break-word;"></td></tr> 
+                <tr><td>⚖️ Ratti / Carat</td><td id="modalRatti" class="spec-data" style="word-wrap: break-word;"></td></tr>
+                <tr><td>♈ Zodiac (Rashi)</td><td id="modalZodiac" class="spec-data" style="word-wrap: break-word;"></td></tr>
+                <tr><td>🪐 Planet (Grah)</td><td id="modalPlanet" class="spec-data" style="word-wrap: break-word;"></td></tr>
+                <tr><td>✨ Treatment</td><td id="modalTreatment" class="spec-data" style="word-wrap: break-word;"></td></tr>
+                <tr><td>💍 Metal With</td><td id="modalMetal" class="spec-data" style="word-wrap: break-word;"></td></tr>
+                <tr><td>☝️ Dharan Ungli</td><td id="modalFinger" class="spec-data" style="word-wrap: break-word;"></td></tr>
+                <tr><td>🏷️ Code</td><td id="gems-spec-code" class="spec-data" style="word-wrap: break-word; color: #511377;">---</td></tr>
+            </table>
+
+            <div id="desc-box" class="desc-container" style="display:none;">
+                <span class="desc-label">Product Description:</span>
+                <p id="product-desc" class="desc-text"></p>
+            </div>
+
+            <a href="#" id="whatsapp-btn" class="whatsapp-btn">Inquiry on WhatsApp</a>
+            <center><a href="index.html" style="display:block; margin-top:20px; color:#d4af37; text-decoration:none; font-size:14px; padding-bottom: 20px;">← Back to Collection</a></center>
         </div>
-
-        <table class="spec-table" id="normal-spec-table">
-            <tr><td>✨ Purity</td><td id="spec-purity" class="spec-data" style="font-weight: 600; font-size: 13px;">---</td></tr> 
-            <tr><td>⚖️ Weight</td><td id="spec-weight" class="spec-data" style="font-weight: 600; font-size: 13px;">grams</td></tr>
-            <tr><td>🏷️ Code</td><td id="spec-code" class="spec-data" style="font-weight: 600; font-size: 13px;">---</td></tr>
-        </table>
-
-        <table class="spec-table" id="gemsSpecialSection" style="display: none; table-layout: fixed; width: 100%;">
-            <tr>
-                <td colspan="2" style="text-align: center; color: #d4af37; font-weight: 800; font-size: 16px; padding-bottom: 12px; border-bottom: none;">
-                    <i class="fa-solid fa-gem"></i> GEMS & STONE DETAILS
-                </td>
-            </tr>
-            <tr><td style="width: 50%;">💎 Stone Name</td><td id="modalStoneName" class="spec-data" style="width: 50%; word-wrap: break-word;"></td></tr> 
-            <tr><td>📜 Lab Certified</td><td id="modalCertified" class="spec-data" style="word-wrap: break-word;"></td></tr> 
-            <tr><td>⚖️ Ratti / Carat</td><td id="modalRatti" class="spec-data" style="word-wrap: break-word;"></td></tr>
-            <tr><td>♈ Zodiac (Rashi)</td><td id="modalZodiac" class="spec-data" style="word-wrap: break-word;"></td></tr>
-            <tr><td>🪐 Planet (Grah)</td><td id="modalPlanet" class="spec-data" style="word-wrap: break-word;"></td></tr>
-            <tr><td>✨ Treatment</td><td id="modalTreatment" class="spec-data" style="word-wrap: break-word;"></td></tr>
-            <tr><td>💍 Metal With</td><td id="modalMetal" class="spec-data" style="word-wrap: break-word;"></td></tr>
-            <tr><td>☝️ Dharan Ungli</td><td id="modalFinger" class="spec-data" style="word-wrap: break-word;"></td></tr>
-            <tr><td>🏷️ Code</td><td id="gems-spec-code" class="spec-data" style="word-wrap: break-word; color: #511377;">---</td></tr>
-        </table>
-
-        <div id="desc-box" class="desc-container" style="display:none;">
-            <span class="desc-label">Product Description:</span>
-            <p id="product-desc" class="desc-text"></p>
-        </div>
-
-        <a href="#" id="whatsapp-btn" class="whatsapp-btn">Inquiry on WhatsApp</a>
-        <center><a href="index.html" style="display:block; margin-top:20px; color:#d4af37; text-decoration:none; font-size:14px; padding-bottom: 20px;">← Back to Collection</a></center>
     </div>
 
     <script>
@@ -185,18 +187,15 @@
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        let categoryDiscounts = {}; // Discounts store karne ke liye global variable
-
+        let categoryDiscounts = {}; 
 
         const urlParams = new URLSearchParams(window.location.search);
         let productId = urlParams.get('id') ? urlParams.get('id').toLowerCase() : null; 
 
         if (productId) {
-            // STEP 1: Pehle discount data fetch karein taaki update price mil sake
             database.ref('category_discounts').on('value', (discountSnap) => {
                 categoryDiscounts = discountSnap.val() || {};
 
-                // STEP 2: Phir product data fetch karein
                 database.ref('products/' + productId).on('value', (snapshot) => {
                     const item = snapshot.val();
                     
@@ -209,7 +208,10 @@
                             document.getElementById('main-content').style.display = 'block';
 
                             document.getElementById('product-title').innerText = item.title || "Jewellery Item";
-                            document.getElementById('main-product-img').src = item.image || "https://via.placeholder.com/400";
+                            
+                            // Image Update
+                            let mediaArr = (item.mediaArray && item.mediaArray.length > 0) ? item.mediaArray : (item.image ? [item.image] : []);
+                            document.getElementById('main-product-img').src = mediaArr.length > 0 ? mediaArr[0] : "https://via.placeholder.com/400";
                             
                             // --- GEMS & STONE SMART LOGIC START ---
                             const gemsSection = document.getElementById('gemsSpecialSection');
@@ -226,21 +228,23 @@
                                 if(item.stonePrice && item.stonePrice.trim() !== "") {
                                     priceBox.style.display = "block";
                                     
-                                    // YAHAN DISCOUNT LOGIC APPLY HUA HAI
+                                    // SPECIAL INDIVIDUAL DISCOUNT LOGIC ADDED HERE
                                     let originalPrice = parseFloat(item.stonePrice);
                                     let catDiscount = categoryDiscounts[itemCat] || categoryDiscounts[(item.category || "").trim()] || 0;
+                                    let specialDisc = parseFloat(item.indDiscount) || 0;
+                                    let finalDiscountPercentage = specialDisc > 0 ? specialDisc : catDiscount;
 
-                                    if (catDiscount > 0) {
-                                        let discountAmount = (originalPrice * catDiscount) / 100;
+                                    if (finalDiscountPercentage > 0) {
+                                        let discountAmount = (originalPrice * finalDiscountPercentage) / 100;
                                         let finalPrice = originalPrice - discountAmount;
                                         
                                         document.getElementById('modalStonePrice').innerHTML = `
                                             <span style="text-decoration: line-through; color: #999; font-size: 14px; margin-right: 8px;">₹${originalPrice}</span>
                                             ₹${Math.round(finalPrice)} /-
-                                            <span style="font-size: 12px; color: #e74c3c; margin-left: 5px; background: #ffebee; padding: 2px 5px; border-radius: 4px;">(${catDiscount}% OFF)</span>
+                                            <span style="font-size: 12px; color: #e74c3c; margin-left: 5px; background: #ffebee; padding: 2px 5px; border-radius: 4px;">(${finalDiscountPercentage}% OFF)</span>
                                         `;
                                     } else {
-                                        document.getElementById('modalStonePrice').innerText = `₹ ${originalPrice} /-`;
+                                        document.getElementById('modalStonePrice').innerHTML = `₹ ${originalPrice} /-`;
                                     }
 
                                 } else {

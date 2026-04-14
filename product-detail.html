@@ -42,9 +42,12 @@
         /* PREMIUM 100% WIDTH LAYOUT */
         .product-page-wrapper { max-width: 800px; margin: 0 auto; position: relative; background: #fff; }
         
-        .image-container { position: relative; width: 100%; height: 50vh; min-height: 350px; overflow: hidden; border-radius: 0px; background-color: #fdfaf0; display: flex; align-items: center; justify-content: center; }
-        .main-img { width: 100%; height: 100%; max-height: 50vh; object-fit: cover; border-radius: 0px; display: block; }
-        
+        /* SLIDER CSS */
+        .img-zoom-wrapper { width: 100%; height: 50vh; min-height: 350px; position: relative; overflow: hidden; border-radius: 0px; background-color: #fdfaf0; display: flex; align-items: center; justify-content: center; }
+        #popupMediaContainer { display: flex; transition: transform 0.3s ease-in-out; height: 100%; width: 100%; align-items: center; flex-wrap: nowrap; }
+        .popup-slide { min-width: 100%; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative;}
+        .popup-slide img, .popup-slide video { width: 100%; height: 100%; max-height: 50vh; object-fit: cover; border-radius: 0px; touch-action: none; user-select: none; -webkit-user-drag: none; }
+
         /* CONTENT PADDING */
         .content-wrapper { padding: 0px 15px 25px 15px; }
 
@@ -131,8 +134,11 @@
     </div>
 
     <div class="product-page-wrapper" id="main-content" style="display:none;">
-        <div class="image-container">
-            <img id="main-product-img" src="" class="main-img" onerror="this.src='https://via.placeholder.com/400'">
+        
+        <div class="img-zoom-wrapper" id="popupSliderWrapper">
+            <div id="popupMediaContainer"></div>
+            <button id="prevMediaBtn" onclick="moveMediaSlide(-1, event)" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.8); border:none; border-radius:50%; width:35px; height:35px; font-weight:bold; font-size:16px; color:#d4af37; z-index:10; display:none; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.2);">❮</button>
+            <button id="nextMediaBtn" onclick="moveMediaSlide(1, event)" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.8); border:none; border-radius:50%; width:35px; height:35px; font-weight:bold; font-size:16px; color:#d4af37; z-index:10; display:none; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.2);">❯</button>
         </div>
 
         <div class="content-wrapper">
@@ -189,6 +195,15 @@
         const database = firebase.database();
         let categoryDiscounts = {}; 
 
+        // ==========================================
+        // SLIDER & ZOOM VARIABLES
+        // ==========================================
+        window.currentMediaIndex = 0;
+        window.totalMediaCount = 0;
+        const modalContainer = document.getElementById('popupMediaContainer');
+        let scale = 1; let panning = false; let pointX = 0, pointY = 0; let startX = 0, startY = 0; let startDistance = 0; let initialScale = 1; let initialPointX = 0; let initialPointY = 0; let lastTapTime = 0; 
+        let swipeStartX = 0; let swipeEndX = 0;
+
         const urlParams = new URLSearchParams(window.location.search);
         let productId = urlParams.get('id') ? urlParams.get('id').toLowerCase() : null; 
 
@@ -209,9 +224,29 @@
 
                             document.getElementById('product-title').innerText = item.title || "Jewellery Item";
                             
-                            // Image Update
+                            // ==========================================
+                            // MEDIA SLIDER SETUP
+                            // ==========================================
+                            modalContainer.innerHTML = '';
+                            window.currentMediaIndex = 0;
+                            resetZoom();
+
                             let mediaArr = (item.mediaArray && item.mediaArray.length > 0) ? item.mediaArray : (item.image ? [item.image] : []);
-                            document.getElementById('main-product-img').src = mediaArr.length > 0 ? mediaArr[0] : "https://via.placeholder.com/400";
+                            window.totalMediaCount = mediaArr.length;
+
+                            mediaArr.forEach(url => {
+                                let slide = document.createElement('div');
+                                slide.className = 'popup-slide';
+                                if(url.toLowerCase().match(/\.(mp4|webm|ogg)$/)) {
+                                    slide.innerHTML = `<video controls playsinline class="modal-img"><source src="${url}" type="video/mp4"></video>`;
+                                } else {
+                                    slide.innerHTML = `<img src="${url}" class="modal-img">`;
+                                }
+                                modalContainer.appendChild(slide);
+                            });
+
+                            document.getElementById('prevMediaBtn').style.display = window.totalMediaCount > 1 ? 'flex' : 'none';
+                            document.getElementById('nextMediaBtn').style.display = window.totalMediaCount > 1 ? 'flex' : 'none';
                             
                             // --- GEMS & STONE SMART LOGIC START ---
                             const gemsSection = document.getElementById('gemsSpecialSection');
@@ -228,7 +263,6 @@
                                 if(item.stonePrice && item.stonePrice.trim() !== "") {
                                     priceBox.style.display = "block";
                                     
-                                    // SPECIAL INDIVIDUAL DISCOUNT LOGIC ADDED HERE
                                     let originalPrice = parseFloat(item.stonePrice);
                                     let catDiscount = categoryDiscounts[itemCat] || categoryDiscounts[(item.category || "").trim()] || 0;
                                     let specialDisc = parseFloat(item.indDiscount) || 0;
@@ -271,7 +305,6 @@
                                 const priceBox = document.getElementById('modalStonePriceBox');
                                 if(priceBox) priceBox.style.display = "none";
                             }
-                            // --- GEMS & STONE SMART LOGIC END ---
 
                             const description = item.description || item.desc || "";
                             if (description.trim() !== "") {
@@ -288,12 +321,12 @@
                             const isSold = inv && inv.isSold === true;
                             if (isSold) {
                                 document.getElementById('soldBanner').style.display = 'block';
-                                document.getElementById('main-product-img').classList.add('is-sold-out-img');
+                                document.getElementById('popupMediaContainer').classList.add('is-sold-out-img');
                                 document.getElementById('whatsapp-btn').classList.add('btn-disabled');
                                 document.getElementById('whatsapp-btn').innerText = "SOLD OUT";
                             } else {
                                 document.getElementById('soldBanner').style.display = 'none';
-                                document.getElementById('main-product-img').classList.remove('is-sold-out-img');
+                                document.getElementById('popupMediaContainer').classList.remove('is-sold-out-img');
                                 document.getElementById('whatsapp-btn').classList.remove('btn-disabled');
                                 document.getElementById('whatsapp-btn').innerText = "Inquiry on WhatsApp";
                             }
@@ -306,10 +339,153 @@
                     console.error("Firebase Error:", error);
                     document.getElementById('loader-ring').innerHTML = `<h3 style='color:red;'>Database Error: ${error.message}</h3>`;
                 });
-            }); // END OF DISCOUNT FETCH BLOCK
+            }); 
         } else {
             document.getElementById('loader-ring').innerHTML = "<h1>No Product Selected</h1><a href='index.html' style='color:#d4af37; text-decoration:underline;'>Go to Collection</a>";
         }
+
+        // ==========================================
+        // SLIDER CONTROL BUTTONS & ZOOM LOGIC
+        // ==========================================
+        window.moveMediaSlide = function(step, event) {
+            if(event) event.stopPropagation();
+            if (window.totalMediaCount <= 1) return;
+            
+            resetZoom(); 
+            window.currentMediaIndex += step;
+            if (window.currentMediaIndex < 0) window.currentMediaIndex = window.totalMediaCount - 1;
+            if (window.currentMediaIndex >= window.totalMediaCount) window.currentMediaIndex = 0;
+            
+            updateTransform(true);
+        };
+
+        function updateTransform(useTransition) {
+            if (useTransition) modalContainer.style.transition = 'transform 0.3s ease';
+            else modalContainer.style.transition = 'none';
+            modalContainer.style.transform = `translateX(-${window.currentMediaIndex * 100}%)`;
+
+            const slides = modalContainer.querySelectorAll('.popup-slide');
+            slides.forEach((slide, index) => {
+                const media = slide.querySelector('img, video');
+                if (media) {
+                    if (index === window.currentMediaIndex) {
+                        if (useTransition) media.style.transition = 'transform 0.3s ease';
+                        else media.style.transition = 'none';
+                        media.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+                    } else {
+                        media.style.transition = 'transform 0.3s ease';
+                        media.style.transform = `translate(0px, 0px) scale(1)`;
+                    }
+                }
+            });
+        }
+
+        function resetZoom() { 
+            scale = 1; pointX = 0; pointY = 0; swipeStartX = 0; swipeEndX = 0;
+            if(modalContainer) updateTransform(true);
+        }
+
+        modalContainer.addEventListener('touchstart', (e) => {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.tagName === 'VIDEO') return; 
+            e.preventDefault(); modalContainer.style.transition = 'none'; 
+            if (e.touches.length === 2) { 
+                startDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); 
+                initialScale = scale; 
+                startX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                startY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                initialPointX = pointX;
+                initialPointY = pointY;
+            } else if (e.touches.length === 1) { 
+                if (scale > 1) {
+                    panning = true; startX = e.touches[0].clientX - pointX; startY = e.touches[0].clientY - pointY; 
+                } else {
+                    swipeStartX = e.touches[0].clientX; 
+                    swipeEndX = swipeStartX;
+                }
+            }
+        });
+
+        modalContainer.addEventListener('touchmove', (e) => {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.tagName === 'VIDEO') return;
+            e.preventDefault(); const wrapper = modalContainer.parentElement; const rect = wrapper.getBoundingClientRect();
+            
+            if (e.touches.length === 2) {
+                const currentDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                let newScale = initialScale * (currentDistance / startDistance); 
+                newScale = Math.max(1, Math.min(newScale, 5)); 
+                
+                const currentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                const currentY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                const scaleRatio = newScale / initialScale;
+                const deltaX = startX - centerX - initialPointX;
+                const deltaY = startY - centerY - initialPointY;
+
+                pointX = initialPointX + (currentX - startX) - deltaX * (scaleRatio - 1);
+                pointY = initialPointY + (currentY - startY) - deltaY * (scaleRatio - 1);
+                scale = newScale;
+
+                const maxX = (rect.width * (scale - 1)) / 2; const maxY = (rect.height * (scale - 1)) / 2;
+                pointX = Math.max(-maxX, Math.min(maxX, pointX)); pointY = Math.max(-maxY, Math.min(maxY, pointY));
+                if (scale === 1) { pointX = 0; pointY = 0; } 
+                
+                updateTransform(false);
+            } else if (e.touches.length === 1) {
+                const maxX = (rect.width * (scale - 1)) / 2; const maxY = (rect.height * (scale - 1)) / 2;
+                if (panning && scale > 1) {
+                    let newPointX = e.touches[0].clientX - startX; let newPointY = e.touches[0].clientY - startY;
+                    pointX = Math.max(-maxX, Math.min(maxX, newPointX)); pointY = Math.max(-maxY, Math.min(maxY, newPointY));
+                    startX = e.touches[0].clientX - pointX; startY = e.touches[0].clientY - pointY;
+                    updateTransform(false);
+                } else if (scale === 1 && swipeStartX > 0) {
+                    swipeEndX = e.touches[0].clientX; 
+                    let diffX = swipeEndX - swipeStartX;
+                    modalContainer.style.transform = `translate(calc(-${window.currentMediaIndex * 100}% + ${diffX}px), 0px) scale(1)`;
+                }
+            }
+        });
+
+        modalContainer.addEventListener('touchend', (e) => {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.tagName === 'VIDEO') return;
+            if (e.touches.length < 2) { initialScale = scale; } 
+            if (e.touches.length === 0) { panning = false; }
+            
+            if (e.touches.length === 1 && scale > 1) {
+                panning = true; 
+                startX = e.touches[0].clientX - pointX; 
+                startY = e.touches[0].clientY - pointY; 
+            }
+            
+            if (scale === 1 && swipeStartX > 0 && window.totalMediaCount > 1) {
+                let diffX = swipeEndX - swipeStartX;
+                if (diffX > 60) {
+                    window.moveMediaSlide(-1);
+                } else if (diffX < -60) {
+                    window.moveMediaSlide(1);
+                } else {
+                    updateTransform(true);
+                }
+                swipeStartX = 0; swipeEndX = 0;
+            }
+
+            let currentTime = new Date().getTime(); let tapLength = currentTime - lastTapTime;
+            if (tapLength < 300 && tapLength > 0 && e.changedTouches.length === 1) {
+                if (scale > 1) { resetZoom(); } else {
+                    scale = 2.5; const rect = modalContainer.parentElement.getBoundingClientRect();
+                    const tapX = e.changedTouches[0].clientX; const tapY = e.changedTouches[0].clientY;
+                    const centerX = rect.left + rect.width / 2; const centerY = rect.top + rect.height / 2;
+                    const deltaX = tapX - centerX; const deltaY = tapY - centerY;
+                    let newPointX = -deltaX * (scale - 1); let newPointY = -deltaY * (scale - 1);
+                    const maxX = (rect.width * (scale - 1)) / 2; const maxY = (rect.height * (scale - 1)) / 2;
+                    pointX = Math.max(-maxX, Math.min(maxX, newPointX)); pointY = Math.max(-maxY, Math.min(maxY, newPointY));
+                    updateTransform(true);
+                }
+            }
+            lastTapTime = currentTime;
+        });
+
     </script>
 </body>
 </html>

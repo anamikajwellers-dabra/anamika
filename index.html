@@ -1443,21 +1443,31 @@ let swipeStartX = 0; let swipeEndX = 0;
             showcaseWrapper.innerHTML = slidesHtml;
         }
 
-        // ==========================================
-        // ALL APPS SHARE LOGIC
+                // ==========================================
+        // ALL APPS SHARE LOGIC (AppCreator24 Fixed)
         // ==========================================
         window.shareAnywhere = function() {
+            // Share hone wala pura text
+            var fullShareText = window.currentShareText + "\n\nLink: " + window.currentShareUrl;
+
+            // 1. Pehle normal Browser (Chrome) ke liye try karein
             if (navigator.share) {
                 navigator.share({
                     title: window.currentShareTitle,
                     text: window.currentShareText,
                     url: window.currentShareUrl
-                }).catch((error) => console.log('Share cancel ho gaya', error));
-            } else {
-                // Agar kisi purane phone me support nahi karta, toh ye aayega
-                Swal.fire('Share Link', 'Link copy karne ke liye niche click karein:<br><br><a href="' + window.currentShareUrl + '" target="_blank">' + window.currentShareUrl + '</a>', 'info');
+                }).catch((error) => console.log('Share cancel', error));
+            } 
+            // 2. Agar API block ho (Jaise AppCreator24 app mein)
+            else {
+                // Android ka Native Share Intent banayein
+                var intentUrl = "intent:#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=" + encodeURIComponent(fullShareText) + ";end";
+                
+                // WebView ko force karein share menu kholne ke liye
+                window.location.replace(intentUrl);
             }
         };
+
 
     </script>
 </body>

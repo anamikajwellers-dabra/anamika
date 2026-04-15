@@ -4,13 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Anamika Jeweller's</title>
-    <link rel="icon" href="https://i.ibb.co/DfBHQthZ/IMG-20260416-021644-1.png">
-
+    
     <link rel="preconnect" href="https://anamika-jwellers-default-rtdb.firebaseio.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <meta property="og:image" content="https://i.ibb.co/DfBHQthZ/IMG-20260416-021644-1.png">
-    <link rel="icon" href="https://i.ibb.co/DfBHQthZ/IMG-20260416-021644-1.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;400;600&family=Bitter:wght@400;700&display=swap" rel="stylesheet">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -486,13 +484,11 @@
             <strong style="color: #511377; font-size:12px; font-family: 'Playfair Display'"> By ANAMIKA JWELLER'S</strong>
         </td>
         
-                <td style="text-align: right; vertical-align: middle; display: flex; justify-content: flex-end; gap: 8px;">                                                                               
-            
-            <a onclick="shareAnywhere()" style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px; background: #fdfaf0; border: 1px solid #d4af37; padding: 6px 12px; border-radius: 20px; color: #333; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <i class="fa-solid fa-share-nodes" style="color: #1976d2; font-size: 16px;"></i> <span style="font-size: 11px; font-weight: bold;">Share</span>
+        <td style="text-align: right; vertical-align: middle;">                                                                               
+            <a id="modalForwardBtn" target="_blank" style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px; background: #fdfaf0; border: 1px solid #d4af37; padding: 6px 12px; border-radius: 20px; color: #333; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <i class="fa-brands fa-whatsapp" style="color: #25d366; font-size: 16px;"></i> <span style="font-size: 11px; font-weight: bold;">Forward</span>
             </a>
         </td>
-
     </tr>
 </table>
 
@@ -1043,10 +1039,13 @@
             const productLink = `https://anamikajwellers-dabra.github.io/anamika/product-detail.html?id=${id}`;
             const waMsg = `Hi Anamika Jewellers, mujhe is item ki enquiry karni hai:\n\n*Item:* ${item.title || id.toUpperCase()}\n*Code:* ${id.toUpperCase()}\n*Link:* ${productLink}`;
             document.getElementById('modalWaBtn').href = `https://wa.me/919977441399?text=${encodeURIComponent(waMsg)}`;
-                
-            window.currentShareTitle = item.title || id.toUpperCase();
-            window.currentShareText = `Yeh design dekhein Anamika Jewellers se:\n\n*${item.title || id.toUpperCase()}*`;
-            window.currentShareUrl = productLink;
+            
+            let faviconLink = document.querySelector("link[rel~='icon']");
+            if (!faviconLink) { faviconLink = document.createElement('link'); faviconLink.rel = 'icon'; document.head.appendChild(faviconLink); }
+            faviconLink.href = mediaArr.length > 0 ? mediaArr[0] : 'https://via.placeholder.com/150';
+
+            const forwardMsg = `Yeh design dekhein Anamika Jewellers se:\n\n*${item.title || id.toUpperCase()}*\nLink: ${productLink}`;
+            document.getElementById('modalForwardBtn').href = `https://wa.me/?text=${encodeURIComponent(forwardMsg)}`;
 
             if (inv && inv.isSold === true) { 
                 document.getElementById('modalSoldBanner').style.display = 'block'; 
@@ -1442,32 +1441,6 @@ let swipeStartX = 0; let swipeEndX = 0;
             top10.forEach(id => { let item = productData[id]; let title = item.title || 'Jewellery Item'; let img = item.image || 'https://via.placeholder.com/150'; slidesHtml += `<div class="showcase-card" onclick="openPopup('${id}')"><img src="${img}" alt="${title}"><div class="showcase-card-title">${title}</div></div>`; });
             showcaseWrapper.innerHTML = slidesHtml;
         }
-
-                // ==========================================
-        // ALL APPS SHARE LOGIC (AppCreator24 Fixed)
-        // ==========================================
-        window.shareAnywhere = function() {
-            // Share hone wala pura text
-            var fullShareText = window.currentShareText + "\n\nLink: " + window.currentShareUrl;
-
-            // 1. Pehle normal Browser (Chrome) ke liye try karein
-            if (navigator.share) {
-                navigator.share({
-                    title: window.currentShareTitle,
-                    text: window.currentShareText,
-                    url: window.currentShareUrl
-                }).catch((error) => console.log('Share cancel', error));
-            } 
-            // 2. Agar API block ho (Jaise AppCreator24 app mein)
-            else {
-                // Android ka Native Share Intent banayein
-                var intentUrl = "intent:#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=" + encodeURIComponent(fullShareText) + ";end";
-                
-                // WebView ko force karein share menu kholne ke liye
-                window.location.replace(intentUrl);
-            }
-        };
-
 
     </script>
 </body>

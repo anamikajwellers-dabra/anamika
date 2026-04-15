@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anamika Admin | Sticky Controls</title>
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; background-color: #fcfcfb; overflow-x: hidden; width: 100%; }
+        #login-section { max-width: 100%; margin: 80px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        #login-section input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        #login-section button { width: 100%; padding: 12px; background: #d4af37; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .forgot-link { display: block; margin-top: 15px; font-size: 12px; color: #1976d2; text-decoration: none; cursor: pointer; }
+
+        #admin-content { display: none; }
+
+        .sticky-header { position: sticky; top: 0; background: #f4f4f4; z-index: 1000; padding-top: 5px; padding-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { color: #d4af37; text-align: center; font-size: 18px; margin: 5px 0; }
+        
+        .top-action-bar { max-width: 550px; margin: 0 auto 10px auto; display: flex; flex-wrap: wrap; gap: 5px; padding: 0 10px; }
+        .btn-action { flex: 1; min-width: 80px; padding: 8px 2px; border-radius: 6px; border: none; font-size: 9px; font-weight: 700; color: white; cursor: pointer; text-align: center; text-transform: uppercase; }
+        .bg-gold { background: #d4af37; } .bg-blue { background: #1976d2; } .bg-green { background: #2e7d32; } .bg-red { background: #c62828; } .bg-purple { background: #673ab7; } .bg-orange { background: #ff9800; } .bg-pink { background: #e91e63; } .bg-teal { background: #009688; } .bg-indigo { background: #3f51b5; } .bg-light-purple { background: #7986cb; }
+
+        .tabs-container { display: flex; max-width: 550px; margin: 0 auto 10px auto; padding: 0 10px; gap: 10px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 13px; background: #e0e0e0; color: #666; }
+        .tab-btn.active-tab { background: #d4af37; color: white; }
+
+        #weight-box { max-width: 530px; margin: 0 auto 10px auto; background: #fff; border: 1.5px solid #d4af37; padding: 10px; border-radius: 12px; display: none; text-align: center; }
+        .search-container { max-width: 550px; margin: 0 auto 5px auto; padding: 0 10px; }
+        #smartSearch { width: 100%; height: 30px; padding: 12px 15px; border-radius: 25px; border: 1.5px solid #d4af37; outline: none; box-sizing: border-box; background: white; }
+
+        .product-card { background: white; display: flex; align-items: center; padding: 10px; margin: 8px auto; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); max-width: 550px; gap: 12px; border: 1px solid #eee; }
+        
+        .prod-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; opacity: 0; transition: opacity 0.4s ease-in-out; background: #f4f4f4; }
+        
+        .info { flex-grow: 1; } .info strong { display: block; font-size: 11px; }
+        
+        .action-area { display: flex; align-items: center; gap: 5px; } 
+        .btn-status { padding: 8px 10px; border-radius: 6px; border: none; font-size: 10px; min-width: 75px; font-weight: 800; cursor: pointer; }
+        
+        .btn-restore-icon { background: #e8f5e9; color: #2e7d32; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .btn-restore-icon:active { transform: scale(0.9); }
+
+        .btn-delete { background: none; border: none; color: #ff5252; cursor: pointer; font-size: 18px; padding: 5px; border-radius: 5px; }
+        .btn-info { background: none; border: none; cursor: pointer; font-size: 18px; padding: 5px; border-radius: 5px; }
+        #excelFile { display: none; }
+        
+        .swal-custom-input { width: 90%; margin: 0px auto; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; display: block;}
+          .swal-delete-icon {
+            position: absolute;
+            top: 15px;
+            left: 10px;
+            color: #c62828;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 999;
+            background: #fff;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-section">
+        <h2 style="color:#d4af37;">Anamika Admin</h2>
+        <input type="email" id="email" placeholder="Admin Email">
+        <input type="password" id="pass" placeholder="Password">
+        <button onclick="login()">LOGIN</button>
+        <span class="forgot-link" onclick="resetPassword()">Forgot Password?</span>
+    </div>
+
+    <div id="admin-content">
+        <div class="sticky-header">
+            <div class="top-action-bar">
+                <button onclick="window.addNewProduct()" class="btn-action bg-gold">➕ Add Item</button>
+                <button onclick="toggleWeightCalc()" class="btn-action bg-purple">⚖️ Weight</button>
+                <button onclick="downloadBackup()" class="btn-action bg-blue">📥 Backup</button>
+                <label for="excelFile" class="btn-action bg-green">📤 Upload</label>
+                <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" onchange="importAndSync()">
+                <button onclick="window.manageOffers()" class="btn-action bg-teal">🎁 Offers</button>
+                <button onclick="manageCategoryDiscounts()" class="btn-action" style="background:#ff7043;">🏷️ Discounts</button>
+
+                <button onclick="window.manageShowcase()" class="btn-action bg-indigo">🖼️ Showcase 1</button>
+                <button onclick="window.manageShowcase2()" class="btn-action" style="background:#5c6bc0;">🖼️ Showcase 2</button>
+                <button onclick="window.manageShowcase3()" class="btn-action bg-light-purple">🖼️ Showcase 3</button>
+                <button onclick="showUsersList()" class="btn-action bg-orange">👥 Users</button>
+                <button onclick="sendNotification()" class="btn-action bg-pink">📢 Notify</button>
+                <button onclick="logout()" class="btn-action bg-red">Logout</button>
+            </div>
+            <div id="weight-box">
+                <div style="display:flex; justify-content:space-around;">
+                    <div><small>LIVE</small><div id="live-weight-display" style="font-weight:bold; color:#2e7d32;">0g</div></div>
+                    <div style="width:1px; background:#ddd;"></div>
+                    <div><small>SOLD</small><div id="sold-weight-display" style="font-weight:bold; color:#c62828;">0g</div></div>
+                </div>
+            </div>
+            <div class="search-container">
+                <input type="text" id="smartSearch" onkeyup="smartFilter()" placeholder="Search Name/ID/Category...">
+            </div>
+            <div class="tabs-container">
+                <button id="btn-live" class="tab-btn active-tab" onclick="switchTab('live')">📦 ACTIVE (<span id="live-count">0</span>)</button>
+                <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">📁 ARCHIVE (<span id="sold-count">0</span>)</button>
+            </div>
+        </div>
+        <div id="list-container" style="padding: 0 10px; margin-top: 10px;"></div>
+    </div>
+
+    <script>
+        var IMGBB_API_KEY = "92c27dba00b654deddf7dadcbe8aa9a6"; 
+        
+        var firebaseConfig = {
+            apiKey: "AIzaSyBoY6noSIMt-YiIVOY7yNiYsKqQLgGmk_M",
+            authDomain: "anamika-jwellers.firebaseapp.com",
+            databaseURL: "https://anamika-jwellers-default-rtdb.firebaseio.com",
+            projectId: "anamika-jwellers"
+        };
+        firebase.initializeApp(firebaseConfig);
+        var database = firebase.database();
+        var auth = firebase.auth();
+
+        history.pushState({ adminApp: true }, null, window.location.href);
+        window.addEventListener('popstate', function(event) {
+            if (typeof Swal !== 'undefined' && Swal.isVisible()) {
+                Swal.close();
+                history.pushState({ adminApp: true }, null, window.location.href);
+            }
+        });
+
+        var allProducts = {}; var inventoryStatus = {}; var currentTab = 'live';
+
+        auth.onAuthStateChanged(function(user) {
+    // चेक करें कि यूज़र लॉगिन है और वह Anonymous (अनाम) नहीं है (यानी उसके पास ईमेल है)
+    if (user && !user.isAnonymous) {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('admin-content').style.display = 'block';
+        loadData();
+    } else {
+        document.getElementById('login-section').style.display = 'block';
+        document.getElementById('admin-content').style.display = 'none';
+    }
+});
+
+        function login() {
+            var e = document.getElementById('email').value.trim();
+            var p = document.getElementById('pass').value;
+            if(!e || !p) return Swal.fire('Error', 'Please enter Email & Password', 'error');
+            auth.signInWithEmailAndPassword(e, p).catch(function(err) { Swal.fire('Login Error', err.message, 'error'); });
+        }
+
+        function resetPassword() {
+            var email = document.getElementById('email').value.trim();
+            if (!email) return Swal.fire('Email?', 'Please enter email first', 'info');
+            auth.sendPasswordResetEmail(email).then(function() { Swal.fire('Sent', 'Reset link sent to email', 'success'); });
+        }
+
+        function logout() {
+            Swal.fire({
+                title: 'Logout?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d4af37',
+                confirmButtonText: 'Yes'
+            }).then(function(res) { if(res.isConfirmed) auth.signOut(); });
+        }
+
+        function loadData() {
+            database.ref('products').on('value', function(snap) { allProducts = snap.val() || {}; renderList(); calculateWeights(); });
+            database.ref('inventory').on('value', function(snap) { inventoryStatus = snap.val() || {}; renderList(); calculateWeights(); });
+        }
+
+        window.toggleStoneFields = function(type) {
+            var catElem = document.getElementById(type === 'add' ? 'addCategory' : 'editCategory');
+            if (!catElem) return;
+            
+            var cat = catElem.value.toUpperCase();
+            var normalDiv = document.getElementById(type === 'add' ? 'add-normal-fields' : 'edit-normal-fields');
+            var stoneDiv = document.getElementById(type === 'add' ? 'add-stone-fields' : 'edit-stone-fields');
+            
+            if (cat.includes("GEMS") || cat.includes("STONE")) {
+                normalDiv.style.display = "none";
+                stoneDiv.style.display = "block";
+            } else {
+                normalDiv.style.display = "block";
+                stoneDiv.style.display = "none";
+            }
+        };
+
+        // ==========================================
+        // 100% SAFE ADD NEW PRODUCT
+        // ==========================================
+        window.addNewProduct = function() {
+            var uniqueCategories = [];
+            var uniquePurities = [];
+            var uniqueTitles = [];
+            
+            for (var key in allProducts) {
+                var p = allProducts[key];
+                if (p.category && uniqueCategories.indexOf(p.category) === -1) uniqueCategories.push(p.category);
+                if (p.purity && uniquePurities.indexOf(p.purity) === -1) uniquePurities.push(p.purity);
+                if (p.title && uniqueTitles.indexOf(p.title) === -1) uniqueTitles.push(p.title);
+            }
+
+            var categoryOptions = uniqueCategories.map(function(c) { return '<option value="' + c.replace(/"/g, '&quot;') + '">'; }).join('');
+            var purityOptions = uniquePurities.map(function(p) { return '<option value="' + p.replace(/"/g, '&quot;') + '">'; }).join('');
+            var titleOptions = uniqueTitles.map(function(t) { return '<option value="' + t.replace(/"/g, '&quot;') + '">'; }).join('');
+
+            var popupHtml = 
+                '<datalist id="cat-list">' + categoryOptions + '</datalist>' +
+                '<datalist id="pur-list">' + purityOptions + '</datalist>' +
+                '<datalist id="tit-list">' + titleOptions + '</datalist>' +
+
+                '<input id="addId" class="swal-custom-input" placeholder="Product ID (e.g., RNG001)">' +
+                '<input id="addCategory" class="swal-custom-input" placeholder="Category" list="cat-list" oninput="toggleStoneFields(\'add\')">' +
+                '<input id="addPrice" class="swal-custom-input" placeholder="Price (₹) - Khali chhod sakte hain" type="number">' +
+
+                                '<div id="add-normal-fields">' +
+                    '<input id="addWeight" class="swal-custom-input" placeholder="Weight (in gm)" type="number" step="0.01">' +
+                    '<input id="addPurity" class="swal-custom-input" placeholder="Purity (e.g., 22K)" list="pur-list">' +
+                    '<input id="addNormalMetal" class="swal-custom-input" placeholder="Metal (Jaise: Silver/Gold)" value="Silver">' +
+                '</div>' +
+
+
+                '<div id="add-stone-fields" style="display:none; border: 1px solid #d4af37; padding: 10px; border-radius: 8px; background: #fffaf0; margin: 10px auto; width: 90%;">' +
+                    '<p style="font-size:11px; color:#d4af37; font-weight:bold; margin-bottom:5px;">💎 GEMS & STONE DETAILS</p>' +
+                    '<input id="addStonePrice" class="swal-custom-input" placeholder="Selling Price (₹) e.g. 5500" type="number">' +
+                    '<input id="addStoneName" class="swal-custom-input" placeholder="Stone Name">' +
+                    '<select id="addCertified" class="swal-custom-input">' +
+                        '<option value="No">Lab Certified: No</option>' +
+                        '<option value="Yes">Lab Certified: Yes ✅</option>' +
+                    '</select>' +
+                    '<input id="addRatti" class="swal-custom-input" placeholder="Ratti / Carat">' +
+                    '<input id="addZodiac" class="swal-custom-input" placeholder="Zodiac (Rashi)">' +
+                    '<input id="addPlanet" class="swal-custom-input" placeholder="Planet (Grah)">' +
+                    '<input id="addTreatment" class="swal-custom-input" placeholder="Treatment(Natural)">' +
+                    '<input id="addMetal" class="swal-custom-input" placeholder="Metal (Gold/Silver)">' +
+                    '<input id="addFinger" class="swal-custom-input" placeholder="Finger (Ungli)">' +
+                '</div>' +
+
+                '<input id="addTitle" class="swal-custom-input" placeholder="Product Name/Title" list="tit-list">' +
+                '<textarea id="addDesc" class="swal-custom-input" placeholder="Description" rows="5"></textarea>' +
+                
+                '<p style="font-size:11px; color:#888; text-align:left; margin-left:5%; margin-top:10px;">📸 Photo 1 (Main Photo):</p>' +
+                '<input id="imgFile1" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+                
+                '<p style="font-size:11px; color:#888; text-align:left; margin-left:5%; margin-top:5px;">📸 Photo 2 (Optional):</p>' +
+                '<input id="imgFile2" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+
+                '<p style="font-size:11px; color:#888; text-align:left; margin-left:5%; margin-top:5px;">📸 Photo 3 (Optional):</p>' +
+                '<input id="imgFile3" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+                
+                '<p style="font-size:11px; color:#888; text-align:left; margin-left:5%; margin-top:5px;">🎥 Video URL (Agar video ho toh):</p>' +
+                '<input id="addVidUrl" class="swal-custom-input" placeholder="Video ka link yahan daalein">';
+
+            Swal.fire({
+                title: 'Add New Product',
+                html: popupHtml,
+                didOpen: function() { window.toggleStoneFields('add'); },
+                showCancelButton: true,
+                confirmButtonText: 'Save Product',
+                confirmButtonColor: '#d4af37',
+                showLoaderOnConfirm: true,
+                preConfirm: function() {
+                    return new Promise(function(resolve, reject) {
+                        var id = document.getElementById('addId').value.trim().toLowerCase().replace(/\s+/g, '');
+
+                        if (!id || allProducts[id]) { 
+                            Swal.showValidationMessage('Invalid ID ya Pehle se maujood hai'); 
+                            resolve(false); 
+                            return; 
+                        }
+                        
+                        var mediaUrlsArray = [];
+                        var vidUrl = document.getElementById('addVidUrl').value.trim();
+                        if(vidUrl) mediaUrlsArray.push(vidUrl);
+
+                        function uploadSinglePhoto(inputId) {
+                            return new Promise(function(resOuter) {
+                                var fileInput = document.getElementById(inputId);
+                                if (fileInput && fileInput.files.length > 0) {
+                                    var formData = new FormData();
+                                    formData.append('image', fileInput.files[0]);
+                                    
+                                    fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: formData })
+                                        .then(function(response) { return response.json(); })
+                                        .then(function(result) {
+                                            if(result.success) { mediaUrlsArray.push(result.data.url); }
+                                            resOuter(true);
+                                        })
+                                        .catch(function(e) { resOuter(true); });
+                                } else {
+                                    resOuter(true);
+                                }
+                            });
+                        }
+
+                        uploadSinglePhoto('imgFile1').then(function() {
+                            return uploadSinglePhoto('imgFile2');
+                        }).then(function() {
+                            return uploadSinglePhoto('imgFile3');
+                        }).then(function() {
+                            var finalImageUrl = mediaUrlsArray.length > 0 ? mediaUrlsArray[0] : '';
+                            resolve({
+                                id: id,
+                                category: document.getElementById('addCategory').value,
+                                price: document.getElementById('addPrice').value,
+                                weight: document.getElementById('addWeight').value,
+                                purity: document.getElementById('addPurity').value,
+                                
+normalMetal: document.getElementById('addNormalMetal').value, 
+                                stonePrice: document.getElementById('addStonePrice').value,
+                                stoneName: document.getElementById('addStoneName').value,
+                                certified: document.getElementById('addCertified').value,
+                                ratti: document.getElementById('addRatti').value,
+                                zodiac: document.getElementById('addZodiac').value,
+                                planet: document.getElementById('addPlanet').value,
+                                treatment: document.getElementById('addTreatment').value,
+                                metal: document.getElementById('addMetal').value,
+                                finger: document.getElementById('addFinger').value,
+                                title: document.getElementById('addTitle').value,
+                                desc: document.getElementById('addDesc').value,
+                                image: finalImageUrl,
+                                mediaArray: mediaUrlsArray,
+                                timestamp: Date.now()
+                            });
+                        });
+                    });
+                }
+            }).then(function(res) {
+                if(res.isConfirmed && res.value) {
+                    var d = res.value;
+                    Promise.all([
+                        database.ref('products/' + d.id).set({ 
+                            title: d.title, price: d.price, weight: d.weight, purity: d.purity, normalMetal: d.normalMetal, category: d.category, 
+                            image: d.image, mediaArray: d.mediaArray, desc: d.desc, timestamp: d.timestamp, stonePrice: d.stonePrice, stoneName: d.stoneName, 
+                            certified: d.certified, ratti: d.ratti, zodiac: d.zodiac, planet: d.planet, 
+                            treatment: d.treatment, metal: d.metal, finger: d.finger 
+                        }),
+                        database.ref('inventory/' + d.id).set({ isSold: false })
+                    ]).then(function() { Swal.fire('Added!', 'Product save ho gaya.', 'success'); });
+                }
+            });
+        };
+
+        // ==========================================
+        // 100% SAFE EDIT PRODUCT
+        // ==========================================
+        window.editProduct = function(id) {
+            var item = allProducts[id];
+            if(!item) return;
+
+            var uniqueCategories = [];
+            var uniquePurities = [];
+            var uniqueTitles = [];
+            
+            for (var key in allProducts) {
+                var p = allProducts[key];
+                if (p.category && uniqueCategories.indexOf(p.category) === -1) uniqueCategories.push(p.category);
+                if (p.purity && uniquePurities.indexOf(p.purity) === -1) uniquePurities.push(p.purity);
+                if (p.title && uniqueTitles.indexOf(p.title) === -1) uniqueTitles.push(p.title);
+            }
+
+            var categoryOptions = uniqueCategories.map(function(c) { return '<option value="' + c.replace(/"/g, '&quot;') + '">'; }).join('');
+            var purityOptions = uniquePurities.map(function(p) { return '<option value="' + p.replace(/"/g, '&quot;') + '">'; }).join('');
+            var titleOptions = uniqueTitles.map(function(t) { return '<option value="' + t.replace(/"/g, '&quot;') + '">'; }).join('');
+
+            var existingMedia = item.mediaArray ? item.mediaArray.join(', ') : (item.image || '');
+
+            var popupHtml = 
+                '<datalist id="cat-list">' + categoryOptions + '</datalist>' +
+                '<datalist id="pur-list">' + purityOptions + '</datalist>' +
+                '<datalist id="tit-list">' + titleOptions + '</datalist>' +
+
+                '<div style="text-align:left; font-size:12px; color:#888; margin-left:5%;">Product ID: ' + id.toUpperCase() + '</div>' +
+                '<input id="editCategory" class="swal-custom-input" placeholder="Category" list="cat-list" value="' + (item.category || '') + '" oninput="toggleStoneFields(\'edit\')">' +
+                '<input id="editPrice" class="swal-custom-input" placeholder="Price (₹) - Khali chhod sakte hain" type="number" value="' + (item.price || '') + '">' +
+
+                // --- NAYA FIELD YAHAN JODA GAYA HAI ---
+                '<input id="editIndDiscount" class="swal-custom-input" placeholder="Special Discount % (Sirf is item ke liye)" type="number" min="0" max="100" style="border-color:#e91e63;" value="' + (item.indDiscount || '') + '">' +
+
+                               '<div id="edit-normal-fields">' +
+                    '<input id="editWeight" class="swal-custom-input" placeholder="Weight (in gm)" type="number" step="0.01" value="' + (item.weight || '') + '">' +
+                    '<input id="editPurity" class="swal-custom-input" placeholder="Purity (e.g., 22K)" list="pur-list" value="' + (item.purity || '') + '">' +
+                    '<input id="editNormalMetal" class="swal-custom-input" placeholder="Metal (Jaise: Silver/Gold)" value="' + (item.normalMetal || 'Silver') + '">' +
+                '</div>' +
+
+                '<div id="edit-stone-fields" style="display:none; border: 1px solid #d4af37; padding: 10px; border-radius: 8px; background: #fffaf0; margin: 10px auto; width: 90%;">' +
+                    '<p style="font-size:11px; color:#d4af37; font-weight:bold; margin-bottom:5px;">💎 GEMS & STONE DETAILS</p>' +
+                    '<input id="editStonePrice" class="swal-custom-input" placeholder="Selling Price (₹) e.g. 5500" type="number" value="' + (item.stonePrice || '') + '">' +
+                    '<input id="editStoneName" class="swal-custom-input" placeholder="Stone Name" value="' + (item.stoneName || '') + '">' +
+                    '<select id="editCertified" class="swal-custom-input">' +
+                        '<option value="No" ' + (item.certified === 'No' ? 'selected' : '') + '>Lab Certified: No</option>' +
+                        '<option value="Yes" ' + (item.certified === 'Yes' ? 'selected' : '') + '>Lab Certified: Yes ✅</option>' +
+                    '</select>' +
+                    '<input id="editRatti" class="swal-custom-input" placeholder="Ratti / Carat" value="' + (item.ratti || '') + '">' +
+                    '<input id="editZodiac" class="swal-custom-input" placeholder="Zodiac (Rashi)" value="' + (item.zodiac || '') + '">' +
+                    '<input id="editPlanet" class="swal-custom-input" placeholder="Planet (Grah)" value="' + (item.planet || '') + '">' +
+                    '<input id="editTreatment" class="swal-custom-input" placeholder="Treatment(Natural)" value="' + (item.treatment || '') + '">' +
+                    '<input id="editMetal" class="swal-custom-input" placeholder="Metal (Gold/Silver)" value="' + (item.metal || '') + '">' +
+                    '<input id="editFinger" class="swal-custom-input" placeholder="Finger (Ungli)" value="' + (item.finger || '') + '">' +
+                '</div>' +
+
+                '<input id="editTitle" class="swal-custom-input" placeholder="Product Name/Title" list="tit-list" value="' + (item.title || '') + '">' +
+                '<textarea id="editDesc" class="swal-custom-input" placeholder="Description" rows="5">' + (item.desc || '') + '</textarea>' +
+                
+                '<p style="font-size:11px; color:#888; text-align:left; margin-left:5%; margin-top:10px;">📸 Nayi Photos Jodein (Purani list niche hai):</p>' +
+                '<input id="imgEdit1" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+                '<input id="imgEdit2" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+                '<input id="imgEdit3" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+                
+                '<p style="font-size:11px; color:#888; text-align:left; margin-left:5%; margin-top:5px;">🔗 Maujuda Photos/Videos URLs (Delete ya Edit karein):</p>' +
+                '<textarea id="editImageUrl" class="swal-custom-input" rows="3">' + existingMedia + '</textarea>';
+
+            Swal.fire({
+                title: 'Edit Product',
+                html: popupHtml,
+                didOpen: function() { window.toggleStoneFields('edit'); },
+                showCancelButton: true,
+                confirmButtonText: 'Update Details',
+                confirmButtonColor: '#1976d2',
+                showLoaderOnConfirm: true,
+                preConfirm: function() {
+                    return new Promise(function(resolve, reject) {
+                        var mediaUrlsArray = [];
+                        var manualUrlStr = document.getElementById('editImageUrl').value.trim();
+                        if(manualUrlStr) {
+                            manualUrlStr.split(',').forEach(function(u) {
+                                if(u.trim()) mediaUrlsArray.push(u.trim());
+                            });
+                        }
+
+                        function uploadSinglePhoto(inputId) {
+                            return new Promise(function(resOuter) {
+                                var fileInput = document.getElementById(inputId);
+                                if (fileInput && fileInput.files.length > 0) {
+                                    var formData = new FormData();
+                                    formData.append('image', fileInput.files[0]);
+                                    
+                                    fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: formData })
+                                        .then(function(response) { return response.json(); })
+                                        .then(function(result) {
+                                            if(result.success) { mediaUrlsArray.push(result.data.url); }
+                                            resOuter(true);
+                                        })
+                                        .catch(function(e) { resOuter(true); });
+                                } else {
+                                    resOuter(true);
+                                }
+                            });
+                        }
+
+                        uploadSinglePhoto('imgEdit1').then(function() {
+                            return uploadSinglePhoto('imgEdit2');
+                        }).then(function() {
+                            return uploadSinglePhoto('imgEdit3');
+                        }).then(function() {
+                            var finalImageUrl = mediaUrlsArray.length > 0 ? mediaUrlsArray[0] : '';
+                            resolve({
+                                category: document.getElementById('editCategory').value,
+                                price: document.getElementById('editPrice').value,
+                                indDiscount: document.getElementById('editIndDiscount').value, // Naya discount pass kiya
+                                weight: document.getElementById('editWeight').value,
+                                purity: document.getElementById('editPurity').value,
+                                
+  normalMetal: document.getElementById('editNormalMetal').value,
+                                stonePrice: document.getElementById('editStonePrice').value,
+                                stoneName: document.getElementById('editStoneName').value,
+                                certified: document.getElementById('editCertified').value,
+                                ratti: document.getElementById('editRatti').value,
+                                zodiac: document.getElementById('editZodiac').value,
+                                planet: document.getElementById('editPlanet').value,
+                                treatment: document.getElementById('editTreatment').value,
+                                metal: document.getElementById('editMetal').value,
+                                finger: document.getElementById('editFinger').value,
+                                title: document.getElementById('editTitle').value,
+                                desc: document.getElementById('editDesc').value,
+                                image: finalImageUrl,
+                                mediaArray: mediaUrlsArray,
+                                timestamp: Date.now()
+                            });
+                        });
+                    });
+                }
+            }).then(function(res) { 
+                if(res.isConfirmed && res.value) { 
+                    database.ref('products/' + id).update(res.value).then(function() { Swal.fire('Updated!', 'Details Update ho gayi.', 'success'); }); 
+                } 
+            });
+        };
+
+        // ==========================================
+        // OTHER ADMIN LOGIC
+        // ==========================================
+        
+        window.manageOffers = function() {
+            database.ref('offers_banners').once('value').then(function(snap) {
+                var offers = snap.val() || {
+                    slide1: { image: "", link: "?offer=Bangles", discount: "" },
+                    slide2: { image: "", link: "?offer=Rings", discount: "" },
+                    slide3: { image: "", link: "?offer=Necklace", discount: "" },
+                    slide4: { image: "", link: "", discount: "" },
+                    slide5: { image: "", link: "", discount: "" }
+                };
+
+                var html = 
+                    '<div style="text-align:left; font-size:12px; margin-bottom:15px; padding:10px; background:#e0f2f1; border-radius:8px;">' +
+                        'Yahan photo upload karein ya URL daalein, category link aur discount % set karein.' +
+                    '</div>' +
+                    '<div style="background:#f9f9f9; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">' +
+                        '<h4 style="margin:0 0 5px 0; color:#d4af37; text-align:left;">Slide 1</h4>' +
+                        '<input id="imgFile1" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+                        '<div style="font-size:10px; font-weight:bold; margin:2px 0;">-- OR --</div>' +
+                        '<input id="img1" class="swal-custom-input" placeholder="Paste Photo URL" value="' + (offers.slide1.image || '') + '">' +
+                        '<input id="link1" class="swal-custom-input" placeholder="Category Link (e.g. ?offer=Bangles)" value="' + (offers.slide1.link || '') + '">' +
+                        '<input id="discount1" class="swal-custom-input" placeholder="Discount %" type="number" min="0" max="100" value="' + (offers.slide1.discount || '') + '">' +
+                    '</div>' +
+                    '<div style="background:#f9f9f9; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">' +
+                        '<h4 style="margin:0 0 5px 0; color:#d4af37; text-align:left;">Slide 2</h4>' +
+                        '<input id="imgFile2" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+                        '<div style="font-size:10px; font-weight:bold; margin:2px 0;">-- OR --</div>' +
+                        '<input id="img2" class="swal-custom-input" placeholder="Paste Photo URL" value="' + (offers.slide2.image || '') + '">' +
+                        '<input id="link2" class="swal-custom-input" placeholder="Category Link" value="' + (offers.slide2.link || '') + '">' +
+                        '<input id="discount2" class="swal-custom-input" placeholder="Discount %" type="number" min="0" max="100" value="' + (offers.slide2.discount || '') + '">' +
+                    '</div>' +
+                    '<div style="background:#f9f9f9; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">' +
+                        '<h4 style="margin:0 0 5px 0; color:#d4af37; text-align:left;">Slide 3</h4>' +
+                        '<input id="imgFile3" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+                        '<div style="font-size:10px; font-weight:bold; margin:2px 0;">-- OR --</div>' +
+                        '<input id="img3" class="swal-custom-input" placeholder="Paste Photo URL" value="' + (offers.slide3.image || '') + '">' +
+                        '<input id="link3" class="swal-custom-input" placeholder="Category Link" value="' + (offers.slide3.link || '') + '">' +
+                        '<input id="discount3" class="swal-custom-input" placeholder="Discount %" type="number" min="0" max="100" value="' + (offers.slide3.discount || '') + '">' +
+                    '</div>' +
+                    '<div style="background:#f9f9f9; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">' +
+                        '<h4 style="margin:0 0 5px 0; color:#d4af37; text-align:left;">Slide 4</h4>' +
+                        '<input id="imgFile4" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+                        '<div style="font-size:10px; font-weight:bold; margin:2px 0;">-- OR --</div>' +
+                        '<input id="img4" class="swal-custom-input" placeholder="Paste Photo URL" value="' + (offers.slide4 ? offers.slide4.image : '') + '">' +
+                        '<input id="link4" class="swal-custom-input" placeholder="Category Link" value="' + (offers.slide4 ? offers.slide4.link : '') + '">' +
+                        '<input id="discount4" class="swal-custom-input" placeholder="Discount %" type="number" min="0" max="100" value="' + (offers.slide4 ? offers.slide4.discount : '') + '">' +
+                    '</div>' +
+                    '<div style="background:#f9f9f9; padding:10px; border:1px solid #ddd; border-radius:8px;">' +
+                        '<h4 style="margin:0 0 5px 0; color:#d4af37; text-align:left;">Slide 5</h4>' +
+                        '<input id="imgFile5" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+                        '<div style="font-size:10px; font-weight:bold; margin:2px 0;">-- OR --</div>' +
+                        '<input id="img5" class="swal-custom-input" placeholder="Paste Photo URL" value="' + (offers.slide5 ? offers.slide5.image : '') + '">' +
+                        '<input id="link5" class="swal-custom-input" placeholder="Category Link" value="' + (offers.slide5 ? offers.slide5.link : '') + '">' +
+                        '<input id="discount5" class="swal-custom-input" placeholder="Discount %" type="number" min="0" max="100" value="' + (offers.slide5 ? offers.slide5.discount : '') + '">' +
+                    '</div>';
+
+                Swal.fire({
+                    title: '🎁 Manage Slider Banners',
+                    html: html,
+                    width: '95%',
+                    showCancelButton: true,
+                    confirmButtonText: 'Save Offers',
+                    confirmButtonColor: '#009688',
+                    showLoaderOnConfirm: true,
+                    preConfirm: function() {
+                        return new Promise(function(resolve, reject) {
+                            function uploadAndGetUrl(fileInputId, textInputId) {
+                                return new Promise(function(resOuter) {
+                                    var finalUrl = document.getElementById(textInputId).value.trim();
+                                    var imageFile = document.getElementById(fileInputId).files[0];
+                                    if (imageFile) {
+                                        var formData = new FormData();
+                                        formData.append('image', imageFile);
+                                        fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: formData })
+                                            .then(function(r) { return r.json(); })
+                                            .then(function(result) {
+                                                if(result.success) { finalUrl = result.data.url; }
+                                                resOuter(finalUrl);
+                                            }).catch(function() { resOuter(finalUrl); });
+                                    } else {
+                                        resOuter(finalUrl);
+                                    }
+                                });
+                            }
+
+                            uploadAndGetUrl('imgFile1', 'img1').then(function(r1) {
+                                return uploadAndGetUrl('imgFile2', 'img2').then(function(r2) {
+                                    return uploadAndGetUrl('imgFile3', 'img3').then(function(r3) {
+                                        return uploadAndGetUrl('imgFile4', 'img4').then(function(r4) {
+                                            return uploadAndGetUrl('imgFile5', 'img5').then(function(r5) {
+                                                resolve({
+                                                    slide1: { image: r1, link: document.getElementById('link1').value.trim(), discount: document.getElementById('discount1').value.trim() },
+                                                    slide2: { image: r2, link: document.getElementById('link2').value.trim(), discount: document.getElementById('discount2').value.trim() },
+                                                    slide3: { image: r3, link: document.getElementById('link3').value.trim(), discount: document.getElementById('discount3').value.trim() },
+                                                    slide4: { image: r4, link: document.getElementById('link4').value.trim(), discount: document.getElementById('discount4').value.trim() },
+                                                    slide5: { image: r5, link: document.getElementById('link5').value.trim(), discount: document.getElementById('discount5').value.trim() }
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    }
+                }).then(function(res) {
+                    if(res.isConfirmed && res.value) {
+                        database.ref('offers_banners').set(res.value)
+                        .then(function() { Swal.fire('Saved!', 'Aapke offers update ho gaye hain.', 'success'); })
+                        .catch(function(err) { Swal.fire('Error', err.message, 'error'); });
+                    }
+                });
+            }).catch(function(err) {
+                Swal.fire('Error', 'Offers load nahi ho paye: ' + err.message, 'error');
+            });
+        };
+
+        window.manageShowcase = function() {
+            database.ref('category_showcase').once('value').then(function(snap) {
+                var data = snap.val() || { image: '', title: '', category: '', isActive: false };
+                
+                var uniqueCategories = [];
+                for (var key in allProducts) { if (allProducts[key].category && uniqueCategories.indexOf(allProducts[key].category) === -1) uniqueCategories.push(allProducts[key].category); }
+                var categoryOptions = uniqueCategories.map(function(c) { return '<option value="' + c + '">'; }).join('');
+
+                var html = 
+                    '<datalist id="showcase-cat-list">' + categoryOptions + '</datalist>' +
+                    '<div style="text-align:left; margin-bottom:5px; font-weight:bold; font-size:13px; color:#333;">1. Status (ON/OFF):</div>' +
+                    '<select id="scStatus" class="swal-custom-input">' +
+                        '<option value="true" ' + (data.isActive ? 'selected' : '') + '>🟢 ACTIVE</option>' +
+                        '<option value="false" ' + (!data.isActive ? 'selected' : '') + '>🔴 HIDDEN</option>' +
+                    '</select>' +
+                    '<div style="text-align:left; margin-top:10px; font-weight:bold; font-size:13px; color:#333;">2. Banner Title:</div>' +
+                    '<input id="scTitle" class="swal-custom-input" placeholder="e.g., Diamond Best Sellers" value="' + (data.title || '') + '">' +
+                    '<div style="text-align:left; margin-top:10px; font-weight:bold; font-size:13px; color:#333;">3. Target Category:</div>' +
+                    '<input id="scCategory" class="swal-custom-input" placeholder="e.g., RING" list="showcase-cat-list" value="' + (data.category || '') + '">' +
+                    '<div style="text-align:left; margin-top:15px; font-weight:bold; font-size:13px; color:#333;">4. Banner Image:</div>' +
+                    '<input id="scImageFile" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+                    '<div style="font-size:12px; font-weight:bold; margin:5px 0;">-- OR --</div>' +
+                    '<input id="scImageUrl" class="swal-custom-input" placeholder="Paste Image Link (URL)" value="' + (data.image || '') + '">';
+
+                Swal.fire({
+                    title: '🖼️ Manage Category Showcase 1',
+                    html: html,
+                    showCancelButton: true,
+                    confirmButtonText: 'Save Showcase 1',
+                    confirmButtonColor: '#3f51b5',
+                    showLoaderOnConfirm: true,
+                    preConfirm: function() {
+                        return new Promise(function(resolve, reject) {
+                            var finalImageUrl = document.getElementById('scImageUrl').value.trim();
+                            var imageFile = document.getElementById('scImageFile').files[0];
+                            if (imageFile) {
+                                var formData = new FormData();
+                                formData.append('image', imageFile);
+                                fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: formData })
+                                .then(function(r) { return r.json(); })
+                                .then(function(result) {
+                                    if(result.success) { finalImageUrl = result.data.url; }
+                                    resolve({ isActive: document.getElementById('scStatus').value === 'true', title: document.getElementById('scTitle').value.trim(), category: document.getElementById('scCategory').value.trim(), image: finalImageUrl });
+                                }).catch(function() { Swal.showValidationMessage('Image upload fail'); resolve(false); });
+                            } else {
+                                resolve({ isActive: document.getElementById('scStatus').value === 'true', title: document.getElementById('scTitle').value.trim(), category: document.getElementById('scCategory').value.trim(), image: finalImageUrl });
+                            }
+                        });
+                    }
+                }).then(function(res) { if(res.isConfirmed && res.value) { database.ref('category_showcase').set(res.value).then(function() { Swal.fire('Saved!', 'Showcase 1 update ho gaya.', 'success'); }); } });
+            });
+        };
+
+        window.manageShowcase2 = function() {
+            database.ref('category_showcase2').once('value').then(function(snap) {
+                var data = snap.val() || { image: '', title: '', category: '', isActive: false };
+                
+                var uniqueCategories = [];
+                for (var key in allProducts) { if (allProducts[key].category && uniqueCategories.indexOf(allProducts[key].category) === -1) uniqueCategories.push(allProducts[key].category); }
+                var categoryOptions = uniqueCategories.map(function(c) { return '<option value="' + c + '">'; }).join('');
+
+                var html = 
+                    '<datalist id="showcase-cat-list2">' + categoryOptions + '</datalist>' +
+                    '<div style="text-align:left; margin-bottom:5px; font-weight:bold; font-size:13px; color:#333;">1. Status:</div>' +
+                    '<select id="scStatus2" class="swal-custom-input">' +
+                        '<option value="true" ' + (data.isActive ? 'selected' : '') + '>🟢 ACTIVE</option>' +
+                        '<option value="false" ' + (!data.isActive ? 'selected' : '') + '>🔴 HIDDEN</option>' +
+                    '</select>' +
+                    '<div style="text-align:left; margin-top:10px; font-weight:bold; font-size:13px; color:#333;">2. Banner Title:</div>' +
+                    '<input id="scTitle2" class="swal-custom-input" placeholder="e.g., Gold Necklaces" value="' + (data.title || '') + '">' +
+                    '<div style="text-align:left; margin-top:10px; font-weight:bold; font-size:13px; color:#333;">3. Target Category:</div>' +
+                    '<input id="scCategory2" class="swal-custom-input" placeholder="e.g., NECKLACE" list="showcase-cat-list2" value="' + (data.category || '') + '">' +
+                    '<div style="text-align:left; margin-top:15px; font-weight:bold; font-size:13px; color:#333;">4. Banner Image:</div>' +
+                    '<input id="scImageFile2" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+                    '<div style="font-size:12px; font-weight:bold; margin:5px 0;">-- OR --</div>' +
+                    '<input id="scImageUrl2" class="swal-custom-input" placeholder="Paste Image Link (URL)" value="' + (data.image || '') + '">';
+
+                Swal.fire({
+                    title: '🖼️ Manage Category Showcase 2',
+                    html: html,
+                    showCancelButton: true,
+                    confirmButtonText: 'Save Showcase 2',
+                    confirmButtonColor: '#5c6bc0',
+                    showLoaderOnConfirm: true,
+                    preConfirm: function() {
+                        return new Promise(function(resolve, reject) {
+                            var finalImageUrl = document.getElementById('scImageUrl2').value.trim();
+                            var imageFile = document.getElementById('scImageFile2').files[0];
+                            if (imageFile) {
+                                var formData = new FormData();
+                                formData.append('image', imageFile);
+                                fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: formData })
+                                .then(function(r) { return r.json(); })
+                                .then(function(result) {
+                                    if(result.success) { finalImageUrl = result.data.url; }
+                                    resolve({ isActive: document.getElementById('scStatus2').value === 'true', title: document.getElementById('scTitle2').value.trim(), category: document.getElementById('scCategory2').value.trim(), image: finalImageUrl });
+                                }).catch(function() { Swal.showValidationMessage('Image upload fail'); resolve(false); });
+                            } else {
+                                resolve({ isActive: document.getElementById('scStatus2').value === 'true', title: document.getElementById('scTitle2').value.trim(), category: document.getElementById('scCategory2').value.trim(), image: finalImageUrl });
+                            }
+                        });
+                    }
+                }).then(function(res) { if(res.isConfirmed && res.value) { database.ref('category_showcase2').set(res.value).then(function() { Swal.fire('Saved!', 'Showcase 2 update ho gaya.', 'success'); }); } });
+            });
+        };
+
+        window.manageShowcase3 = function() {
+            database.ref('category_showcase3').once('value').then(function(snap) {
+                var data = snap.val() || { image: '', title: '', category: '', isActive: false };
+                
+                var uniqueCategories = [];
+                for (var key in allProducts) { if (allProducts[key].category && uniqueCategories.indexOf(allProducts[key].category) === -1) uniqueCategories.push(allProducts[key].category); }
+                var categoryOptions = uniqueCategories.map(function(c) { return '<option value="' + c + '">'; }).join('');
+
+                var html = 
+                    '<datalist id="showcase-cat-list3">' + categoryOptions + '</datalist>' +
+                    '<div style="text-align:left; margin-bottom:5px; font-weight:bold; font-size:13px; color:#333;">1. Status:</div>' +
+                    '<select id="scStatus3" class="swal-custom-input">' +
+                        '<option value="true" ' + (data.isActive ? 'selected' : '') + '>🟢 ACTIVE</option>' +
+                        '<option value="false" ' + (!data.isActive ? 'selected' : '') + '>🔴 HIDDEN</option>' +
+                    '</select>' +
+                    '<div style="text-align:left; margin-top:10px; font-weight:bold; font-size:13px; color:#333;">2. Banner Title:</div>' +
+                    '<input id="scTitle3" class="swal-custom-input" placeholder="e.g., New Arrival" value="' + (data.title || '') + '">' +
+                    '<div style="text-align:left; margin-top:10px; font-weight:bold; font-size:13px; color:#333;">3. Target Category:</div>' +
+                    '<input id="scCategory3" class="swal-custom-input" placeholder="e.g., BRACELET" list="showcase-cat-list3" value="' + (data.category || '') + '">' +
+                    '<div style="text-align:left; margin-top:15px; font-weight:bold; font-size:13px; color:#333;">4. Banner Image:</div>' +
+                    '<input id="scImageFile3" type="file" accept="image/*" class="swal-custom-input" style="padding: 5px;">' +
+                    '<div style="font-size:12px; font-weight:bold; margin:5px 0;">-- OR --</div>' +
+                    '<input id="scImageUrl3" class="swal-custom-input" placeholder="Paste Image Link (URL)" value="' + (data.image || '') + '">';
+
+                Swal.fire({
+                    title: '🖼️ Manage Category Showcase 3',
+                    html: html,
+                    showCancelButton: true,
+                    confirmButtonText: 'Save Showcase 3',
+                    confirmButtonColor: '#7986cb',
+                    showLoaderOnConfirm: true,
+                    preConfirm: function() {
+                        return new Promise(function(resolve, reject) {
+                            var finalImageUrl = document.getElementById('scImageUrl3').value.trim();
+                            var imageFile = document.getElementById('scImageFile3').files[0];
+                            if (imageFile) {
+                                var formData = new FormData();
+                                formData.append('image', imageFile);
+                                fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: formData })
+                                .then(function(r) { return r.json(); })
+                                .then(function(result) {
+                                    if(result.success) { finalImageUrl = result.data.url; }
+                                    resolve({ isActive: document.getElementById('scStatus3').value === 'true', title: document.getElementById('scTitle3').value.trim(), category: document.getElementById('scCategory3').value.trim(), image: finalImageUrl });
+                                }).catch(function() { Swal.showValidationMessage('Image upload fail'); resolve(false); });
+                            } else {
+                                resolve({ isActive: document.getElementById('scStatus3').value === 'true', title: document.getElementById('scTitle3').value.trim(), category: document.getElementById('scCategory3').value.trim(), image: finalImageUrl });
+                            }
+                        });
+                    }
+                }).then(function(res) { if(res.isConfirmed && res.value) { database.ref('category_showcase3').set(res.value).then(function() { Swal.fire('Saved!', 'Showcase 3 update ho gaya.', 'success'); }); } });
+            });
+        };
+
+        // ==========================================
+        // OTHER ADMIN LOGIC
+        // ==========================================
+        function showUsersList(openUid = null) {
+            Swal.fire({
+                title: 'Fetching Data...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            Promise.all([
+                database.ref('users').once('value'),
+                database.ref('user_names').once('value')
+            ]).then(([usersSnap, namesSnap]) => {
+                const usersData = usersSnap.val() || {};
+                const namesData = namesSnap.val() || {};
+                const userIds = Object.keys(usersData);
+                
+                if (userIds.length === 0) {
+                    Swal.fire('No Users', 'Abhi tak kisi user ne app mein kuch Like (Favorite) nahi kiya hai.', 'info');
+                    return;
+                }
+
+                let htmlContent = `<div style="text-align:left; max-height:350px; overflow-y:auto; background:#fff; padding:0; border-radius:8px;">`;
+                htmlContent += `<p style="color:#d4af37; font-size:16px; margin:10px 5px;"><strong>Total Active Users: ${userIds.length}</strong></p><ul style="padding:0; list-style:none; margin:0;">`;
+                
+                userIds.forEach((uid, index) => {
+                    let userData = usersData[uid] || {}; 
+                    let likesObj = userData.likes || {};
+                    let likedIds = Object.keys(likesObj).filter(id => likesObj[id] === true);
+                    let likesCount = likedIds.length;
+                    
+                    let userPhone = userData.phone ? userData.phone : '';
+                    let contactHtml = userPhone ? `<br><span style="font-size:11px; color:#1976d2; font-weight:normal;">📞 ${userPhone}</span>` : '';
+
+                    let productListItems = '';
+
+                    if (likesCount > 0) {
+                        productListItems = likedIds.map(id => {
+                            let prodName = allProducts[id] ? allProducts[id].title : "Item";
+                            return `
+                                <div onclick="viewLikedProduct('${id}', '${uid}')" style="background:#e8f5e9; color:#2e7d32; padding:8px 10px; border-radius:6px; margin:4px 0; font-size:12px; border: 1px solid #c8e6c9; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+                                    <span>${prodName} <b>(${id.toUpperCase()})</b></span>
+                                    <i class="fa-solid fa-eye"></i>
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        productListItems = `<div style="color:#888; font-style:italic; padding:5px 0; font-size:12px;">Koi item pasand nahi kiya.</div>`;
+                    }
+
+                    let isOpen = (openUid === uid) ? 'open' : '';
+                    let customName = namesData[uid] || '';
+                    let displayName = customName ? customName : `User ${index + 1}`;
+                    let safeName = customName.replace(/'/g, "\\'"); 
+                    
+                    htmlContent += `
+                    <li style="border-bottom:1px solid #eee;">
+                        <details ${isOpen}>
+                            <summary style="cursor:pointer; outline:none; padding:12px 2px; display:flex; justify-content:space-between; align-items:center; list-style:none;">
+                                <div style="display:flex; align-items:center; gap:6px; font-size:11px; color:#777; flex-wrap:wrap; width: 75%;">
+                                    <span style="font-weight:bold; font-size:13px; color:#333;">${displayName} ${contactHtml}</span>
+                                    <span onclick="setUserName('${uid}', '${safeName}', event)" style="color:#1976d2; padding:2px 6px; border-radius:4px; background:#e3f2fd; font-weight:bold; cursor:pointer;"><i class="fa-solid fa-pen-to-square"></i></span>
+                                    <span onclick="deleteUserRecord('${uid}', '${safeName}', event)" style="color:#c62828; padding:2px 6px; border-radius:4px; background:#ffebee; font-weight:bold; cursor:pointer;"><i class="fa-solid fa-trash"></i></span>
+                                    <div style="width:100%; word-break:break-all; margin-top:2px;">${uid}</div>
+                                </div>
+                                <div style="color:#e74c3c; font-weight:bold; font-size:12px; background:#ffebee; padding:4px 8px; border-radius:15px; white-space:nowrap; margin-left:5px; flex-shrink:0;">
+                                    ❤️ ${likesCount} ▾
+                                </div>
+                            </summary>
+                            <div style="padding:0 2px 10px 2px;">
+                                ${productListItems}
+                            </div>
+                        </details>
+                    </li>`;
+                });
+                htmlContent += `</ul></div>`;
+                htmlContent += `<p style="font-size:10px; color:#888; margin-top:12px; line-height:1.4;">Note: Users ke Asli Mobile Numbers dekhne ke liye apne Firebase Console mein <b>'Authentication'</b> tab par jayen aur is ID se match karein.</p>`;
+
+                Swal.fire({ title: '👥 Users & Likes', html: htmlContent, confirmButtonColor: '#d4af37', confirmButtonText: 'Close', width: '450px' });
+            }).catch(err => {
+                Swal.fire('Permission Denied!', 'Error: ' + err.message, 'error');
+            });
+        }
+
+        function setUserName(uid, currentName, event) {
+            event.preventDefault(); event.stopPropagation();
+            Swal.fire({ title: 'User ka naam likhein', input: 'text', inputValue: currentName, inputPlaceholder: 'Jaise: Rahul Sharma', showCancelButton: true, confirmButtonText: 'Save', confirmButtonColor: '#d4af37' })
+            .then(res => { if (res.isConfirmed) { database.ref('user_names/' + uid).set(res.value).then(() => { showUsersList(uid); }); } });
+        }
+
+        function deleteUserRecord(uid, name, event) {
+            event.preventDefault(); event.stopPropagation();
+            Swal.fire({ title: 'Delete User Data?', text: `Kya aap sach mein ${name} ka sara Likes data hamesha ke liye delete karna chahte hain?`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#c62828', confirmButtonText: 'Haan, Delete karein' })
+            .then((result) => { if (result.isConfirmed) { Promise.all([database.ref('users/' + uid).remove(), database.ref('user_names/' + uid).remove()]).then(() => { showUsersList(); }); } });
+        }
+
+        function viewLikedProduct(id, uid) {
+            const item = allProducts[id];
+            if(!item) { Swal.fire('Not Found', 'Yeh item ab database mein nahi hai ya delete ho chuka hai.', 'error').then(() => { showUsersList(uid); }); return; }
+
+            Swal.fire({
+                title: item.title || 'Jewelry Item',
+                html: `
+                    <div style="text-align:center;">
+                        <img src="${item.image}" style="max-width:100%; height:200px; object-fit:cover; border-radius:10px; margin-bottom:15px; border:1px solid #eee;" onerror="this.src='https://via.placeholder.com/200'">
+                        <p style="margin:5px 0;"><strong>ID:</strong> ${id.toUpperCase()}</p>
+                        <p style="margin:5px 0;"><strong>Weight:</strong> ${item.weight || 'N/A'} gm</p>
+                        <p style="margin:5px 0;"><strong>Purity:</strong> ${item.purity || 'N/A'}</p>
+                        <p style="margin:5px 0;"><strong>Category:</strong> ${item.category || 'N/A'}</p>
+                        ${item.desc ? `<p style="margin:10px 0; font-size:12px; color:#555; background:#f4f4f4; padding:8px; border-radius:5px;">${item.desc}</p>` : ''}
+                    </div>
+                `,
+                showCancelButton: true, confirmButtonColor: '#d4af37', cancelButtonColor: '#666', confirmButtonText: 'Close', cancelButtonText: '⬅ Back to Users'
+            }).then((result) => { if (result.dismiss === Swal.DismissReason.cancel) { showUsersList(uid); } });
+        }
+
+        function sendNotification() {
+            Swal.fire({
+                title: '📢 Sabhi ko Message bhejein',
+                html: `<input id="notiTitle" class="swal-custom-input" placeholder="Title (Jaise: Diwali Dhamaka!)" style="font-weight:bold;"><textarea id="notiBody" class="swal-custom-input" placeholder="Yahan apna lamba message likhein..." rows="3"></textarea>`,
+                showCancelButton: true, confirmButtonText: 'Send Notification', confirmButtonColor: '#e91e63',
+                preConfirm: () => {
+                    const title = document.getElementById('notiTitle').value.trim(); const body = document.getElementById('notiBody').value.trim();
+                    if (!title || !body) { Swal.showValidationMessage('Title aur Message dono likhna zaroori hai!'); return false; }
+                    return { title: title, body: body, timestamp: new Date().getTime(), readBy: {} };
+                }
+            }).then((res) => { if (res.isConfirmed) { database.ref('global_notification').set(res.value).then(() => { Swal.fire('Sent!', 'Message safaltapoorvak sabhi users ke database mein update kar diya gaya hai.', 'success'); }); } });
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('btn-live').classList.toggle('active-tab', tab === 'live');
+            document.getElementById('btn-archive').classList.toggle('active-tab', tab === 'archive');
+            renderList();
+        }
+
+        function renderList() {
+            const list = document.getElementById('list-container');
+            list.innerHTML = '';
+            let lCount = 0; let sCount = 0;
+            const keys = Object.keys(allProducts).reverse();
+            keys.forEach(id => {
+                const isSold = inventoryStatus[id] ? inventoryStatus[id].isSold : false;
+                if(isSold) sCount++; else lCount++;
+                if ((currentTab === 'live' && !isSold) || (currentTab === 'archive' && isSold)) {
+                    const item = allProducts[id];
+                    let infoBtn = isSold ? `<button class="btn-info" onclick="viewSaleDetails('${id}')" title="Customer Details">👁️</button>` : '';
+                    let editBtn = `<button class="btn-info" onclick="window.editProduct('${id}')" title="Edit Item">✏️</button>`;
+                    let statusAction = !isSold ? `<button class="btn-status" style="background:#e8f5e9; color:#2e7d32" onclick="toggleStatus('${id}', false, '${item.title}')">[SOLD]</button>` : `<button class="btn-restore-icon" onclick="toggleStatus('${id}', true, '${item.title}')" title="Restore Item"><i class="fa-solid fa-rotate-left"></i></button>`;
+                    
+                    let weightText = "";
+                    let cat = (item.category || "").toUpperCase();
+                    if (cat.includes("GEMS") || cat.includes("STONE")) {
+                        weightText = item.ratti ? `Wt: ${item.ratti} Carats` : `Wt: N/A`;
+                    } else {
+                        weightText = item.weight ? `Wt: ${item.weight}gm` : `Wt: 0gm`;
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `<img src="${item.image}" loading="lazy" onload="this.style.opacity=1" class="prod-img" onerror="this.src='https://via.placeholder.com/50';">
+                        <div class="info"><strong>${item.title}</strong><span style="font-size:11px; color:#888;">ID: ${id.toUpperCase()} </span>
+                            <span style="font-size:10px; color:#000000;"> ${weightText} </span></div>
+                        <div class="action-area">${infoBtn}${editBtn}${statusAction}<button class="btn-delete" onclick="deleteItem('${id}', '${item.title}')">🗑️</button></div>`;
+                    list.appendChild(card);
+                }
+            });
+            document.getElementById('live-count').innerText = lCount;
+            document.getElementById('sold-count').innerText = sCount;
+        }
+
+        function toggleStatus(id, currentSold, title) {
+            if (!currentSold) {
+                let d = new Date(); let today = String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+                Swal.fire({
+                    title: 'Sell Details',
+                    html: `<input id="saleName" class="swal-custom-input" placeholder="Customer Name"><input id="salePhone" class="swal-custom-input" placeholder="Phone Number" type="tel"><input id="salePrice" class="swal-custom-input" placeholder="Selling Price (₹)" type="number"><input id="saleDate" class="swal-custom-input" value="${today}">`,
+                    showCancelButton: true, confirmButtonText: 'Save & Mark Sold', confirmButtonColor: '#2e7d32',
+                    preConfirm: () => { return { name: document.getElementById('saleName').value, phone: document.getElementById('salePhone').value, price: document.getElementById('salePrice').value, date: document.getElementById('saleDate').value } }
+                }).then((res) => { if(res.isConfirmed) { Promise.all([database.ref('sales_details/' + id).set(res.value), database.ref('inventory/' + id).update({ isSold: true })]); } });
+            } else {
+                Swal.fire({ title: 'Status?', text: `Restore "${title}" to Live Inventory?`, icon: 'question', showCancelButton: true, confirmButtonColor: '#d4af37' }).then((res) => {
+                    if(res.isConfirmed) { database.ref('inventory/' + id).update({ isSold: false }); }
+                });
+            }
+        }
+
+        function deleteItem(id, title) {
+            Swal.fire({ title: 'Delete?', text: `Item: ${title}`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#c62828' }).then((res) => {
+                if(res.isConfirmed) { database.ref('products/' + id).remove(); database.ref('inventory/' + id).remove(); database.ref('sales_details/' + id).remove(); }
+            });
+        }
+
+          function viewSaleDetails(id) {
+            database.ref('sales_details/' + id).once('value').then(snap => {
+                const data = snap.val();
+                if (data) {
+                    let formattedDate = data.date || 'N/A';
+                    if (data.date && data.date.includes('-')) {
+                        let parts = data.date.split('-');
+                        if(parts.length === 3 && parts[0].length === 4) formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    }
+                    Swal.fire({
+                        title: 'Customer Details',
+                        html: `
+                            <div class="swal-delete-icon" onclick="deleteSaleRecord('${id}')" title="Delete Details">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </div>
+                            <div style="text-align: left; padding: 15px; border: 1px solid #ddd; border-radius: 12px; background: #f9f9f9; margin-top: 10px;">
+                                <p style="margin:8px 0;"><strong><i class="fa-solid fa-user"></i> Name:</strong> ${data.name || 'N/A'}</p>
+                                <p style="margin:8px 0;"><strong><i class="fa-solid fa-phone"></i> Phone:</strong> ${data.phone || 'N/A'}</p>
+                                <p style="margin:8px 0;"><strong><i class="fa-solid fa-indian-rupee-sign"></i> Price:</strong> ${data.price || '0'} ₹ </p>
+                                <p style="margin:8px 0;"><strong><i class="fa-solid fa-calendar-days"></i> Date:</strong> ${formattedDate}</p>
+                            </div>`,
+                        showCancelButton: false,
+                        confirmButtonText: 'Close',
+                        confirmButtonColor: '#666'
+                    });
+                } else { Swal.fire('No Data', 'Is product ki koi sale detail save nahi hai.', 'info'); }
+            });
+        }
+        
+        window.deleteSaleRecord = function(id) {
+            Swal.fire({ 
+                title: 'Delete Karein?', 
+                text: "Kya aap sach mein customer details delete karna chahte hain?", 
+                icon: 'warning', 
+                showCancelButton: true, 
+                confirmButtonColor: '#c62828', 
+                confirmButtonText: 'Haan, Delete karein' 
+            }).then((result) => { 
+                if (result.isConfirmed) { 
+                    database.ref('sales_details/' + id).remove().then(() => {
+                        Swal.fire('Deleted!', 'Customer details delete ho gayi hain.', 'success');
+                    }); 
+                } 
+            });
+        }
+
+        function calculateWeights() {
+            let lw = 0; let sw = 0;
+            Object.keys(allProducts).forEach(id => {
+                let w = parseFloat(allProducts[id].weight) || 0;
+                if(inventoryStatus[id]?.isSold) sw += w; else lw += w;
+            });
+            document.getElementById('live-weight-display').innerText = lw.toFixed(3) + " g";
+            document.getElementById('sold-weight-display').innerText = sw.toFixed(3) + " g";
+        }
+
+        function toggleWeightCalc() {
+            const box = document.getElementById('weight-box');
+            box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+        }
+
+        function downloadBackup() {
+            const rows = Object.keys(allProducts).map(id => {
+                const item = allProducts[id];
+                return {
+                    "ID": id.toUpperCase(),
+                    "Title": item.title || "",
+                    "Category": item.category || "",
+                    "Price": item.price || "",
+                    "Special Discount": item.indDiscount || "",
+                    "Weight": item.weight || "",
+                    "Purity": item.purity || "",
+                    "Normal Metal": item.normalMetal || "",
+                    "Description": item.desc || "",
+                    "Image URL": item.image || "",
+                    "Stone Price": item.stonePrice || "",
+                    "Stone Name": item.stoneName || "",
+                    "Lab Certified": item.certified || "",
+                    "Ratti": item.ratti || "",
+                    "Zodiac": item.zodiac || "",
+                    "Planet": item.planet || "",
+                    "Treatment": item.treatment || "",
+                    "Metal": item.metal || "",
+                    "Finger": item.finger || ""
+                };
+            });
+            const ws = XLSX.utils.json_to_sheet(rows); 
+            const wb = XLSX.utils.book_new(); 
+            XLSX.utils.book_append_sheet(wb, ws, "Stock"); 
+            XLSX.writeFile(wb, "Anamika_Backup.xlsx");
+        }
+
+        function importAndSync() {
+            const file = document.getElementById('excelFile').files[0];
+            if (!file) return; 
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {defval: ""}); 
+                
+                let updates = {};
+                
+                json.forEach((row, index) => { 
+                    if(row.ID) { 
+                        const pId = String(row.ID).trim().toLowerCase().replace(/\s+/g, '');
+                        const existingData = allProducts[pId] || {};
+                        
+                        updates['products/' + pId] = {
+                            ...existingData, 
+                            title: row.Title !== undefined ? String(row.Title) : (existingData.title || ""),
+                            category: row.Category !== undefined ? String(row.Category).trim() : (existingData.category || ""),
+                            price: row.Price !== undefined ? String(row.Price) : (existingData.price || ""),
+                            indDiscount: row["Special Discount"] !== undefined ? String(row["Special Discount"]) : (existingData.indDiscount || ""),
+                            weight: row.Weight !== undefined ? String(row.Weight) : (existingData.weight || ""),
+                            purity: row.Purity !== undefined ? String(row.Purity) : (existingData.purity || ""),
+                            normalMetal: row["Normal Metal"] !== undefined ? String(row["Normal Metal"]) : (existingData.normalMetal || ""),
+                            desc: row.Description !== undefined ? String(row.Description) : (existingData.desc || ""),
+                            image: row["Image URL"] !== undefined ? String(row["Image URL"]) : (existingData.image || ""),
+                            stonePrice: row["Stone Price"] !== undefined ? String(row["Stone Price"]) : (existingData.stonePrice || ""),
+                            stoneName: row["Stone Name"] !== undefined ? String(row["Stone Name"]) : (existingData.stoneName || ""),
+                            certified: row["Lab Certified"] !== undefined ? String(row["Lab Certified"]) : (existingData.certified || ""),
+                            ratti: row.Ratti !== undefined ? String(row.Ratti) : (existingData.ratti || ""),
+                            zodiac: row.Zodiac !== undefined ? String(row.Zodiac) : (existingData.zodiac || ""),
+                            planet: row.Planet !== undefined ? String(row.Planet) : (existingData.planet || ""),
+                            treatment: row.Treatment !== undefined ? String(row.Treatment) : (existingData.treatment || ""),
+                            metal: row.Metal !== undefined ? String(row.Metal) : (existingData.metal || ""),
+                            finger: row.Finger !== undefined ? String(row.Finger) : (existingData.finger || ""),
+                            // NAYA LOGIC: Agar naya item hai to current time aur index daalein, taaki wo list mein sabse upar (latest) dikhe
+                            timestamp: existingData.timestamp || (Date.now() + index) 
+                        };
+                        
+                        if(!inventoryStatus[pId]) {
+                            updates['inventory/' + pId] = { isSold: false };
+                        }
+                    } 
+                });
+                
+                if (Object.keys(updates).length > 0) {
+                    database.ref().update(updates)
+                    .then(() => { Swal.fire('Updated', 'Saara data Excel se safaltapoorvak update ho gaya hai!', 'success'); })
+                    .catch((err) => { Swal.fire('Error', err.message, 'error'); });
+                } else {
+                    Swal.fire('Info', 'Excel sheet mein koi valid item ID nahi mili.', 'info');
+                }
+                
+                document.getElementById('excelFile').value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function smartFilter() {
+            let input = document.getElementById('smartSearch').value.toUpperCase();
+            let cards = document.getElementsByClassName('product-card');
+            for (let card of cards) { card.style.display = card.innerText.toUpperCase().includes(input) ? "" : "none"; }
+        }
+
+        function manageCategoryDiscounts() {
+            let uniqueCategories = [...new Set(Object.values(allProducts).map(p => p.category).filter(Boolean))];
+            
+            if(uniqueCategories.length === 0) {
+                return Swal.fire('No Categories', 'Pehle kuch products add karein jinki category ho.', 'info');
+            }
+
+            database.ref('category_discounts').once('value').then(snap => {
+                let currentDiscounts = snap.val() || {};
+                
+                let html = '<div style="max-height: 60vh; overflow-y: auto; text-align: left;">';
+                html += '<p style="font-size:12px; color:#666; margin-bottom:10px;">Har category ke aage discount percentage (0-100) likhein:</p>';
+
+                uniqueCategories.forEach(cat => {
+                    let disc = currentDiscounts[cat] || '';
+                    html += `
+                        <div style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #f9f9f9; border: 1px solid #eee; border-radius: 8px;">
+                            <strong style="font-size: 14px; color: #333; width: 60%;">${cat}</strong>
+                            <div style="width: 35%; display: flex; align-items: center;">
+                                <input type="number" id="disc_${cat.replace(/\s+/g, '_')}" class="swal-custom-input" placeholder="%" value="${disc}" style="margin: 0; text-align: center; width: 100%;">
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+
+                Swal.fire({
+                    title: '🏷️ Category Discounts',
+                    html: html,
+                    showCancelButton: true,
+                    confirmButtonText: 'Save Discounts',
+                    confirmButtonColor: '#ff7043',
+                    preConfirm: () => {
+                        let newDiscounts = {};
+                        uniqueCategories.forEach(cat => {
+                            let val = document.getElementById(`disc_${cat.replace(/\s+/g, '_')}`).value.trim();
+                            if(val && val > 0) {
+                                newDiscounts[cat] = parseFloat(val);
+                            }
+                        });
+                        return newDiscounts;
+                    }
+                }).then(res => {
+                    if(res.isConfirmed) {
+                        database.ref('category_discounts').set(res.value)
+                        .then(() => Swal.fire('Saved!', 'Sabhi discounts update ho gaye hain.', 'success'))
+                        .catch(err => Swal.fire('Error', err.message, 'error'));
+                    }
+                });
+            });
+        }
+
+    </script>
+</body>
+</html>

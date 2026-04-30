@@ -1064,8 +1064,31 @@ normalMetal: document.getElementById('addNormalMetal').value,
             const ws = XLSX.utils.json_to_sheet(rows); 
             const wb = XLSX.utils.book_new(); 
             XLSX.utils.book_append_sheet(wb, ws, "Stock"); 
+                    try {
+            // Excel file ko memory (buffer) me banaya
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const file = new File([blob], "Anamika_Backup.xlsx", { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+            // Check karega ki kya phone 'Share' (WhatsApp, Drive, File Manager) support karta hai
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                navigator.share({
+                    files: [file],
+                    title: 'Anamika Backup',
+                    text: 'Aapke sabhi products ka backup yahan hai.'
+                }).catch((error) => {
+                    // Agar user ne share cancel kar diya ya error aayi, to normal download try karega
+                    XLSX.writeFile(wb, "Anamika_Backup.xlsx");
+                });
+            } else {
+                // PC ya Chrome browser ke liye normal download
+                XLSX.writeFile(wb, "Anamika_Backup.xlsx");
+            }
+        } catch (error) {
+            // Kisi wajah se fail hua to purana download tarika use karega
             XLSX.writeFile(wb, "Anamika_Backup.xlsx");
         }
+      }
 
         function importAndSync() {
             const file = document.getElementById('excelFile').files[0];
